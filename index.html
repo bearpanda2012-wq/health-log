@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>บันทึกสุขภาพ</title>
+<meta name="theme-color" content="#d6334f">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="บันทึกสุขภาพ">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f5f6f8;--card:#fff;--ink:#16191d;--muted:#6b7280;--line:#e5e7eb;
+  --accent:#d6334f;--accent-soft:#fde8ec;--field:#f9fafb;
+  --good:#12a150;--ok:#2f80ed;--hn:#d98a06;--h1:#ea580c;--h2:#dc2626;--crit:#9f1239;--low:#7c3aed;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1115;--card:#181b21;--ink:#eceef2;--muted:#9aa1ad;--line:#2a2f38;
+  --accent:#f0566f;--accent-soft:#3a1d24;--field:#1f232b;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  font-size:16px;line-height:1.5;padding-bottom:84px;-webkit-tap-highlight-color:transparent}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line)}
+header h1{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}
+header h1 .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.status{font-size:12px;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:3px 10px;border-radius:99px;white-space:nowrap}
+.status.on{color:var(--good)}
+main{max-width:640px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.card h2{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.card h2 small{font-weight:400;color:var(--muted);font-size:13px}
+label.f{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);
+  border-radius:10px;padding:10px 12px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:64px}
+.bp{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.bp input{font-size:28px;font-weight:700;text-align:center;padding:10px 4px}
+.bp label.f{text-align:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row{margin-top:12px}
+.seg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg input{display:none}
+.seg label{flex:1;text-align:center;padding:7px 4px;border-radius:8px;font-size:14px;cursor:pointer;color:var(--muted)}
+.seg input:checked+label{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.badge{display:inline-block;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;color:#fff}
+.b-good{background:var(--good)}.b-ok{background:var(--ok)}.b-hn{background:var(--hn)}.b-h1{background:var(--h1)}
+.b-h2{background:var(--h2)}.b-crit{background:var(--crit)}.b-low{background:var(--low)}
+#bpLive{margin-top:12px;min-height:26px;text-align:center}
+.warn{margin-top:10px;background:var(--accent-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px;display:none}
+details summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+details summary::after{content:'＋';color:var(--muted)}
+details[open] summary::after{content:'－'}
+details[open] summary{margin-bottom:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips input{display:none}
+.chips label{font-size:13px;padding:5px 12px;border-radius:99px;border:1px solid var(--line);background:var(--field);cursor:pointer}
+.chips input:checked+label{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.check{display:flex;align-items:center;gap:10px;font-size:15px;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+.btn{width:100%;font:inherit;font-weight:600;font-size:17px;border:0;border-radius:12px;padding:14px;
+  background:var(--accent);color:#fff;cursor:pointer}
+.btn:disabled{opacity:.6}
+.last{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.last .big{font-size:26px;font-weight:700}
+.muted{color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--field);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:20px}
+.day{font-size:13px;color:var(--muted);font-weight:600;margin:16px 4px 6px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.item .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.item .v{font-size:20px;font-weight:700}
+.item .v span{font-size:14px;font-weight:400;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:12px;background:var(--field);border:1px solid var(--line);border-radius:8px;padding:2px 8px}
+.note{font-size:13px;color:var(--muted);margin-top:6px;white-space:pre-wrap}
+.del{font:inherit;font-size:12px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:3px 10px;cursor:pointer}
+.btn2.confirm,.del.confirm{border-color:var(--h2);color:#fff;background:var(--h2)}
+.filters{display:flex;gap:8px;margin-bottom:12px}
+.chartbox{position:relative;height:300px}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);
+  display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:6}
+nav button{flex:1;font:inherit;font-size:13px;background:none;border:0;color:var(--muted);padding:6px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button .i{font-size:20px;line-height:1}
+nav button.on{color:var(--accent);font-weight:600}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);
+  padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:9;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.status{cursor:pointer;font:inherit;font-size:12px}
+.btn2{font:inherit;font-weight:600;font-size:15px;border:1px solid var(--line);border-radius:12px;padding:11px 14px;background:var(--field);color:var(--ink);cursor:pointer}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btnrow .btn{flex:1;font-size:15px;padding:11px}
+.steps{padding-left:20px;font-size:14px;color:var(--muted)}
+.steps li{margin-bottom:6px}
+.steps code,.mono{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--field);border:1px solid var(--line);border-radius:6px;padding:1px 6px;word-break:break-all;color:var(--ink)}
+.msg{margin-top:10px;font-size:14px}
+.msg.ok{color:var(--good)}.msg.bad{color:var(--h2)}
+.banner{background:var(--accent-soft);border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.banner button{font:inherit;font-size:13px;font-weight:600;border:0;border-radius:8px;padding:6px 12px;background:var(--accent);color:#fff;cursor:pointer;white-space:nowrap}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="dot"></span>บันทึกสุขภาพ</h1>
+  <button class="status" id="status" type="button">กำลังโหลด…</button>
+</header>
+
+<main>
+  <!-- ===== บันทึก ===== -->
+  <section id="tab-add">
+    <div class="banner" id="demoBanner" hidden><span>โหมดทดลอง: ข้อมูลเก็บแค่ในเครื่องนี้</span><button type="button" data-go="settings">เชื่อม Google Sheets</button></div>
+    <div class="card" id="lastCard" hidden></div>
+
+    <form id="form" autocomplete="off">
+      <div class="card">
+        <h2>ความดันโลหิต <small>mmHg</small></h2>
+        <div class="bp">
+          <div><label class="f" for="sys">ตัวบน</label><input id="sys" type="number" inputmode="numeric" placeholder="120"></div>
+          <div><label class="f" for="dia">ตัวล่าง</label><input id="dia" type="number" inputmode="numeric" placeholder="80"></div>
+          <div><label class="f" for="pulse">ชีพจร</label><input id="pulse" type="number" inputmode="numeric" placeholder="72"></div>
+        </div>
+        <div id="bpLive"></div>
+        <div class="warn" id="bpWarn">ค่าสูงมาก ให้นั่งพัก 5 นาทีแล้ววัดซ้ำ ถ้ายังสูงและมีอาการเจ็บหน้าอก ปวดหัวรุนแรง แขนขาอ่อนแรง พูดไม่ชัด หรือตามัว ให้โทร <b>1669</b> หรือไปโรงพยาบาลทันที</div>
+        <div class="grid2 row">
+          <div><label class="f">แขน</label>
+            <div class="seg"><input type="radio" name="arm" id="armL" value="ซ้าย" checked><label for="armL">ซ้าย</label><input type="radio" name="arm" id="armR" value="ขวา"><label for="armR">ขวา</label></div>
+          </div>
+          <div><label class="f">ท่า</label>
+            <div class="seg"><input type="radio" name="posture" id="pS" value="นั่ง" checked><label for="pS">นั่ง</label><input type="radio" name="posture" id="pL" value="นอน"><label for="pL">นอน</label><input type="radio" name="posture" id="pU" value="ยืน"><label for="pU">ยืน</label></div>
+          </div>
+        </div>
+        <div class="row"><label class="f" for="datetime">วันเวลาที่วัด</label><input id="datetime" type="datetime-local"></div>
+      </div>
+
+      <div class="card">
+        <details id="more">
+          <summary>สุขภาพอื่นๆ</summary>
+          <div class="grid2">
+            <div><label class="f" for="weight">น้ำหนัก (กก.)</label><input id="weight" type="number" step="0.1" inputmode="decimal"></div>
+            <div><label class="f" for="temp">อุณหภูมิ (°C)</label><input id="temp" type="number" step="0.1" inputmode="decimal"></div>
+            <div><label class="f" for="sugar">น้ำตาลในเลือด (mg/dL)</label><input id="sugar" type="number" inputmode="numeric"></div>
+            <div><label class="f" for="sugarTiming">ช่วงที่วัดน้ำตาล</label>
+              <select id="sugarTiming"><option value="งดอาหาร">งดอาหาร (เช้า)</option><option value="ก่อนอาหาร">ก่อนอาหาร</option><option value="หลังอาหาร 2 ชม.">หลังอาหาร 2 ชม.</option><option value="สุ่ม">สุ่ม</option></select></div>
+            <div><label class="f" for="spo2">ออกซิเจน SpO2 (%)</label><input id="spo2" type="number" inputmode="numeric"></div>
+            <div><label class="f" for="sleep">นอน (ชม.)</label><input id="sleep" type="number" step="0.5" inputmode="decimal"></div>
+          </div>
+          <div class="row"><label class="check"><input type="checkbox" id="med"> กินยาประจำวันแล้ว</label></div>
+          <div class="row"><label class="f">อาการ</label>
+            <div class="chips" id="symChips"></div>
+          </div>
+          <div class="row"><label class="f" for="note">โน้ต</label><textarea id="note" placeholder="เช่น ดื่มกาแฟก่อนวัด, นอนน้อย, เครียด"></textarea></div>
+        </details>
+      </div>
+
+      <button class="btn" id="saveBtn" type="submit">บันทึก</button>
+    </form>
+  </section>
+
+  <!-- ===== ประวัติ ===== -->
+  <section id="tab-history" hidden>
+    <div class="filters">
+      <select id="histRange"><option value="7">7 วัน</option><option value="30" selected>30 วัน</option><option value="90">90 วัน</option><option value="0">ทั้งหมด</option></select>
+    </div>
+    <div class="card" id="summary"></div>
+    <div id="list"></div>
+  </section>
+
+  <!-- ===== กราฟ ===== -->
+  <section id="tab-chart" hidden>
+    <div class="filters">
+      <select id="metric">
+        <option value="bp">ความดัน</option><option value="pulse">ชีพจร</option><option value="weight">น้ำหนัก</option>
+        <option value="sugar">น้ำตาล</option><option value="temp">อุณหภูมิ</option><option value="spo2">SpO2</option><option value="sleep">การนอน</option>
+      </select>
+      <select id="chartRange"><option value="7">7 วัน</option><option value="30" selected>30 วัน</option><option value="90">90 วัน</option><option value="0">ทั้งหมด</option></select>
+    </div>
+    <div class="card"><div class="chartbox"><canvas id="chart"></canvas></div><div id="chartEmpty" class="empty" hidden>ยังไม่มีข้อมูลในช่วงนี้</div></div>
+    <div class="card muted" id="legendNote"></div>
+  </section>
+
+  <!-- ===== ตั้งค่า ===== -->
+  <section id="tab-settings" hidden>
+    <div class="card">
+      <h2>เชื่อมกับ Google Sheets</h2>
+      <label class="f" for="cfgUrl">Web App URL (จาก Apps Script)</label>
+      <input id="cfgUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" spellcheck="false">
+      <div class="row"><label class="f" for="cfgKey">รหัสลับ (API key)</label>
+        <input id="cfgKey" type="password" placeholder="ได้จาก setup() ใน Apps Script" autocomplete="off" spellcheck="false"></div>
+      <div class="btnrow">
+        <button class="btn" type="button" id="cfgSave">ทดสอบและบันทึก</button>
+        <button class="btn2" type="button" id="cfgClear">ยกเลิกการเชื่อม</button>
+      </div>
+      <div class="msg" id="cfgMsg"></div>
+    </div>
+
+    <div class="card" id="phoneCard" hidden>
+      <h2>ใช้บนเครื่องอื่น</h2>
+      <p class="muted">คัดลอกลิงก์นี้ไปเปิดบนมือถือ แอปจะตั้งค่าให้อัตโนมัติ ลิงก์นี้มีรหัสลับอยู่ข้างใน ห้ามส่งให้คนอื่น</p>
+      <div class="btnrow"><button class="btn2" type="button" id="copyLink">คัดลอกลิงก์ตั้งค่า</button></div>
+    </div>
+
+    <div class="card">
+      <h2>วิธีตั้งค่า (ครั้งเดียว)</h2>
+      <ol class="steps">
+        <li>สร้าง Google Sheet ใหม่ → เมนู <b>ส่วนขยาย → Apps Script</b></li>
+        <li>วางโค้ดจากไฟล์ <a href="https://github.com/bearpanda2012-wq/health-log/blob/main/apps-script/Code.gs" target="_blank" rel="noopener"><code>apps-script/Code.gs</code></a> → บันทึก</li>
+        <li>เลือกฟังก์ชัน <code>setup</code> → <b>Run</b> → อนุญาตสิทธิ์ → คัดลอก <b>รหัสลับ</b> จาก Execution log</li>
+        <li><b>Deploy → New deployment → Web app</b><br>Execute as: <b>Me</b> · Who has access: <b>Anyone</b></li>
+        <li>คัดลอก <b>Web App URL</b> (ลงท้ายด้วย <code>/exec</code>) มาใส่ด้านบนพร้อมรหัสลับ</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>ส่งออก</h2>
+      <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
+      <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button data-tab="add" class="on"><span class="i">＋</span>บันทึก</button>
+  <button data-tab="history"><span class="i">☰</span>ประวัติ</button>
+  <button data-tab="chart"><span class="i">📈</span>กราฟ</button>
+  <button data-tab="settings"><span class="i">⚙︎</span>ตั้งค่า</button>
+</nav>
+<div id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const SYMPTOMS = ['ปวดหัว','เวียนหัว','ใจสั่น','เหนื่อยง่าย','เจ็บหน้าอก','ตาพร่า','คลื่นไส้','บวม'];
+let records = [];
+let chart = null;
+
+/* ---------- ข้อมูล: Google Sheets หรือโหมดทดลอง ---------- */
+const mem = { data: null };
+const demo = {
+  load(){ if (mem.data) return mem.data; try { mem.data = JSON.parse(localStorage.getItem('hl_demo') || '[]'); } catch(e){ mem.data = []; } return mem.data; },
+  save(){ try { localStorage.setItem('hl_demo', JSON.stringify(mem.data)); } catch(e){} },
+  getRecords(){ return this.load().slice(); },
+  addRecord(r){ const id = 'd' + Date.now() + Math.random().toString(36).slice(2,6);
+    this.load().push(Object.assign({}, r, { id, med: r.med ? 'ใช่' : null, createdAt: new Date().toISOString() })); this.save(); return { ok:true, id }; },
+  deleteRecord(id){ const d = this.load(); const i = d.findIndex(x => x.id === id); if (i >= 0) d.splice(i,1); this.save(); return { ok: i >= 0 }; }
+};
+/* ---------- การตั้งค่าการเชื่อมต่อ (เก็บในเครื่องนี้) ---------- */
+const store = {
+  mem: {},
+  get(k){ try { const v = localStorage.getItem(k); return v === null ? (this.mem[k] ?? null) : v; } catch(e){ return this.mem[k] ?? null; } },
+  set(k, v){ this.mem[k] = v; try { localStorage.setItem(k, v); } catch(e){} },
+  del(k){ delete this.mem[k]; try { localStorage.removeItem(k); } catch(e){} }
+};
+function getCfg(){ try { const c = JSON.parse(store.get('hl_cfg') || 'null'); return c && c.url && c.key ? c : null; } catch(e){ return null; } }
+function setCfg(c){ c ? store.set('hl_cfg', JSON.stringify(c)) : store.del('hl_cfg'); }
+const isLive = () => !!getCfg();
+
+const ERR_TH = {
+  bad_key: 'รหัสลับไม่ถูกต้อง',
+  not_setup: 'ยังไม่ได้รัน setup() ใน Apps Script',
+  unknown_action: 'เวอร์ชันสคริปต์ไม่ตรง ลอง Deploy ใหม่',
+  not_found: 'ไม่พบรายการนี้ในชีต'
+};
+
+async function remote(cfg, action, payload){
+  let resp;
+  if (action === 'list' || action === 'ping') {
+    const u = cfg.url + (cfg.url.includes('?') ? '&' : '?') + 'action=' + action + '&key=' + encodeURIComponent(cfg.key) + '&t=' + Date.now();
+    resp = await fetch(u, { redirect: 'follow' });
+  } else {
+    // text/plain = simple request ไม่มี CORS preflight (Apps Script ไม่รองรับ OPTIONS)
+    resp = await fetch(cfg.url, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({ action, key: cfg.key }, payload)) });
+  }
+  const text = await resp.text();
+  let data;
+  try { data = JSON.parse(text); }
+  catch(e){ throw new Error(/<html/i.test(text) ? 'URL ไม่ถูกต้อง หรือยังไม่ได้ตั้ง Who has access เป็น Anyone' : 'ตอบกลับผิดรูปแบบ'); }
+  if (!data.ok) throw new Error(ERR_TH[data.error] || data.error || 'เกิดข้อผิดพลาด');
+  return data;
+}
+
+async function api(fn, arg){
+  const cfg = getCfg();
+  if (!cfg) {
+    await new Promise(r => setTimeout(r, 80));
+    return demo[fn](arg);
+  }
+  if (fn === 'getRecords') return (await remote(cfg, 'list')).records;
+  if (fn === 'addRecord')  return remote(cfg, 'add', { record: arg });
+  if (fn === 'deleteRecord') return remote(cfg, 'delete', { id: arg });
+}
+
+/* ---------- ตัวช่วย ---------- */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const has = v => v !== null && v !== undefined && v !== '';
+const pad = n => String(n).padStart(2,'0');
+function localInput(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function num(id){ const v = $('#'+id).value.trim(); if (v === '') return null; const n = Number(v); return isFinite(n) ? n : null; }
+function fmtDay(d){ return d.toLocaleDateString('th-TH', { weekday:'short', day:'numeric', month:'short', year:'2-digit' }); }
+function fmtTime(d){ return d.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' }); }
+function fmtShort(d){ return d.toLocaleDateString('th-TH', { day:'numeric', month:'short' }); }
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2400); }
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+/* เกณฑ์ความดัน (ผู้ใหญ่ วัดที่บ้าน/คลินิก ตามแนวทางสมาคมความดันโลหิตสูงแห่งประเทศไทย) */
+function bpClass(s, d){
+  if (!has(s) || !has(d)) return null;
+  if (s >= 180 || d >= 110) return { t:'สูงมาก (ระดับ 3)', c:'crit' };
+  if (s >= 160 || d >= 100) return { t:'สูง ระดับ 2', c:'h2' };
+  if (s >= 140 || d >= 90)  return { t:'สูง ระดับ 1', c:'h1' };
+  if (s >= 130 || d >= 85)  return { t:'ค่อนข้างสูง', c:'hn' };
+  if (s < 90 || d < 60)     return { t:'ต่ำ', c:'low' };
+  if (s >= 120 || d >= 80)  return { t:'ปกติ', c:'ok' };
+  return { t:'เหมาะสม', c:'good' };
+}
+const badge = c => c ? `<span class="badge b-${c.c}">${c.t}</span>` : '';
+
+function inRange(days){
+  if (!days) return records;
+  const from = Date.now() - days * 864e5;
+  return records.filter(r => new Date(r.datetime).getTime() >= from);
+}
+
+/* ---------- ฟอร์ม ---------- */
+$('#symChips').innerHTML = SYMPTOMS.map((s,i) => `<input type="checkbox" id="sy${i}" value="${s}"><label for="sy${i}">${s}</label>`).join('');
+
+function updateLive(){
+  const c = bpClass(num('sys'), num('dia'));
+  $('#bpLive').innerHTML = badge(c);
+  $('#bpWarn').style.display = c && c.c === 'crit' ? 'block' : 'none';
+}
+['sys','dia'].forEach(id => $('#'+id).addEventListener('input', updateLive));
+
+function resetForm(){
+  ['sys','dia','pulse','weight','temp','sugar','spo2','sleep','note'].forEach(id => $('#'+id).value = '');
+  document.querySelectorAll('#symChips input').forEach(i => i.checked = false);
+  $('#med').checked = false;
+  $('#datetime').value = localInput(new Date());
+  updateLive();
+}
+
+function validate(r){
+  const rng = (v, lo, hi, name) => has(v) && (v < lo || v > hi) ? `${name} ควรอยู่ระหว่าง ${lo}–${hi}` : null;
+  if (has(r.sys) !== has(r.dia)) return 'กรอกตัวบนและตัวล่างให้ครบทั้งคู่';
+  if (has(r.sys) && r.sys <= r.dia) return 'ตัวบนต้องมากกว่าตัวล่าง';
+  const errs = [rng(r.sys,60,280,'ตัวบน'), rng(r.dia,30,180,'ตัวล่าง'), rng(r.pulse,25,250,'ชีพจร'),
+    rng(r.weight,2,400,'น้ำหนัก'), rng(r.temp,30,45,'อุณหภูมิ'), rng(r.sugar,10,800,'น้ำตาล'),
+    rng(r.spo2,50,100,'SpO2'), rng(r.sleep,0,24,'ชั่วโมงนอน')].filter(Boolean);
+  if (errs.length) return errs[0];
+  const any = ['sys','pulse','weight','temp','sugar','spo2','sleep'].some(k => has(r[k])) || r.med || r.symptoms || r.note;
+  return any ? null : 'ยังไม่ได้กรอกค่าอะไรเลย';
+}
+
+$('#form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const dtVal = $('#datetime').value;
+  const syms = [...document.querySelectorAll('#symChips input:checked')].map(i => i.value).join(', ');
+  const r = {
+    datetime: (dtVal ? new Date(dtVal) : new Date()).toISOString(),
+    sys: num('sys'), dia: num('dia'), pulse: num('pulse'),
+    arm: null, posture: null,
+    weight: num('weight'), sugar: num('sugar'), sugarTiming: null,
+    temp: num('temp'), spo2: num('spo2'), sleep: num('sleep'),
+    med: $('#med').checked, symptoms: syms || null, note: $('#note').value.trim() || null
+  };
+  if (has(r.sys) || has(r.pulse)) {
+    r.arm = document.querySelector('input[name=arm]:checked').value;
+    r.posture = document.querySelector('input[name=posture]:checked').value;
+  }
+  if (has(r.sugar)) r.sugarTiming = $('#sugarTiming').value;
+  const err = validate(r);
+  if (err) return toast(err);
+
+  const btn = $('#saveBtn'); btn.disabled = true; btn.textContent = 'กำลังบันทึก…';
+  try {
+    const res = await api('addRecord', r);
+    records.unshift(Object.assign({}, r, { id: res.id, med: r.med ? 'ใช่' : null }));
+    sortRecords();
+    if (r.arm) store.set('hl_prefs', JSON.stringify({ arm: r.arm, posture: r.posture }));
+    resetForm(); renderAll();
+    toast('บันทึกแล้ว ✓');
+  } catch(e) {
+    toast('บันทึกไม่สำเร็จ: ' + (e && e.message || e));
+  } finally { btn.disabled = false; btn.textContent = 'บันทึก'; }
+});
+
+/* ---------- แสดงผล ---------- */
+function sortRecords(){ records.sort((a,b) => new Date(b.datetime) - new Date(a.datetime)); }
+
+function tagsFor(r){
+  const t = [];
+  if (has(r.pulse) && !has(r.sys)) t.push(`ชีพจร ${r.pulse}`);
+  if (has(r.weight)) t.push(`⚖️ ${r.weight} กก.`);
+  if (has(r.sugar)) t.push(`🩸 ${r.sugar} mg/dL${r.sugarTiming ? ' · ' + r.sugarTiming : ''}`);
+  if (has(r.temp)) t.push(`🌡️ ${r.temp}°C`);
+  if (has(r.spo2)) t.push(`O₂ ${r.spo2}%`);
+  if (has(r.sleep)) t.push(`😴 ${r.sleep} ชม.`);
+  if (r.med === 'ใช่' || r.med === true) t.push('💊 กินยาแล้ว');
+  if (has(r.symptoms)) t.push(`⚠️ ${r.symptoms}`);
+  if (has(r.sys) && (r.arm || r.posture)) t.push([r.arm && 'แขน'+r.arm, r.posture].filter(Boolean).join(' · '));
+  return t.map(x => `<span class="tag">${esc(x)}</span>`).join('');
+}
+
+function itemHTML(r){
+  const d = new Date(r.datetime);
+  const bp = has(r.sys) ? `<div class="v">${r.sys}/${r.dia}${has(r.pulse) ? ` <span>ชีพจร ${r.pulse}</span>` : ''}</div>` : `<div class="v"><span>${fmtTime(d)}</span></div>`;
+  return `<div class="item">
+    <div class="top"><div>${has(r.sys) ? `<div class="muted">${fmtTime(d)}</div>` : ''}${bp}</div>
+      <div style="text-align:right">${badge(bpClass(r.sys, r.dia))}<div style="margin-top:6px"><button class="del" data-id="${esc(r.id)}">ลบ</button></div></div></div>
+    <div class="tags">${tagsFor(r)}</div>
+    ${has(r.note) ? `<div class="note">${esc(r.note)}</div>` : ''}
+  </div>`;
+}
+
+function renderLast(){
+  const last = records.find(r => has(r.sys));
+  const el = $('#lastCard');
+  if (!last) { el.hidden = true; return; }
+  const d = new Date(last.datetime);
+  el.hidden = false;
+  el.innerHTML = `<div class="last"><div><div class="muted">ค่าความดันล่าสุด · ${fmtShort(d)} ${fmtTime(d)}</div>
+    <div class="big">${last.sys}/${last.dia}${has(last.pulse) ? ` <span class="muted">ชีพจร ${last.pulse}</span>` : ''}</div></div>${badge(bpClass(last.sys, last.dia))}</div>`;
+}
+
+function avg(arr){ return arr.length ? arr.reduce((a,b) => a + b, 0) / arr.length : null; }
+
+function renderHistory(){
+  const days = +$('#histRange').value;
+  const rows = inRange(days);
+  const bp = rows.filter(r => has(r.sys));
+  const aS = avg(bp.map(r => +r.sys)), aD = avg(bp.map(r => +r.dia));
+  const pul = rows.filter(r => has(r.pulse)).map(r => +r.pulse);
+  const high = bp.filter(r => r.sys >= 140 || r.dia >= 90).length;
+  const w = rows.filter(r => has(r.weight));
+  $('#summary').innerHTML = `<h2>สรุป <small>${days ? days + ' วันล่าสุด' : 'ทั้งหมด'} · ${rows.length} รายการ</small></h2>
+    <div class="stats">
+      <div class="stat"><span class="muted">ความดันเฉลี่ย</span><b>${aS ? Math.round(aS) + '/' + Math.round(aD) : '–'}</b>${aS ? badge(bpClass(aS, aD)) : ''}</div>
+      <div class="stat"><span class="muted">ชีพจรเฉลี่ย</span><b>${pul.length ? Math.round(avg(pul)) : '–'}</b></div>
+      <div class="stat"><span class="muted">ครั้งที่ ≥ 140/90</span><b>${bp.length ? `${high} <span class="muted">(${Math.round(high / bp.length * 100)}%)</span>` : '–'}</b></div>
+      <div class="stat"><span class="muted">น้ำหนักล่าสุด</span><b>${w.length ? w[0].weight + ' กก.' : '–'}</b></div>
+    </div>`;
+  if (!rows.length) { $('#list').innerHTML = '<div class="empty">ยังไม่มีบันทึกในช่วงนี้</div>'; return; }
+  let html = '', lastDay = '';
+  rows.forEach(r => {
+    const day = fmtDay(new Date(r.datetime));
+    if (day !== lastDay) { html += `<div class="day">${day}</div>`; lastDay = day; }
+    html += itemHTML(r);
+  });
+  $('#list').innerHTML = html;
+}
+
+$('#list').addEventListener('click', async e => {
+  const b = e.target.closest('.del'); if (!b) return;
+  if (!b.classList.contains('confirm')) {
+    b.classList.add('confirm'); b.textContent = 'ยืนยันลบ?';
+    setTimeout(() => { b.classList.remove('confirm'); b.textContent = 'ลบ'; }, 3000);
+    return;
+  }
+  b.disabled = true; b.textContent = 'กำลังลบ…';
+  try {
+    await api('deleteRecord', b.dataset.id);
+    records = records.filter(r => r.id !== b.dataset.id);
+    renderAll(); toast('ลบแล้ว');
+  } catch(err) { toast('ลบไม่สำเร็จ'); b.disabled = false; b.textContent = 'ลบ'; }
+});
+
+const METRICS = {
+  bp:     { label:'ความดัน (mmHg)', note:'เส้นประ = เกณฑ์ความดันสูง 140/90 mmHg' },
+  pulse:  { key:'pulse',  label:'ชีพจร (ครั้ง/นาที)', note:'ชีพจรขณะพักของผู้ใหญ่ส่วนใหญ่อยู่ราว 60–100 ครั้ง/นาที' },
+  weight: { key:'weight', label:'น้ำหนัก (กก.)', note:'ชั่งเวลาเดิมทุกวัน เช่น ตอนเช้าหลังเข้าห้องน้ำ จะเทียบได้แม่นกว่า' },
+  sugar:  { key:'sugar',  label:'น้ำตาล (mg/dL)', note:'ค่างดอาหารปกติมักต่ำกว่า 100 mg/dL · ค่าเป้าหมายของแต่ละคนควรถามแพทย์' },
+  temp:   { key:'temp',   label:'อุณหภูมิ (°C)', note:'ตั้งแต่ราว 37.5°C ขึ้นไปถือว่ามีไข้' },
+  spo2:   { key:'spo2',   label:'SpO2 (%)', note:'ปกติมักอยู่ 95–100% ถ้าต่ำกว่า 94% ต่อเนื่องควรปรึกษาแพทย์' },
+  sleep:  { key:'sleep',  label:'การนอน (ชม.)', note:'ผู้ใหญ่ส่วนใหญ่ต้องการนอนราว 7–9 ชั่วโมง' }
+};
+
+function drawChart(){
+  const m = $('#metric').value, days = +$('#chartRange').value, cfg = METRICS[m];
+  $('#legendNote').textContent = cfg.note;
+  const rows = inRange(days).filter(r => m === 'bp' ? has(r.sys) : has(r[cfg.key])).slice().reverse();
+  const empty = !rows.length;
+  $('#chartEmpty').hidden = !empty; $('#chart').parentElement.style.display = empty ? 'none' : '';
+  if (chart) { chart.destroy(); chart = null; }
+  if (empty) return;
+  if (!window.Chart) { $('#chartEmpty').hidden = false; $('#chartEmpty').textContent = 'โหลดไลบรารีกราฟไม่ได้ ตรวจสอบอินเทอร์เน็ต'; return; }
+  const labels = rows.map(r => { const d = new Date(r.datetime); return fmtShort(d) + ' ' + fmtTime(d); });
+  const accent = cssVar('--accent'), ok = cssVar('--ok'), muted = cssVar('--muted'), line = cssVar('--line');
+  const ds = (label, data, color, extra) => Object.assign({ label, data, borderColor: color, backgroundColor: color, tension: .3, pointRadius: 3, borderWidth: 2, spanGaps: true }, extra || {});
+  let datasets;
+  if (m === 'bp') {
+    datasets = [
+      ds('ตัวบน', rows.map(r => +r.sys), accent),
+      ds('ตัวล่าง', rows.map(r => +r.dia), ok),
+      ds('140', rows.map(() => 140), accent, { borderDash:[5,5], borderWidth:1, pointRadius:0, tension:0 }),
+      ds('90', rows.map(() => 90), ok, { borderDash:[5,5], borderWidth:1, pointRadius:0, tension:0 })
+    ];
+  } else {
+    datasets = [ds(cfg.label, rows.map(r => +r[cfg.key]), accent)];
+  }
+  chart = new Chart($('#chart'), {
+    type: 'line', data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: muted, filter: i => !['140','90'].includes(i.text) } } },
+      scales: {
+        x: { ticks: { color: muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 6, callback(v){ return this.getLabelForValue(v).split(' ')[0] + ' ' + this.getLabelForValue(v).split(' ')[1]; } }, grid: { color: line } },
+        y: { ticks: { color: muted }, grid: { color: line } }
+      }
+    }
+  });
+}
+
+function renderAll(){
+  renderLast(); renderHistory();
+  if (!$('#tab-chart').hidden) drawChart();
+}
+
+['histRange'].forEach(id => $('#'+id).addEventListener('change', renderHistory));
+['metric','chartRange'].forEach(id => $('#'+id).addEventListener('change', drawChart));
+
+function goTab(tab){
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.tab === tab));
+  ['add','history','chart','settings'].forEach(t => $('#tab-' + t).hidden = t !== tab);
+  window.scrollTo(0, 0);
+  if (tab === 'chart') drawChart();
+  if (tab === 'settings') fillSettings();
+}
+document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => goTab(b.dataset.tab)));
+document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) goTab(g.dataset.go); });
+$('#status').addEventListener('click', () => goTab('settings'));
+
+/* ---------- ตั้งค่า ---------- */
+function fillSettings(){
+  const c = getCfg();
+  $('#cfgUrl').value = c ? c.url : '';
+  $('#cfgKey').value = c ? c.key : '';
+  $('#phoneCard').hidden = !c;
+  $('#cfgClear').hidden = !c;
+}
+function setMsg(t, cls){ const m = $('#cfgMsg'); m.textContent = t; m.className = 'msg ' + (cls || ''); }
+
+$('#cfgSave').addEventListener('click', async () => {
+  const url = $('#cfgUrl').value.trim(), key = $('#cfgKey').value.trim();
+  if (!/^https:\/\/script\.google(usercontent)?\.com\/.+\/exec/.test(url)) return setMsg('URL ต้องขึ้นต้นด้วย https://script.google.com/… และลงท้ายด้วย /exec', 'bad');
+  if (!key) return setMsg('ใส่รหัสลับด้วยครับ', 'bad');
+  const b = $('#cfgSave'); b.disabled = true; setMsg('กำลังทดสอบ…');
+  try {
+    await remote({ url, key }, 'ping');
+    setCfg({ url, key });
+    setMsg('เชื่อมต่อสำเร็จ ✓', 'ok');
+    fillSettings();
+    await loadRecords();
+  } catch(e) { setMsg('เชื่อมต่อไม่ได้: ' + e.message, 'bad'); }
+  finally { b.disabled = false; }
+});
+
+$('#cfgClear').addEventListener('click', async () => {
+  const b = $('#cfgClear');
+  if (!b.classList.contains('confirm')) { b.classList.add('confirm'); b.textContent = 'แน่ใจ? กดอีกครั้ง'; setTimeout(() => { b.classList.remove('confirm'); b.textContent = 'ยกเลิกการเชื่อม'; }, 3000); return; }
+  b.classList.remove('confirm'); b.textContent = 'ยกเลิกการเชื่อม';
+  setCfg(null); fillSettings(); setMsg('ยกเลิกแล้ว ข้อมูลในชีตยังอยู่ครบ');
+  await loadRecords();
+});
+
+$('#copyLink').addEventListener('click', async () => {
+  const c = getCfg(); if (!c) return;
+  const link = location.origin + location.pathname + '#setup=' + encodeURIComponent(btoa(JSON.stringify(c)));
+  try { await navigator.clipboard.writeText(link); toast('คัดลอกลิงก์แล้ว — เปิดบนมือถือได้เลย'); }
+  catch(e) { prompt('คัดลอกลิงก์นี้:', link); }
+});
+
+$('#exportCsv').addEventListener('click', () => {
+  if (!records.length) return toast('ยังไม่มีข้อมูล');
+  const cols = [['datetime','วันเวลา'],['sys','ตัวบน'],['dia','ตัวล่าง'],['pulse','ชีพจร'],['arm','แขน'],['posture','ท่า'],['weight','น้ำหนัก'],['sugar','น้ำตาล'],['sugarTiming','ช่วงวัดน้ำตาล'],['temp','อุณหภูมิ'],['spo2','SpO2'],['sleep','นอน'],['med','กินยา'],['symptoms','อาการ'],['note','โน้ต']];
+  const q = v => { v = v == null ? '' : String(v); if (/^[=+\-@]/.test(v) && isNaN(+v)) v = "'" + v; return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const rows = records.slice().reverse().map(r => cols.map(([k]) => k === 'datetime' ? localInput(new Date(r[k])).replace('T', ' ') : q(r[k])).join(','));
+  const csv = '﻿' + cols.map(c => c[1]).join(',') + '\n' + rows.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'health-log-' + localInput(new Date()).slice(0, 10) + '.csv';
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+/* ---------- โหลดข้อมูล ---------- */
+async function loadRecords(){
+  const st = $('#status'), live = isLive();
+  st.textContent = 'กำลังโหลด…'; st.classList.remove('on');
+  $('#demoBanner').hidden = live;
+  try {
+    records = (await api('getRecords')) || [];
+    sortRecords(); renderAll();
+    st.textContent = live ? '● Google Sheets' : 'โหมดทดลอง';
+    st.classList.toggle('on', live);
+  } catch(e) {
+    records = []; renderAll();
+    st.textContent = '⚠ เชื่อมต่อไม่ได้';
+    toast('โหลดข้อมูลไม่ได้: ' + e.message);
+  }
+}
+
+/* ---------- เริ่มต้น ---------- */
+(function init(){
+  // รับการตั้งค่าจากลิงก์ #setup=...
+  const m = location.hash.match(/setup=([^&]+)/);
+  if (m) {
+    try { const c = JSON.parse(atob(decodeURIComponent(m[1]))); if (c.url && c.key) { setCfg({ url: c.url, key: c.key }); setTimeout(() => toast('ตั้งค่าการเชื่อมต่อแล้ว ✓'), 600); } } catch(e){}
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+  try {
+    const p = JSON.parse(store.get('hl_prefs') || '{}');
+    if (p.arm) document.querySelectorAll('input[name=arm]').forEach(i => i.checked = i.value === p.arm);
+    if (p.posture) document.querySelectorAll('input[name=posture]').forEach(i => i.checked = i.value === p.posture);
+  } catch(e){}
+  resetForm();
+  loadRecords();
+})();
+</script>
+</body>
+</html>

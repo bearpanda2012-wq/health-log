@@ -87,7 +87,7 @@ textarea{resize:vertical;min-height:64px}
 .seg input{display:none}
 .seg label{flex:1;text-align:center;padding:7px 4px;border-radius:8px;font-size:14px;cursor:pointer;color:var(--muted)}
 .seg input:checked+label{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.badge{display:inline-block;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;color:#fff}
+.badge{display:inline-block;white-space:nowrap;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;color:#fff}
 .b-good{background:#147A66}.b-ok{background:var(--ok)}.b-hn{background:var(--hn)}.b-h1{background:var(--h1)}
 .b-h2{background:var(--h2)}.b-crit{background:var(--crit)}.b-low{background:var(--low)}
 #bpLive{margin-top:12px;text-align:center}
@@ -138,12 +138,41 @@ details[open] summary{margin-bottom:12px}
 :root[data-theme="dark"] .tag.t-weight{background:#1E2A40;color:#9CC3FF} :root[data-theme="dark"] .tag.t-sugar{background:#2E2140;color:#D8B4FE} :root[data-theme="dark"] .tag.t-temp{background:#3A2618;color:#FDBA8C} :root[data-theme="dark"] .tag.t-spo2{background:#16323A;color:#7DD9EA} :root[data-theme="dark"] .tag.t-sleep{background:#25234A;color:#B8B3FF} :root[data-theme="dark"] .tag.t-med{background:#1B312C;color:#7EDDC6} :root[data-theme="dark"] .tag.t-sym{background:#3A2227;color:#F59AA0}
 .note{display:flex;gap:8px;align-items:flex-start;font-size:15px;font-weight:600;line-height:1.45;color:var(--note-ink);background:var(--note-bg);border-radius:12px;padding:8px 12px;margin:8px 0 0 50px;white-space:pre-wrap}
 .note svg{flex:none;width:16px;height:16px;margin-top:3px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.editbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--note-bg);color:var(--note-ink);font-weight:700;font-size:14px;border-radius:12px;padding:8px 10px 8px 14px;margin-bottom:12px}
+.editbar button{font:inherit;font-size:13px;font-weight:600;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 12px;min-height:36px;cursor:pointer}
+.edit{font:inherit;font-size:12px;background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:3px 10px;cursor:pointer}
 .del{font:inherit;font-size:12px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:3px 10px;cursor:pointer}
 .btn2.confirm,.del.confirm{border-color:var(--h2);color:#fff;background:var(--h2)}
 .filters{display:flex;gap:8px;margin-bottom:12px}
 .pagehead{display:flex;align-items:center;justify-content:space-between;margin:6px 2px 12px}
 .pagetitle{font-family:'Kanit',sans-serif;font-weight:600;font-size:26px}
 .viewseg{margin-bottom:14px}
+.pdfcard{margin-top:14px}
+.pdfhead{display:flex;align-items:center;gap:8px;font-family:Kanit,sans-serif;font-size:17px;margin-bottom:10px}
+.pdfhead svg{width:22px;height:22px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#printArea{display:none}
+@media print{
+  @page{size:A4;margin:12mm}
+  html,body{background:#fff!important;color:#111!important}
+  body.printing>*:not(#printArea){display:none!important}
+  body.printing #printArea{display:block!important}
+}
+#printArea{font-family:'IBM Plex Sans Thai',sans-serif;color:#111;font-size:11pt;line-height:1.4}
+#printArea h1{font-family:Kanit,sans-serif;font-size:20pt;margin:0;color:#D63F4B}
+#printArea h2{font-family:Kanit,sans-serif;font-size:13pt;margin:14px 0 6px;border-bottom:2px solid #F0E4DC;padding-bottom:3px}
+#printArea .rp-top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #D63F4B;padding-bottom:6px}
+#printArea .rp-meta{text-align:right;font-size:10pt;color:#444}
+#printArea .rp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+#printArea .rp-t{border:1px solid #ddd;border-radius:8px;padding:6px 8px}
+#printArea .rp-t small{display:block;color:#555;font-size:9pt}
+#printArea .rp-t b{font-family:Kanit,sans-serif;font-size:15pt}
+#printArea table{width:100%;border-collapse:collapse;font-size:9.5pt}
+#printArea th,#printArea td{border-bottom:1px solid #e5e5e5;padding:4px 5px;text-align:left;vertical-align:top}
+#printArea th{background:#FDF1EC;font-weight:700}
+#printArea tr{break-inside:avoid}
+#printArea .hi{color:#C62828;font-weight:700}#printArea .lo{color:#B45309;font-weight:700}#printArea .ok{color:#147A66;font-weight:700}
+#printArea .rp-foot{margin-top:12px;font-size:8.5pt;color:#666}
+#printArea svg{width:100%;height:auto;display:block}
 .pills{display:flex;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px;gap:2px;margin-bottom:12px}
 .pill{flex:1;font:inherit;font-size:13px;color:var(--muted);background:none;border:0;border-radius:99px;padding:7px 4px;min-height:34px;cursor:pointer;white-space:nowrap}
 .pill.on{background:var(--ink);color:var(--bg);font-weight:700}
@@ -196,7 +225,9 @@ details[open] summary{margin-bottom:12px}
 .trend.neutral{background:var(--card);border:1px solid var(--line);color:var(--ink)}
 .item .ival{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .item .itime{font-size:13px;color:var(--muted);min-width:40px}
-.item .iright{display:flex;align-items:center;gap:8px}
+.item .iright{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.item .ival{min-width:0;flex-wrap:wrap}
+.item .edit,.item .del{padding:3px 8px}
 .item .tags{padding-left:50px}
 .chartbox{position:relative;height:260px}
 .empty{text-align:center;color:var(--muted);padding:40px 10px}
@@ -240,6 +271,7 @@ nav button.on svg{stroke-width:2.4}
     <div class="card" id="lastCard" hidden></div>
 
     <form id="form" class="card" autocomplete="off">
+      <div class="editbar" id="editBar" hidden><span id="editTxt">กำลังแก้ไขรายการ</span><button type="button" id="editCancel">ยกเลิก</button></div>
       <div class="rec-head">
         <span class="rec-title">จดค่าใหม่</span>
         <input id="datetime" class="when" type="datetime-local" aria-label="วันเวลาที่วัด">
@@ -363,6 +395,16 @@ nav button.on svg{stroke-width:2.4}
         <button class="btn2" type="button" id="wkToList">ดูรายการ</button>
       </div>
       <p class="muted" style="margin-top:8px">ส่งเป็นข้อความสรุปผ่าน LINE หรือแอปอื่นได้ หรือคัดลอกไปวาง</p>
+      <div class="card pdfcard">
+        <div class="pdfhead"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg><b>รายงาน PDF ให้หมอ</b></div>
+        <label class="f" for="rpName">ชื่อผู้ป่วย (ไม่บังคับ)</label>
+        <input id="rpName" type="text" maxlength="80" placeholder="เช่น นายสมชาย ใจดี">
+        <div class="pills" id="rpRange" role="group" aria-label="ช่วงของรายงาน" style="margin:10px 0 12px">
+          <button type="button" class="pill" data-v="7">7 วัน</button><button type="button" class="pill on" data-v="30">30 วัน</button><button type="button" class="pill" data-v="90">90 วัน</button>
+        </div>
+        <button class="btn" type="button" id="makePdf">สร้างรายงาน PDF</button>
+        <p class="muted" style="margin:8px 0 0">หน้าต่างพิมพ์จะเปิดขึ้น เลือก "บันทึกเป็น PDF" แล้วส่งให้หมอ หรือพิมพ์ออกกระดาษก็ได้</p>
+      </div>
     </div>
   </section>
 
@@ -454,7 +496,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 18 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 19 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -464,6 +506,7 @@ nav button.on svg{stroke-width:2.4}
   <button data-tab="chart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>กราฟ</button>
   <button data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>ตั้งค่า</button>
 </nav>
+<div id="printArea" aria-hidden="true"></div>
 <div id="toast"></div>
 
 <script>
@@ -480,6 +523,8 @@ const demo = {
   getRecords(){ return this.load().slice(); },
   addRecord(r){ const id = 'd' + Date.now() + Math.random().toString(36).slice(2,6);
     this.load().push(Object.assign({}, r, { id, med: r.med || null, createdAt: new Date().toISOString() })); this.save(); return { ok:true, id }; },
+  updateRecord(a){ const d = this.load(); const i = d.findIndex(x => x.id === a.id); if (i < 0) return { ok:false, error:'not_found' };
+    d[i] = Object.assign({}, a.record, { id: a.id, med: a.record.med || null, createdAt: d[i].createdAt }); this.save(); return { ok:true, id: a.id }; },
   deleteRecord(id){ const d = this.load(); const i = d.findIndex(x => x.id === id); if (i >= 0) d.splice(i,1); this.save(); return { ok: i >= 0 }; }
 };
 /* ---------- การตั้งค่าการเชื่อมต่อ (เก็บในเครื่องนี้) ---------- */
@@ -534,6 +579,16 @@ async function api(fn, arg){
   if (fn === 'getRecords') return (await remote(cfg, 'list')).records;
   if (fn === 'addRecord')  return remote(cfg, 'add', { record: arg });
   if (fn === 'deleteRecord') return remote(cfg, 'delete', { id: arg });
+  if (fn === 'updateRecord') {
+    try { return await remote(cfg, 'update', { id: arg.id, record: arg.record }); }
+    catch(e) {
+      // โค้ดในชีตรุ่นเก่ายังไม่มี "update" → เพิ่มใหม่แล้วลบของเดิม
+      if (!/unknown_action|เวอร์ชันสคริปต์ไม่ตรง/.test(String(e && e.message))) throw e;
+      const res = await remote(cfg, 'add', { record: arg.record });
+      await remote(cfg, 'delete', { id: arg.id }).catch(() => {});
+      return res;
+    }
+  }
 }
 
 /* ---------- ตัวช่วย ---------- */
@@ -670,7 +725,7 @@ $('#form').addEventListener('submit', async e => {
     arm: null, posture: null,
     weight: num('weight'), sugar: num('sugar'), sugarTiming: null,
     temp: num('temp'), spo2: num('spo2'), sleep: num('sleep'),
-    med: (rememberMedName(), collectMed()), symptoms: syms || null, note: $('#note').value.trim() || null
+    med: (editingId ? null : rememberMedName(), collectMed()), symptoms: syms || null, note: $('#note').value.trim() || null
   };
   if (has(r.sys) || has(r.pulse)) {
     r.arm = document.querySelector('input[name=arm]:checked').value;
@@ -682,6 +737,14 @@ $('#form').addEventListener('submit', async e => {
 
   const btn = $('#saveBtn'); btn.disabled = true; btn.textContent = 'กำลังบันทึก…';
   try {
+    if (editingId) {
+      if (!r.med && editingOrig && editingOrig.med === 'ใช่') r.med = 'ใช่';
+      const res = await api('updateRecord', { id: editingId, record: r });
+      records = records.filter(x => x.id !== editingId);
+      records.unshift(Object.assign({}, r, { id: res.id || editingId, med: r.med || null }));
+      sortRecords(); endEdit(); renderAll(); toast('แก้ไขแล้ว ✓'); goTab('history');
+      return;
+    }
     const res = await api('addRecord', r);
     records.unshift(Object.assign({}, r, { id: res.id, med: r.med || null }));
     sortRecords();
@@ -690,7 +753,7 @@ $('#form').addEventListener('submit', async e => {
     toast('บันทึกแล้ว ✓');
   } catch(e) {
     toast('บันทึกไม่สำเร็จ: ' + (e && e.message || e));
-  } finally { btn.disabled = false; btn.textContent = 'บันทึก'; }
+  } finally { btn.disabled = false; btn.textContent = editingId ? 'บันทึกการแก้ไข' : 'บันทึก'; }
 });
 
 /* ---------- แสดงผล ---------- */
@@ -719,7 +782,7 @@ function itemHTML(r){
   const tags = tagsFor(r);
   return `<div class="item">
     <div class="top"><div class="ival"><span class="itime">${fmtTime(d)}</span>${main}</div>
-      <div class="iright">${badge(bpClass(r.sys, r.dia))}<button class="del" data-id="${esc(r.id)}" aria-label="ลบรายการ ${fmtTime(d)}">ลบ</button></div></div>
+      <div class="iright">${badge(bpClass(r.sys, r.dia))}<button class="edit" data-id="${esc(r.id)}" aria-label="แก้ไขรายการ ${fmtTime(d)}">แก้</button><button class="del" data-id="${esc(r.id)}" aria-label="ลบรายการ ${fmtTime(d)}">ลบ</button></div></div>
     ${tags ? `<div class="tags">${tags}</div>` : ''}
     ${has(r.note) ? `<div class="note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>${esc(r.note)}</span></div>` : ''}
   </div>`;
@@ -925,6 +988,54 @@ function renderHistory(){
   if (histView === 'list') renderList(); else if (histView === 'cal') renderCal(); else renderWeek();
 }
 
+/* ---------- แก้ไขรายการ ---------- */
+let editingId = null, editingOrig = null;
+function openPanel(q){
+  const panel = $('#p-' + q), b = document.querySelector(`.qchip[data-q="${q}"]`);
+  if (!panel.hidden) return;
+  panel.hidden = false; b.setAttribute('aria-expanded', true);
+  if (q !== 'med') { b.classList.add('on'); b.textContent = '− ' + b.textContent.slice(2); }
+}
+function startEdit(id){
+  const r = records.find(x => x.id === id); if (!r) return;
+  resetForm();
+  editingId = id; editingOrig = r;
+  const v = (id2, x) => $('#' + id2).value = has(x) ? x : '';
+  $('#datetime').value = localInput(new Date(r.datetime));
+  ['sys','dia','pulse','weight','sugar','temp','spo2','sleep'].forEach(k => v(k, r[k]));
+  $('#note').value = r.note || '';
+  if (r.arm) { const a = document.querySelector(`input[name=arm][value="${r.arm}"]`); if (a) a.checked = true; }
+  if (r.posture) { const p = document.querySelector(`input[name=posture][value="${r.posture}"]`); if (p) p.checked = true; }
+  if (has(r.weight)) openPanel('weight');
+  if (has(r.sugar)) { openPanel('sugar'); if (r.sugarTiming) $('#sugarTiming').value = r.sugarTiming; }
+  if (has(r.med) && r.med !== 'ใช่') {
+    const [meals, ...nm] = String(r.med).split(' · ');
+    meals.split(',').map(x => x.trim()).forEach(m => {
+      const [meal, ...tm] = m.split(' '); const row = medRows().find(x => x.querySelector('.medck').value === meal);
+      if (row) { row.querySelector('.medck').checked = true; if (tm.length) row.querySelector('.medtm').value = tm.join(' '); }
+    });
+    $('#medName').value = nm.join(' · ');
+    openPanel('med');
+  }
+  if (has(r.symptoms)) { const set = String(r.symptoms).split(',').map(x => x.trim()); document.querySelectorAll('#symChips input').forEach(i => i.checked = set.includes(i.value)); openPanel('sym'); }
+  if (has(r.temp) || has(r.spo2) || has(r.sleep) || has(r.note)) $('#more').open = true;
+  syncMedChip(); updateLive(); updateSugar();
+  const d = new Date(r.datetime);
+  $('#editTxt').textContent = `✎ กำลังแก้ไข ${fmtShort(d)} ${fmtTime(d)}`;
+  $('#editBar').hidden = false; $('#saveBtn').textContent = 'บันทึกการแก้ไข'; $('.rec-title').textContent = 'แก้ไขค่า';
+  goTab('add'); window.scrollTo({ top: 0 });
+}
+function endEdit(){
+  editingId = null; editingOrig = null;
+  $('#editBar').hidden = true; $('#saveBtn').textContent = 'บันทึก'; $('.rec-title').textContent = 'จดค่าใหม่';
+  $('#medName').value = store.get('hl_medname') || '';
+  resetForm();
+}
+$('#editCancel').addEventListener('click', () => { endEdit(); goTab('history'); });
+function onEdit(e){ const b = e.target.closest('.edit'); if (b) startEdit(b.dataset.id); }
+$('#list').addEventListener('click', onEdit);
+$('#calDayList').addEventListener('click', onEdit);
+
 async function onDelete(e){
   const b = e.target.closest('.del'); if (!b) return;
   if (!b.classList.contains('confirm')) {
@@ -947,7 +1058,7 @@ const METRICS = {
   bp:     { title:'ความดัน', unit:'mmHg', note:'เส้นประ = เกณฑ์ความดันสูง 140/90 mmHg · พื้นที่สีชมพู = โซนความดันสูง' },
   pulse:  { key:'pulse',  title:'ชีพจร', unit:'ครั้ง/นาที', note:'ชีพจรขณะพักของผู้ใหญ่ส่วนใหญ่อยู่ราว 60–100 ครั้ง/นาที' },
   weight: { key:'weight', title:'น้ำหนัก', unit:'กก.', dec:1, note:'ชั่งเวลาเดิมทุกวัน เช่น ตอนเช้าหลังเข้าห้องน้ำ จะเทียบได้แม่นกว่า' },
-  sugar:  { key:'sugar',  title:'น้ำตาล', unit:'mg/dL', note:'ค่างดอาหารปกติมักต่ำกว่า 100 mg/dL · ค่าเป้าหมายของแต่ละคนควรถามแพทย์' },
+  sugar:  { key:'sugar',  title:'น้ำตาล', unit:'mg/dL', note:'แถบเขียว = ปกติ 70–130 mg/dL · จุดส้ม = ต่ำ · จุดแดง = สูง' },
   temp:   { key:'temp',   title:'อุณหภูมิ', unit:'°C', dec:1, note:'ตั้งแต่ราว 37.5°C ขึ้นไปถือว่ามีไข้' },
   spo2:   { key:'spo2',   title:'SpO2', unit:'%', note:'ปกติมักอยู่ 95–100% ถ้าต่ำกว่า 94% ต่อเนื่องควรปรึกษาแพทย์' },
   sleep:  { key:'sleep',  title:'การนอน', unit:'ชม.', dec:1, note:'ผู้ใหญ่ส่วนใหญ่ต้องการนอนราว 7–9 ชั่วโมง' }
@@ -962,6 +1073,15 @@ function chartRows(){
   const from = a ? new Date(a + 'T00:00:00') : new Date(0), to = b ? new Date(b + 'T23:59:59') : new Date();
   return records.filter(r => { const t = new Date(r.datetime); return t >= from && t <= to; });
 }
+const sugarBand = {
+  id: 'sugarBand',
+  beforeDatasetsDraw(c, args, o){
+    if (!o || !o.on) return;
+    const y = c.scales.y, a = c.chartArea, clamp = v => Math.max(a.top, Math.min(a.bottom, y.getPixelForValue(v)));
+    const t = clamp(130), b = clamp(70);
+    c.ctx.save(); c.ctx.fillStyle = o.color; c.ctx.fillRect(a.left, t, a.right - a.left, b - t); c.ctx.restore();
+  }
+};
 const highZone = {
   id: 'highZone',
   beforeDatasetsDraw(c, args, o){
@@ -1012,19 +1132,25 @@ function drawChart(){
     ds('ตัวล่าง', rows.map(r => +r.dia), blue),
     ds('140', rows.map(() => 140), accent, { borderDash:[5,5], borderWidth:1.2, pointRadius:0, pointHoverRadius:0, tension:0 }),
     ds('90', rows.map(() => 90), blue, { borderDash:[5,5], borderWidth:1.2, pointRadius:0, pointHoverRadius:0, tension:0 })
-  ] : [ds(cfg.title, rows.map(val), accent)];
+  ] : m === 'sugar' ? [ds(cfg.title, rows.map(val), accent, {
+      pointRadius: rows.length > 40 ? 2 : 4,
+      pointBackgroundColor: rows.map(r => { const v = val(r); return v < 70 ? '#D97706' : v > 130 ? '#DC2626' : '#1FA38A'; }),
+      pointBorderColor: rows.map(r => { const v = val(r); return v < 70 ? '#D97706' : v > 130 ? '#DC2626' : '#1FA38A'; })
+    })]
+    : [ds(cfg.title, rows.map(val), accent)];
   chart = new Chart($('#chart'), {
-    type: 'line', data: { labels, datasets }, plugins: [highZone],
+    type: 'line', data: { labels, datasets }, plugins: [highZone, sugarBand],
     options: {
       responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
       plugins: {
+        sugarBand: { on: m === 'sugar', color: effectiveTheme() === 'dark' ? 'rgba(60,196,168,.14)' : 'rgba(31,163,138,.12)' },
         highZone: { on: m === 'bp', color: effectiveTheme() === 'dark' ? 'rgba(240,106,115,.12)' : 'rgba(232,80,91,.08)' },
         legend: { labels: { color: muted, boxWidth: 14, boxHeight: 3, filter: i => !['140','90'].includes(i.text) } },
         tooltip: { filter: i => !['140','90'].includes(i.dataset.label) }
       },
       scales: {
         x: { ticks: { color: muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 5, callback(v){ const l = this.getLabelForValue(v).split(' '); return l[0] + ' ' + l[1]; } }, grid: { display: false } },
-        y: { ticks: { color: muted }, grid: { color: line }, suggestedMin: m === 'bp' ? 60 : undefined, suggestedMax: m === 'bp' ? 160 : undefined }
+        y: { ticks: { color: muted }, grid: { color: line }, suggestedMin: m === 'bp' ? 60 : m === 'sugar' ? 50 : undefined, suggestedMax: m === 'bp' ? 160 : m === 'sugar' ? 160 : undefined }
       }
     }
   });
@@ -1180,6 +1306,110 @@ function setTheme(t){ t === 'auto' ? store.del('hl_theme') : store.set('hl_theme
 $('#themeBtn').addEventListener('click', () => setTheme(effectiveTheme() === 'dark' ? 'light' : 'dark'));
 document.querySelectorAll('input[name=theme]').forEach(i => i.addEventListener('change', () => setTheme(i.value)));
 mqDark.addEventListener && mqDark.addEventListener('change', applyTheme);
+
+/* ---------- รายงาน PDF ให้หมอ ---------- */
+let rpDays = 30;
+$('#rpName').value = store.get('hl_name') || '';
+$('#rpRange').addEventListener('click', e => {
+  const b = e.target.closest('.pill'); if (!b) return;
+  rpDays = +b.dataset.v; $('#rpRange').querySelectorAll('.pill').forEach(x => x.classList.toggle('on', x === b));
+});
+function svgChart(rows, series, opt){
+  // rows: เก่า→ใหม่, series: [{get, color, name}], opt: {lo, hi, lines:[{v,color}], band:[a,b]}
+  const W = 700, H = 200, L = 36, R = 8, T = 10, B = 24, n = rows.length;
+  const vals = rows.flatMap(r => series.map(s => s.get(r))).filter(v => isFinite(v));
+  let lo = Math.min(opt.lo, ...vals), hi = Math.max(opt.hi, ...vals); const pad = (hi - lo) * .06; lo -= pad; hi += pad;
+  const x = i => L + (n === 1 ? (W - L - R) / 2 : i * (W - L - R) / (n - 1)), y = v => T + (hi - v) * (H - T - B) / (hi - lo);
+  let g = '';
+  if (opt.band) g += `<rect x="${L}" y="${y(opt.band[1])}" width="${W - L - R}" height="${y(opt.band[0]) - y(opt.band[1])}" fill="#1FA38A" opacity=".12"/>`;
+  const step = (hi - lo) > 120 ? 40 : (hi - lo) > 50 ? 20 : 10;
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#eee"/><text x="${L - 4}" y="${y(v) + 4}" font-size="10" text-anchor="end" fill="#666">${v}</text>`;
+  (opt.lines || []).forEach(l => g += `<line x1="${L}" x2="${W - R}" y1="${y(l.v)}" y2="${y(l.v)}" stroke="${l.color}" stroke-dasharray="5 4"/>`);
+  series.forEach(s => {
+    const pts = rows.map((r, i) => [x(i), s.get(r)]).filter(p => isFinite(p[1]));
+    g += `<polyline fill="none" stroke="${s.color}" stroke-width="2" points="${pts.map(p => p[0].toFixed(1) + ',' + y(p[1]).toFixed(1)).join(' ')}"/>`;
+    pts.forEach(p => g += `<circle cx="${p[0].toFixed(1)}" cy="${y(p[1]).toFixed(1)}" r="${n > 60 ? 1.5 : 2.6}" fill="${s.dot ? s.dot(p[1]) : s.color}"/>`);
+  });
+  const lab = i => { const d = new Date(rows[i].datetime); return fmtShort(d); };
+  const idx = n > 1 ? [0, Math.floor((n - 1) / 2), n - 1] : [0];
+  idx.forEach((i, k) => g += `<text x="${x(i)}" y="${H - 6}" font-size="10" fill="#666" text-anchor="${k === 0 && n > 1 ? 'start' : k === idx.length - 1 && n > 1 ? 'end' : 'middle'}">${lab(i)}</text>`);
+  const leg = series.map((s, i) => `<g transform="translate(${L + 8 + i * 90},${T + 4})"><rect width="14" height="3" y="4" fill="${s.color}"/><text x="18" y="9" font-size="10" fill="#333">${s.name}</text></g>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${g}${leg}</svg>`;
+}
+function buildReport(days){
+  const to = new Date(), from = new Date(); from.setDate(from.getDate() - days + 1); from.setHours(0, 0, 0, 0);
+  const rows = records.filter(r => { const t = new Date(r.datetime); return t >= from && t <= to; });
+  const asc = rows.slice().reverse();
+  const bp = asc.filter(r => has(r.sys)), sg = asc.filter(r => has(r.sugar)), wt = asc.filter(r => has(r.weight));
+  const R = v => Math.round(v), name = $('#rpName').value.trim();
+  const dfmt = d => d.toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'numeric' });
+  const tile = (t, v, sub) => `<div class="rp-t"><small>${t}</small><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+  let h = `<div class="rp-top"><div><h1>รายงานสุขภาพ</h1><div>${name ? '<b>' + esc(name) + '</b> · ' : ''}ช่วง ${dfmt(from)} – ${dfmt(to)} (${days} วัน)</div></div>
+    <div class="rp-meta">ดันดี · บันทึกสุขภาพ<br>พิมพ์เมื่อ ${dfmt(to)} ${fmtTime(to)}</div></div>`;
+  // สรุป
+  h += '<h2>สรุป</h2><div class="rp-grid">';
+  if (bp.length) {
+    const aS = avg(bp.map(r => +r.sys)), aD = avg(bp.map(r => +r.dia)), high = bp.filter(r => r.sys >= 140 || r.dia >= 90).length;
+    const mx = bp.reduce((a, r) => +r.sys > +a.sys ? r : a), mn = bp.reduce((a, r) => +r.sys < +a.sys ? r : a);
+    const am = bp.filter(r => new Date(r.datetime).getHours() < 12), pm = bp.filter(r => new Date(r.datetime).getHours() >= 12);
+    const pl = bp.filter(r => has(r.pulse));
+    h += tile('ความดันเฉลี่ย', `${R(aS)}/${R(aD)}`, `${bp.length} ครั้ง · ${(bpClass(R(aS), R(aD)) || {}).t || ''}`)
+      + tile('สูงสุด / ต่ำสุด', `${mx.sys}/${mx.dia}`, `ต่ำสุด ${mn.sys}/${mn.dia}`)
+      + tile('เกิน 140/90', `${high} ครั้ง`, `${R(high * 100 / bp.length)}% ของการวัด`)
+      + tile('เช้า / บ่าย-เย็น', `${am.length ? R(avg(am.map(r => +r.sys))) + '/' + R(avg(am.map(r => +r.dia))) : '–'}`, `บ่าย-เย็น ${pm.length ? R(avg(pm.map(r => +r.sys))) + '/' + R(avg(pm.map(r => +r.dia))) : '–'}`);
+    if (pl.length) h += tile('ชีพจรเฉลี่ย', R(avg(pl.map(r => +r.pulse))), 'ครั้ง/นาที');
+  }
+  if (sg.length) {
+    const lv = r => (sugarLevel(r.sugar, r.sugarTiming) || {}).t;
+    const c = t => sg.filter(r => lv(r) === t).length;
+    h += tile('น้ำตาลเฉลี่ย', R(avg(sg.map(r => +r.sugar))), `mg/dL · ${sg.length} ครั้ง`)
+      + tile('ระดับน้ำตาล', `${c('ปกติ')}/${sg.length} ปกติ`, `ต่ำ ${c('ต่ำ')} · สูง ${c('สูง')}`);
+  }
+  if (wt.length) h += tile('น้ำหนัก', `${(+wt[wt.length - 1].weight).toFixed(1)} กก.`, wt.length > 1 ? `เริ่ม ${(+wt[0].weight).toFixed(1)} กก.` : '');
+  const dayKeys = new Set(rows.map(r => dayKey(r.datetime))), medDays = new Set(rows.filter(r => has(r.med)).map(r => dayKey(r.datetime)));
+  if (medDays.size) h += tile('วันที่กินยา', `${medDays.size}/${dayKeys.size} วัน`, 'ของวันที่มีบันทึก');
+  h += '</div>';
+  const names = [...new Set(rows.filter(r => has(r.med) && r.med !== 'ใช่').map(r => String(r.med).split(' · ').slice(1).join(' · ')).filter(Boolean))];
+  if (names.length) h += `<p style="margin:8px 0 0"><b>ยาที่บันทึก:</b> ${names.map(esc).join(', ')}</p>`;
+  // กราฟ
+  if (bp.length >= 2) h += '<h2>กราฟความดัน (mmHg)</h2>' + svgChart(bp, [
+    { get: r => +r.sys, color: '#E8505B', name: 'ตัวบน' }, { get: r => +r.dia, color: '#2F6FD6', name: 'ตัวล่าง' }],
+    { lo: 60, hi: 160, lines: [{ v: 140, color: '#E8505B' }, { v: 90, color: '#2F6FD6' }] });
+  if (sg.length >= 2) h += '<h2>กราฟน้ำตาล (mg/dL) · แถบเขียว = ปกติ 70–130</h2>' + svgChart(sg, [
+    { get: r => +r.sugar, color: '#8B5CF6', name: 'น้ำตาล', dot: v => v < 70 ? '#D97706' : v > 130 ? '#DC2626' : '#1FA38A' }],
+    { lo: 50, hi: 160, band: [70, 130] });
+  // ตาราง
+  h += '<h2>รายการที่บันทึก</h2>';
+  if (!rows.length) h += '<p>ไม่มีข้อมูลในช่วงนี้</p>';
+  else {
+    h += '<table><thead><tr><th>วันที่</th><th>เวลา</th><th>ความดัน</th><th>ชีพจร</th><th>น้ำตาล</th><th>น้ำหนัก</th><th>ยา</th><th>อาการ / โน้ต</th></tr></thead><tbody>';
+    rows.forEach(r => {
+      const d = new Date(r.datetime), c = bpClass(r.sys, r.dia);
+      const bpCls = !c ? '' : ['h1','h2','crit'].includes(c.c) ? 'hi' : c.c === 'low' ? 'lo' : '';
+      const L = has(r.sugar) ? sugarLevel(r.sugar, r.sugarTiming) : null;
+      const sgCls = L ? { 'ต่ำ':'lo', 'ปกติ':'ok', 'สูง':'hi' }[L.t] : '';
+      const extra = [r.symptoms, r.note].filter(has).map(esc).join(' · ');
+      h += `<tr><td>${d.toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit' })}</td><td>${fmtTime(d)}</td>
+        <td class="${bpCls}">${has(r.sys) ? r.sys + '/' + r.dia : ''}${r.arm && has(r.sys) ? `<br><small>แขน${esc(r.arm)} ${esc(r.posture || '')}</small>` : ''}</td>
+        <td>${has(r.pulse) ? r.pulse : ''}</td>
+        <td class="${sgCls}">${has(r.sugar) ? r.sugar + (L ? ' ' + L.t : '') : ''}${r.sugarTiming && has(r.sugar) ? `<br><small>${esc(r.sugarTiming)}</small>` : ''}</td>
+        <td>${has(r.weight) ? (+r.weight).toFixed(1) : ''}</td>
+        <td>${has(r.med) ? esc(r.med === 'ใช่' ? 'กินแล้ว' : r.med) : ''}</td><td>${extra}</td></tr>`;
+    });
+    h += '</tbody></table>';
+  }
+  h += '<div class="rp-foot">เกณฑ์ความดันสูง ≥ 140/90 mmHg · เกณฑ์น้ำตาล: ต่ำ &lt; 70, ปกติ 70–130, สูง &gt; 130 mg/dL · รายงานนี้ผู้ป่วยบันทึกเองด้วยแอปดันดี ใช้ประกอบการพบแพทย์ ไม่ใช่ผลการวินิจฉัย</div>';
+  return h;
+}
+$('#makePdf').addEventListener('click', () => {
+  store.set('hl_name', $('#rpName').value.trim());
+  $('#printArea').innerHTML = buildReport(rpDays);
+  document.body.classList.add('printing');
+  const t0 = document.title; document.title = 'รายงานสุขภาพ ' + isoDate(new Date());
+  setTimeout(() => { window.print(); }, 80);
+  const done = () => { document.body.classList.remove('printing'); document.title = t0; window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+});
 
 /* ---------- เริ่มต้น ---------- */
 (function init(){

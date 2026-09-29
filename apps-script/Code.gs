@@ -187,6 +187,7 @@ function handle_(action, p) {
       case 'list':   return json_({ ok: true, records: getRecords() });
       case 'add':    return json_(addRecord(p.record || {}));
       case 'delete': return json_(deleteRecord(p.id));
+      case 'update': return json_(updateRecord(p.id, p.record || {}));
       default:       return json_({ ok: false, error: 'unknown_action' });
     }
   } catch (err) {
@@ -270,6 +271,36 @@ function addRecord(rec) {
     });
     sh.appendRow(row);
     return { ok: true, id: id };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function updateRecord(id, rec) {
+  if (!id) return { ok: false, error: 'no_id' };
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const sh = getSheet_();
+    const n = sh.getLastRow() - 1;
+    if (n <= 0) return { ok: false, error: 'not_found' };
+    const ids = sh.getRange(2, 1, n, 1).getValues();
+    for (let i = 0; i < ids.length; i++) {
+      if (ids[i][0] === id) {
+        const old = sh.getRange(i + 2, 1, 1, KEYS.length).getValues()[0];
+        const d = rec.datetime ? new Date(rec.datetime) : null;
+        const row = KEYS.map((k, j) => {
+          if (k === 'id') return id;
+          if (k === 'createdAt') return old[j];
+          if (k === 'datetime') return d && !isNaN(d.getTime()) ? d : old[j];
+          if (k === 'med') return rec.med === true ? 'ใช่' : (rec.med ? clean_(rec, 'med') : '');
+          return clean_(rec, k);
+        });
+        sh.getRange(i + 2, 1, 1, KEYS.length).setValues([row]);
+        return { ok: true, id: id };
+      }
+    }
+    return { ok: false, error: 'not_found' };
   } finally {
     lock.releaseLock();
   }

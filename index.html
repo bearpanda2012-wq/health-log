@@ -56,6 +56,8 @@ textarea{resize:vertical;min-height:64px}
 .bp label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);text-align:center}
 .bp input{height:72px;border-width:1.5px;border-radius:16px;font-family:'Kanit',sans-serif;font-size:32px;font-weight:600;text-align:center;padding:4px}
 .bp input::placeholder{color:var(--ph)}
+.bp input::-webkit-outer-spin-button,.bp input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.bp input{-moz-appearance:textfield}
 .when::-webkit-calendar-picker-indicator{filter:var(--cal)}
 .hdr-r{display:flex;align-items:center;gap:8px}
 .themebtn{width:36px;height:36px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
@@ -168,6 +170,14 @@ nav button.on svg{stroke-width:2.4}
       <div id="bpLive"></div>
       <div class="warn" id="bpWarn">ค่าสูงมาก ให้นั่งพัก 5 นาทีแล้ววัดซ้ำ ถ้ายังสูงและมีอาการเจ็บหน้าอก ปวดหัวรุนแรง แขนขาอ่อนแรง พูดไม่ชัด หรือตามัว ให้โทร <b>1669</b> หรือไปโรงพยาบาลทันที</div>
 
+      <div class="grid2 row">
+        <div><label class="f">แขน</label>
+          <div class="seg"><input type="radio" name="arm" id="armL" value="ซ้าย" checked><label for="armL">ซ้าย</label><input type="radio" name="arm" id="armR" value="ขวา"><label for="armR">ขวา</label></div>
+        </div>
+        <div><label class="f">ท่า</label>
+          <div class="seg"><input type="radio" name="posture" id="pS" value="นั่ง" checked><label for="pS">นั่ง</label><input type="radio" name="posture" id="pL" value="นอน"><label for="pL">นอน</label><input type="radio" name="posture" id="pU" value="ยืน"><label for="pU">ยืน</label></div>
+        </div>
+      </div>
       <div class="qchips">
         <button type="button" class="qchip" data-q="weight">+ น้ำหนัก</button>
         <button type="button" class="qchip" data-q="sugar">+ น้ำตาล</button>
@@ -192,14 +202,6 @@ nav button.on svg{stroke-width:2.4}
       <details id="more">
         <summary>รายละเอียดเพิ่มเติม</summary>
         <div class="grid2">
-          <div><label class="f">แขน</label>
-            <div class="seg"><input type="radio" name="arm" id="armL" value="ซ้าย" checked><label for="armL">ซ้าย</label><input type="radio" name="arm" id="armR" value="ขวา"><label for="armR">ขวา</label></div>
-          </div>
-          <div><label class="f">ท่า</label>
-            <div class="seg"><input type="radio" name="posture" id="pS" value="นั่ง" checked><label for="pS">นั่ง</label><input type="radio" name="posture" id="pL" value="นอน"><label for="pL">นอน</label><input type="radio" name="posture" id="pU" value="ยืน"><label for="pU">ยืน</label></div>
-          </div>
-        </div>
-        <div class="grid2 row">
           <div><label class="f" for="temp">อุณหภูมิ (°C)</label><input id="temp" type="number" step="0.1" inputmode="decimal"></div>
           <div><label class="f" for="spo2">ออกซิเจน SpO2 (%)</label><input id="spo2" type="number" inputmode="numeric"></div>
           <div><label class="f" for="sleep">นอน (ชม.)</label><input id="sleep" type="number" step="0.5" inputmode="decimal"></div>
@@ -290,7 +292,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 10 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 11 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 

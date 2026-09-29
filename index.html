@@ -15,27 +15,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#FFF8F3;--card:#fff;--ink:#1E2A3A;--muted:#6B7280;--line:#F0E4DC;
-  --accent:#E8505B;--accent-soft:#FDE6E7;--field:#FFFBF8;
-  --good:#1FA38A;--ok:#2f80ed;--hn:#d98a06;--h1:#ea580c;--h2:#dc2626;--crit:#9f1239;--low:#7c3aed;
+  --bg:#FFF8F3;--card:#fff;--ink:#1E2A3A;--muted:#6B6460;--line:#F0E4DC;
+  --accent:#E8505B;--accent-ink:#D63F4B;--accent-soft:#FDE6E7;--accent-text:#C93B46;--field:#FFFBF8;
+  --good:#147A66;--good-soft:#DDF3EE;--ok:#2f80ed;--hn:#d98a06;--h1:#ea580c;--h2:#dc2626;--crit:#9f1239;--low:#7c3aed;
 }
 @media (prefers-color-scheme:dark){:root{
   --bg:#15131A;--card:#1E1B24;--ink:#F3EEEA;--muted:#A59DA3;--line:#2E2A33;
-  --accent:#F06A73;--accent-soft:#3A2227;--field:#24212A;
+  --accent:#F06A73;--accent-ink:#E04F5B;--accent-soft:#3A2227;--accent-text:#F59AA0;--field:#24212A;
+  --good:#3CC4A8;--good-soft:#1B312C;
 }}
+:root{color-scheme:light dark}
 *{box-sizing:border-box;margin:0;padding:0}
 [hidden]{display:none!important}
 body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--ink);
   font-size:16px;line-height:1.5;padding-bottom:84px;-webkit-tap-highlight-color:transparent}
-header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 16px 10px;
-  display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line)}
-header h1{font-family:'Kanit',sans-serif;font-size:24px;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--accent);letter-spacing:.3px}
-header h1 img{width:32px;height:32px;border-radius:9px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:16px 20px 10px;max-width:640px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+header h1{font-family:'Kanit',sans-serif;font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px;color:var(--accent);letter-spacing:.3px}
+header h1 img{width:36px;height:36px;border-radius:10px}
 header h1 small{font-family:'IBM Plex Sans Thai',sans-serif;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:0}
-.status{font-size:12px;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:3px 10px;border-radius:99px;white-space:nowrap}
-.status.on{color:var(--good)}
-main{max-width:640px;margin:0 auto;padding:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.status{font-size:12px;font-weight:600;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:5px 11px;border-radius:99px;white-space:nowrap}
+.status.on{color:var(--good);background:var(--good-soft);border-color:transparent}
+main{max-width:640px;margin:0 auto;padding:6px 20px 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
 .card h2{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 .card h2 small{font-weight:400;color:var(--muted);font-size:13px}
 label.f{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
@@ -43,9 +45,22 @@ input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--
   border-radius:10px;padding:10px 12px;outline:none}
 input:focus,select:focus,textarea:focus{border-color:var(--accent)}
 textarea{resize:vertical;min-height:64px}
-.bp{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.bp input{font-size:28px;font-weight:700;text-align:center;padding:10px 4px}
-.bp label.f{text-align:center}
+.bp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.bp label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);text-align:center}
+.bp input{height:72px;border-width:1.5px;border-radius:16px;font-family:'Kanit',sans-serif;font-size:32px;font-weight:600;text-align:center;padding:4px}
+.bp input::placeholder{color:#CDBFB6}
+@media (prefers-color-scheme:dark){.bp input::placeholder{color:#4F4954}.when::-webkit-calendar-picker-indicator{filter:invert(1)}}
+.hello{margin:6px 2px 14px}
+.hello-q{font-family:'Kanit',sans-serif;font-weight:600;font-size:26px;line-height:1.25}
+.rec-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:14px}
+.rec-title{font-family:'Kanit',sans-serif;font-weight:600;font-size:18px}
+.when{width:auto;border:0;background:none;padding:0;font-size:13px;color:var(--muted);text-align:right;min-width:0;max-width:60%}
+.qchips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 2px}
+.qchip{font:inherit;font-size:13px;font-weight:600;color:var(--accent-text);background:var(--accent-soft);border:1.5px solid transparent;border-radius:99px;padding:7px 11px;min-height:36px;cursor:pointer}
+.qchip.on{border-color:var(--accent-text);background:var(--card)}
+.last{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.last .big{font-family:'Kanit',sans-serif;font-size:38px;font-weight:700;line-height:1.1}
+.last .right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .row{margin-top:12px}
 .seg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:10px;padding:3px}
@@ -53,11 +68,13 @@ textarea{resize:vertical;min-height:64px}
 .seg label{flex:1;text-align:center;padding:7px 4px;border-radius:8px;font-size:14px;cursor:pointer;color:var(--muted)}
 .seg input:checked+label{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .badge{display:inline-block;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;color:#fff}
-.b-good{background:var(--good)}.b-ok{background:var(--ok)}.b-hn{background:var(--hn)}.b-h1{background:var(--h1)}
+.b-good{background:#147A66}.b-ok{background:var(--ok)}.b-hn{background:var(--hn)}.b-h1{background:var(--h1)}
 .b-h2{background:var(--h2)}.b-crit{background:var(--crit)}.b-low{background:var(--low)}
-#bpLive{margin-top:12px;min-height:26px;text-align:center}
+#bpLive{margin-top:12px;text-align:center}
+#bpLive:empty{display:none}
 .warn{margin-top:10px;background:var(--accent-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px;display:none}
-details summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+details{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+details summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--muted);list-style:none;display:flex;justify-content:space-between}
 details summary::after{content:'＋';color:var(--muted)}
 details[open] summary::after{content:'－'}
 details[open] summary{margin-bottom:12px}
@@ -67,11 +84,10 @@ details[open] summary{margin-bottom:12px}
 .chips input:checked+label{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
 .check{display:flex;align-items:center;gap:10px;font-size:15px;cursor:pointer}
 .check input{width:20px;height:20px;accent-color:var(--accent)}
-.btn{width:100%;font:inherit;font-weight:600;font-size:17px;border:0;border-radius:12px;padding:14px;
-  background:var(--accent);color:#fff;cursor:pointer}
+.btn{width:100%;font:inherit;font-weight:600;font-size:17px;border:0;border-radius:16px;padding:14px;
+  background:var(--accent-ink);color:#fff;cursor:pointer}
+#saveBtn{font-family:'Kanit',sans-serif;font-size:20px;height:56px;margin-top:14px}
 .btn:disabled{opacity:.6}
-.last{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.last .big{font-size:26px;font-weight:700}
 .muted{color:var(--muted);font-size:13px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{background:var(--field);border-radius:12px;padding:10px 12px}
@@ -91,10 +107,11 @@ details[open] summary{margin-bottom:12px}
 .empty{text-align:center;color:var(--muted);padding:40px 10px}
 nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);
   display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:6}
-nav button{flex:1;font:inherit;font-size:13px;background:none;border:0;color:var(--muted);padding:6px;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:2px}
-nav button .i{font-size:20px;line-height:1}
-nav button.on{color:var(--accent);font-weight:600}
+nav button{flex:1;font:inherit;font-size:12px;background:none;border:0;color:var(--muted);padding:6px;cursor:pointer;min-height:48px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+nav button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--accent-ink);font-weight:700}
+nav button.on svg{stroke-width:2.4}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);
   padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:9;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -113,7 +130,7 @@ nav button.on{color:var(--accent);font-weight:600}
 </head>
 <body>
 <header>
-  <h1><img src="icon-192.png" alt="">ดันดี<small>บันทึกความดัน</small></h1>
+  <h1><img src="icon-192.png" alt="">ดันดี</h1>
   <button class="status" id="status" type="button">กำลังโหลด…</button>
 </header>
 
@@ -121,19 +138,32 @@ nav button.on{color:var(--accent);font-weight:600}
   <!-- ===== บันทึก ===== -->
   <section id="tab-add">
     <div class="banner" id="demoBanner" hidden><span>โหมดทดลอง: ข้อมูลเก็บแค่ในเครื่องนี้</span><button type="button" data-go="settings">เชื่อม Google Sheets</button></div>
+    <div class="hello"><div class="muted" id="greet">สวัสดี</div><div class="hello-q" id="helloQ">วันนี้วัดความดันหรือยัง?</div></div>
     <div class="card" id="lastCard" hidden></div>
 
-    <form id="form" autocomplete="off">
-      <div class="card">
-        <h2>ความดันโลหิต <small>mmHg</small></h2>
-        <div class="bp">
-          <div><label class="f" for="sys">ตัวบน</label><input id="sys" type="number" inputmode="numeric" placeholder="120"></div>
-          <div><label class="f" for="dia">ตัวล่าง</label><input id="dia" type="number" inputmode="numeric" placeholder="80"></div>
-          <div><label class="f" for="pulse">ชีพจร</label><input id="pulse" type="number" inputmode="numeric" placeholder="72"></div>
-        </div>
-        <div id="bpLive"></div>
-        <div class="warn" id="bpWarn">ค่าสูงมาก ให้นั่งพัก 5 นาทีแล้ววัดซ้ำ ถ้ายังสูงและมีอาการเจ็บหน้าอก ปวดหัวรุนแรง แขนขาอ่อนแรง พูดไม่ชัด หรือตามัว ให้โทร <b>1669</b> หรือไปโรงพยาบาลทันที</div>
-        <div class="grid2 row">
+    <form id="form" class="card" autocomplete="off">
+      <div class="rec-head">
+        <span class="rec-title">จดค่าใหม่</span>
+        <input id="datetime" class="when" type="datetime-local" aria-label="วันเวลาที่วัด">
+      </div>
+      <div class="bp">
+        <label for="sys">ตัวบน<input id="sys" type="number" inputmode="numeric" placeholder="120"></label>
+        <label for="dia">ตัวล่าง<input id="dia" type="number" inputmode="numeric" placeholder="80"></label>
+        <label for="pulse">ชีพจร<input id="pulse" type="number" inputmode="numeric" placeholder="72"></label>
+      </div>
+      <div id="bpLive"></div>
+      <div class="warn" id="bpWarn">ค่าสูงมาก ให้นั่งพัก 5 นาทีแล้ววัดซ้ำ ถ้ายังสูงและมีอาการเจ็บหน้าอก ปวดหัวรุนแรง แขนขาอ่อนแรง พูดไม่ชัด หรือตามัว ให้โทร <b>1669</b> หรือไปโรงพยาบาลทันที</div>
+
+      <div class="qchips">
+        <button type="button" class="qchip" data-q="weight">+ น้ำหนัก</button>
+        <button type="button" class="qchip" data-q="sugar">+ น้ำตาล</button>
+        <button type="button" class="qchip" data-q="med" id="qMed">+ กินยา</button>
+        <button type="button" class="qchip" data-q="sym">+ อาการ</button>
+      </div>
+
+      <details id="more">
+        <summary>รายละเอียดเพิ่มเติม</summary>
+        <div class="grid2">
           <div><label class="f">แขน</label>
             <div class="seg"><input type="radio" name="arm" id="armL" value="ซ้าย" checked><label for="armL">ซ้าย</label><input type="radio" name="arm" id="armR" value="ขวา"><label for="armR">ขวา</label></div>
           </div>
@@ -141,28 +171,21 @@ nav button.on{color:var(--accent);font-weight:600}
             <div class="seg"><input type="radio" name="posture" id="pS" value="นั่ง" checked><label for="pS">นั่ง</label><input type="radio" name="posture" id="pL" value="นอน"><label for="pL">นอน</label><input type="radio" name="posture" id="pU" value="ยืน"><label for="pU">ยืน</label></div>
           </div>
         </div>
-        <div class="row"><label class="f" for="datetime">วันเวลาที่วัด</label><input id="datetime" type="datetime-local"></div>
-      </div>
-
-      <div class="card">
-        <details id="more">
-          <summary>สุขภาพอื่นๆ</summary>
-          <div class="grid2">
-            <div><label class="f" for="weight">น้ำหนัก (กก.)</label><input id="weight" type="number" step="0.1" inputmode="decimal"></div>
-            <div><label class="f" for="temp">อุณหภูมิ (°C)</label><input id="temp" type="number" step="0.1" inputmode="decimal"></div>
-            <div><label class="f" for="sugar">น้ำตาลในเลือด (mg/dL)</label><input id="sugar" type="number" inputmode="numeric"></div>
-            <div><label class="f" for="sugarTiming">ช่วงที่วัดน้ำตาล</label>
-              <select id="sugarTiming"><option value="งดอาหาร">งดอาหาร (เช้า)</option><option value="ก่อนอาหาร">ก่อนอาหาร</option><option value="หลังอาหาร 2 ชม.">หลังอาหาร 2 ชม.</option><option value="สุ่ม">สุ่ม</option></select></div>
-            <div><label class="f" for="spo2">ออกซิเจน SpO2 (%)</label><input id="spo2" type="number" inputmode="numeric"></div>
-            <div><label class="f" for="sleep">นอน (ชม.)</label><input id="sleep" type="number" step="0.5" inputmode="decimal"></div>
-          </div>
-          <div class="row"><label class="check"><input type="checkbox" id="med"> กินยาประจำวันแล้ว</label></div>
-          <div class="row"><label class="f">อาการ</label>
-            <div class="chips" id="symChips"></div>
-          </div>
-          <div class="row"><label class="f" for="note">โน้ต</label><textarea id="note" placeholder="เช่น ดื่มกาแฟก่อนวัด, นอนน้อย, เครียด"></textarea></div>
-        </details>
-      </div>
+        <div class="grid2 row">
+          <div><label class="f" for="weight">น้ำหนัก (กก.)</label><input id="weight" type="number" step="0.1" inputmode="decimal"></div>
+          <div><label class="f" for="temp">อุณหภูมิ (°C)</label><input id="temp" type="number" step="0.1" inputmode="decimal"></div>
+          <div><label class="f" for="sugar">น้ำตาลในเลือด (mg/dL)</label><input id="sugar" type="number" inputmode="numeric"></div>
+          <div><label class="f" for="sugarTiming">ช่วงที่วัดน้ำตาล</label>
+            <select id="sugarTiming"><option value="งดอาหาร">งดอาหาร (เช้า)</option><option value="ก่อนอาหาร">ก่อนอาหาร</option><option value="หลังอาหาร 2 ชม.">หลังอาหาร 2 ชม.</option><option value="สุ่ม">สุ่ม</option></select></div>
+          <div><label class="f" for="spo2">ออกซิเจน SpO2 (%)</label><input id="spo2" type="number" inputmode="numeric"></div>
+          <div><label class="f" for="sleep">นอน (ชม.)</label><input id="sleep" type="number" step="0.5" inputmode="decimal"></div>
+        </div>
+        <div class="row"><label class="check"><input type="checkbox" id="med"> กินยาประจำวันแล้ว</label></div>
+        <div class="row" id="symRow"><label class="f">อาการ</label>
+          <div class="chips" id="symChips"></div>
+        </div>
+        <div class="row"><label class="f" for="note">โน้ต</label><textarea id="note" placeholder="เช่น ดื่มกาแฟก่อนวัด, นอนน้อย, เครียด"></textarea></div>
+      </details>
 
       <button class="btn" id="saveBtn" type="submit">บันทึก</button>
     </form>
@@ -236,15 +259,15 @@ nav button.on{color:var(--accent);font-weight:600}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 7 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 8 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
 <nav>
-  <button data-tab="add" class="on"><span class="i">＋</span>บันทึก</button>
-  <button data-tab="history"><span class="i">☰</span>ประวัติ</button>
-  <button data-tab="chart"><span class="i">📈</span>กราฟ</button>
-  <button data-tab="settings"><span class="i">⚙︎</span>ตั้งค่า</button>
+  <button data-tab="add" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>บันทึก</button>
+  <button data-tab="history"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>ประวัติ</button>
+  <button data-tab="chart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>กราฟ</button>
+  <button data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>ตั้งค่า</button>
 </nav>
 <div id="toast"></div>
 
@@ -359,10 +382,21 @@ function updateLive(){
 }
 ['sys','dia'].forEach(id => $('#'+id).addEventListener('input', updateLive));
 
+function syncMedChip(){ $('#qMed').classList.toggle('on', $('#med').checked); $('#qMed').textContent = $('#med').checked ? '✓ กินยา' : '+ กินยา'; }
+$('#med').addEventListener('change', syncMedChip);
+document.querySelectorAll('.qchip').forEach(b => b.addEventListener('click', () => {
+  const q = b.dataset.q;
+  if (q === 'med') { $('#med').checked = !$('#med').checked; syncMedChip(); return; }
+  $('#more').open = true;
+  const target = q === 'sym' ? $('#symRow') : $('#' + q);
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (q !== 'sym') setTimeout(() => target.focus({ preventScroll: true }), 300);
+}));
+
 function resetForm(){
   ['sys','dia','pulse','weight','temp','sugar','spo2','sleep','note'].forEach(id => $('#'+id).value = '');
   document.querySelectorAll('#symChips input').forEach(i => i.checked = false);
-  $('#med').checked = false;
+  $('#med').checked = false; syncMedChip();
   $('#datetime').value = localInput(new Date());
   updateLive();
 }
@@ -440,14 +474,39 @@ function itemHTML(r){
   </div>`;
 }
 
+function relDay(d){
+  const t = new Date(); t.setHours(0,0,0,0);
+  const x = new Date(d); x.setHours(0,0,0,0);
+  const diff = Math.round((t - x) / 864e5);
+  return diff === 0 ? 'วันนี้' : diff === 1 ? 'เมื่อวาน' : fmtShort(d);
+}
+function sparkline(vals){
+  if (vals.length < 2) return '';
+  const W = 96, H = 40, p = 4, mn = Math.min(...vals), mx = Math.max(...vals), rg = (mx - mn) || 1;
+  const pts = vals.map((v, i) => [p + i * (W - 2 * p) / (vals.length - 1), p + (1 - (v - mn) / rg) * (H - 2 * p)]);
+  const last = pts[pts.length - 1];
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-label="แนวโน้มตัวบนล่าสุด"><polyline points="${pts.map(q => q.map(n => n.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="4" fill="var(--accent)"/></svg>`;
+}
 function renderLast(){
-  const last = records.find(r => has(r.sys));
+  const bpAll = records.filter(r => has(r.sys));
+  const last = bpAll[0];
   const el = $('#lastCard');
+  // คำทักทาย
+  const h = new Date().getHours();
+  $('#greet').textContent = h < 12 ? 'สวัสดีตอนเช้า' : h < 17 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น';
+  const today = bpAll.filter(r => relDay(new Date(r.datetime)) === 'วันนี้').length;
+  $('#helloQ').textContent = today ? `วันนี้วัดแล้ว ${today} ครั้ง` : 'วันนี้วัดความดันหรือยัง?';
   if (!last) { el.hidden = true; return; }
   const d = new Date(last.datetime);
+  const wk = inRange(7).filter(r => has(r.sys));
+  const aS = avg(wk.map(r => +r.sys)), aD = avg(wk.map(r => +r.dia));
+  const spark = sparkline(bpAll.slice(0, 7).reverse().map(r => +r.sys));
   el.hidden = false;
-  el.innerHTML = `<div class="last"><div><div class="muted">ค่าความดันล่าสุด · ${fmtShort(d)} ${fmtTime(d)}</div>
-    <div class="big">${last.sys}/${last.dia}${has(last.pulse) ? ` <span class="muted">ชีพจร ${last.pulse}</span>` : ''}</div></div>${badge(bpClass(last.sys, last.dia))}</div>`;
+  el.innerHTML = `<div class="last"><div>
+      <div class="muted">ล่าสุด · ${relDay(d)} ${fmtTime(d)}</div>
+      <div class="big">${last.sys}/${last.dia}</div>
+      <div class="muted">${has(last.pulse) ? 'ชีพจร ' + last.pulse : ''}${has(last.pulse) && aS ? ' · ' : ''}${aS ? `เฉลี่ย 7 วัน ${Math.round(aS)}/${Math.round(aD)}` : ''}</div>
+    </div><div class="right">${badge(bpClass(last.sys, last.dia))}${spark}</div></div>`;
 }
 
 function avg(arr){ return arr.length ? arr.reduce((a,b) => a + b, 0) / arr.length : null; }

@@ -550,7 +550,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 27 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 28 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -611,6 +611,7 @@ const ERR_TH = {
   unknown_action: 'เวอร์ชันสคริปต์ไม่ตรง ลอง Deploy ใหม่',
   not_found: 'ไม่พบรายการนี้ในชีต',
   ocr_off: 'ยังไม่ได้เปิดอ่านค่าจากรูป',
+  busy: 'Gemini มีคนใช้เยอะชั่วคราว กด "ลองอีกครั้ง" หรือรอสักครู่',
   bad_image: 'รูปใหญ่หรือเสียเกินไป'
 };
 
@@ -1114,7 +1115,7 @@ function renderHistory(){
 }
 
 /* ---------- อ่านค่าจากรูปเครื่องวัด (Gemini ผ่านชีต) ---------- */
-let scanTimer = null;
+let scanTimer = null, scanLast = null;
 function scanClose(){ clearTimeout(scanTimer); scanTimer = null; $('#scanDlg').hidden = true; $('#scanFile').value = ''; }
 async function shrinkImage(file){
   let src;
@@ -1150,8 +1151,8 @@ $('#scanBtn').addEventListener('click', () => {
   $('#scanFile').click();
 });
 $('#scanCancel').addEventListener('click', () => { scanClose(); });
-$('#scanFile').addEventListener('change', async () => {
-  const file = $('#scanFile').files[0]; if (!file) return;
+$('#scanFile').addEventListener('change', () => { const f = $('#scanFile').files[0]; if (f) scanRun(f); });
+async function scanRun(file){
   const dlg = $('#scanDlg');
   $('#scanCancel').onclick = null;
   $('#scanTitle').textContent = 'กำลังอ่านค่า…'; $('#scanVal').innerHTML = '<span class="spin" aria-hidden="true">⏳</span>';
@@ -1160,7 +1161,7 @@ $('#scanFile').addEventListener('change', async () => {
   let res;
   try {
     const url = await shrinkImage(file);
-    $('#scanImg').src = url;
+    $('#scanImg').src = url; scanLast = file;
     res = await api('ocr', { image: url.split(',')[1], mime: 'image/jpeg' });
   } catch(e) {
     if ($('#scanDlg').hidden) return;
@@ -1170,6 +1171,7 @@ $('#scanFile').addEventListener('change', async () => {
     $('#scanSub').innerHTML = off ? 'ยังไม่ได้เปิดฟีเจอร์นี้<br>ที่ Google ชีต เมนู <b>❤️ ดันดี → 3) เปิดอ่านค่าจากรูป</b>'
       : old ? 'โค้ดในชีตยังเป็นรุ่นเก่า<br>อัปเดตโค้ดแล้ว Deploy เวอร์ชันใหม่ก่อน' : esc(e.message);
     $('#scanCancel').textContent = 'ปิด';
+    if (!off && !old) { $('#scanOk').hidden = false; $('#scanOk').textContent = 'ลองอีกครั้ง'; $('#scanOk').onclick = () => scanRun(scanLast); }
     return;
   }
   if ($('#scanDlg').hidden) return; // ผู้ใช้กดยกเลิกระหว่างรอ
@@ -1190,7 +1192,7 @@ $('#scanFile').addEventListener('change', async () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   ['sys', 'dia', 'pulse'].forEach(id => { const el = $('#' + id); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); });
   toast(ok && res.sure ? 'ใส่ค่าให้แล้ว ✓ ตรวจแล้วกดบันทึก' : 'ใส่ค่าให้แล้ว แต่บางตัวอ่านไม่ชัด โปรดตรวจก่อนบันทึก');
-});
+}
 
 /* ---------- แก้ไขรายการ ---------- */
 let editingId = null, editingOrig = null;

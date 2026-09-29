@@ -228,7 +228,7 @@ function gemini_(key, b64, mime, prompt, full) {
   };
   const t0 = Date.now();
   const saved = PropertiesService.getScriptProperties().getProperty('GEMINI_MODEL');
-  const models = (saved && !full) ? [saved] : geminiModels_(key);
+  const models = (saved && !full) ? [saved] : geminiModels_(key).filter(function (m) { return !(full && m === saved); });
   let last = 'no_model';
   for (let i = 0; i < models.length && i < 4; i++) {
     if (Date.now() - t0 > 60000) { last = 'ช้าเกินไป (' + last + ')'; break; }
@@ -238,6 +238,9 @@ function gemini_(key, b64, mime, prompt, full) {
     opt.payload = mk(true);
     let res = UrlFetchApp.fetch(url, opt);
     if (res.getResponseCode() === 400 && /thinking/i.test(res.getContentText())) { opt.payload = mk(false); res = UrlFetchApp.fetch(url, opt); }
+    if ([500, 502, 503, 504].indexOf(res.getResponseCode()) >= 0 && Date.now() - t0 < 40000) { // ไม่ว่างชั่วคราว → รอแล้วลองซ้ำ 1 ครั้ง
+      Utilities.sleep(1500); res = UrlFetchApp.fetch(url, opt);
+    }
     const code = res.getResponseCode(), txt = res.getContentText();
     console.log('gemini', models[i], code, (Date.now() - t1) + 'ms', code === 200 ? '' : errMsg_(txt));
     if (code === 400 && /API key not valid|API_KEY_INVALID/.test(txt)) return { ok: false, error: 'รหัส Gemini ไม่ถูกต้อง' };
@@ -250,7 +253,8 @@ function gemini_(key, b64, mime, prompt, full) {
       return { ok: true, model: models[i], data: JSON.parse(t.replace(/^```(json)?|```$/g, '').trim()) };
     } catch (e) { return { ok: false, error: 'อ่านคำตอบไม่ได้' }; }
   }
-  if (saved && !full) return gemini_(key, b64, mime, prompt, true); // รุ่นที่จำไว้ใช้ไม่ได้แล้ว → หาใหม่
+  if (saved && !full && Date.now() - t0 < 45000) return gemini_(key, b64, mime, prompt, true); // รุ่นที่จำไว้ใช้ไม่ได้ → ลองรุ่นอื่น
+  if (/HTTP 5\d\d/.test(last)) return { ok: false, error: 'busy', detail: last };
   return { ok: false, error: last };
 }
 

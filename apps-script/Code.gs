@@ -173,14 +173,14 @@ function menuOcr() {
     '<h2>อ่านค่าจากรูปด้วย AI</h2>'
     + (has ? '<p class="ok">✓ เปิดใช้งานอยู่แล้ว วางรหัสใหม่ด้านล่างถ้าต้องการเปลี่ยน</p>' : '')
     + '<ol><li>เปิด <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> (ล็อกอินบัญชี Google เดียวกัน)</li>'
-    + '<li>กด <b class="hl">Create API key</b> แล้วกดคัดลอก (รหัสขึ้นต้นด้วย AIza…)</li>'
+    + '<li>กด <b class="hl">Create API key</b> แล้วกด <b class="hl">Copy key</b></li>'
     + '<li>วางด้านล่างแล้วกด <b class="hl">บันทึกและทดสอบ</b></li></ol>'
-    + '<input id="k" placeholder="AIza…" autocomplete="off"><p><button class="btn" id="go" onclick="save()">บันทึกและทดสอบ</button></p>'
+    + '<input id="k" placeholder="วางรหัส Gemini ที่นี่" autocomplete="off"><p><button class="btn" id="go" onclick="save()">บันทึกและทดสอบ</button></p>'
     + '<p id="m"></p>'
     + '<p class="muted">รหัสเก็บในชีตนี้เท่านั้น · รูปจะถูกส่งให้ Google Gemini อ่านตัวเลข · รหัสฟรีมีโควตาต่อวันเพียงพอสำหรับใช้ที่บ้าน</p>'
     + '<p class="muted">⚠️ หลังบันทึกครั้งแรก ต้อง Deploy เวอร์ชันใหม่: ส่วนขยาย → Apps Script → การทำให้ใช้งานได้ → จัดการ → ✏️ → เวอร์ชันใหม่</p>'
     + '<script>function save(){var k=document.getElementById("k").value.trim(),m=document.getElementById("m"),b=document.getElementById("go");'
-    + 'if(!/^AIza[\\w-]{20,}$/.test(k)){m.style.color="#C93B46";m.textContent="รหัสไม่ถูกต้อง ต้องขึ้นต้นด้วย AIza";return;}'
+    + 'if(!/^[\\w.\\-]{20,}$/.test(k)){m.style.color="#C93B46";m.textContent="รหัสไม่ถูกต้อง ลองกด Copy key แล้ววางใหม่";return;}'
     + 'b.disabled=true;m.style.color="";m.textContent="⏳ กำลังทดสอบ…";'
     + 'google.script.run.withSuccessHandler(function(r){b.disabled=false;m.style.color=r.ok?"#1FA38A":"#C93B46";m.textContent=r.ok?"✓ ใช้ได้แล้ว! ในแอปจะมีปุ่ม 📷 อ่านจากรูป":"ใช้ไม่ได้: "+r.error;})'
     + '.withFailureHandler(function(e){b.disabled=false;m.style.color="#C93B46";m.textContent="ผิดพลาด: "+e.message;}).saveGeminiKey(k);}</script>',

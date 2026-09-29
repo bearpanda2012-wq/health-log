@@ -70,6 +70,8 @@ textarea{resize:vertical;min-height:64px}
 .qchips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:14px 0 2px}
 .medrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0}
 .medrow+.medrow{border-top:1px dashed var(--line)}
+.medname{border-top:1px dashed var(--line);padding-top:10px;margin-top:4px}
+.medname .hint{font-size:12px;color:var(--muted);margin-top:4px}
 .medrow .check{font-weight:600;min-height:40px}
 .medrow select{width:auto;min-width:140px;padding:8px 10px}
 .medrow select:disabled{opacity:.45}
@@ -283,6 +285,10 @@ nav button.on svg{stroke-width:2.4}
           <select class="medtm" aria-label="ช่วงเวลากินยามื้อกลางวัน"><option>ก่อนอาหาร</option><option selected>หลังอาหาร</option></select></div>
         <div class="medrow"><label class="check"><input type="checkbox" class="medck" value="เย็น"> เย็น</label>
           <select class="medtm" aria-label="ช่วงเวลากินยามื้อเย็น"><option>ก่อนอาหาร</option><option selected>หลังอาหาร</option></select></div>
+        <div class="medname"><label class="f" for="medName">ชื่อยา (ไม่บังคับ)</label>
+          <input id="medName" type="text" list="medNames" maxlength="200" autocomplete="off" placeholder="เช่น อัมโลดิพีน 5 มก., เมทฟอร์มิน">
+          <datalist id="medNames"></datalist>
+          <div class="hint">จำชื่อไว้ให้ครั้งหน้า · บันทึกพร้อมมื้อที่ติ๊ก</div></div>
       </div>
       <div class="qpanel" id="p-sym" hidden>
         <label class="f">อาการ (เลือกได้หลายข้อ)</label>
@@ -448,7 +454,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 17 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 18 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -595,8 +601,19 @@ const medRows = () => [...document.querySelectorAll('.medrow')];
 function collectMed(){
   const v = medRows().filter(r => r.querySelector('.medck').checked)
     .map(r => r.querySelector('.medck').value + ' ' + r.querySelector('.medtm').value);
-  return v.length ? v.join(', ') : null;
+  if (!v.length) return null;
+  const name = $('#medName').value.trim().replace(/\s+/g, ' ');
+  return name ? v.join(', ') + ' · ' + name : v.join(', ');
 }
+function loadMedNames(){ try { return JSON.parse(store.get('hl_mednames') || '[]'); } catch(e){ return []; } }
+function renderMedNames(){ $('#medNames').innerHTML = loadMedNames().map(n => `<option value="${esc(n)}">`).join(''); }
+function rememberMedName(){
+  const n = $('#medName').value.trim().replace(/\s+/g, ' ');
+  store.set('hl_medname', n);
+  if (n) { store.set('hl_mednames', JSON.stringify([n, ...loadMedNames().filter(x => x !== n)].slice(0, 10))); renderMedNames(); }
+}
+$('#medName').value = store.get('hl_medname') || '';
+renderMedNames();
 function syncMedChip(){
   const b = $('#qMed'), open = !$('#p-med').hidden, n = medRows().filter(r => r.querySelector('.medck').checked).length;
   medRows().forEach(r => r.querySelector('.medtm').disabled = !r.querySelector('.medck').checked);
@@ -653,7 +670,7 @@ $('#form').addEventListener('submit', async e => {
     arm: null, posture: null,
     weight: num('weight'), sugar: num('sugar'), sugarTiming: null,
     temp: num('temp'), spo2: num('spo2'), sleep: num('sleep'),
-    med: collectMed(), symptoms: syms || null, note: $('#note').value.trim() || null
+    med: (rememberMedName(), collectMed()), symptoms: syms || null, note: $('#note').value.trim() || null
   };
   if (has(r.sys) || has(r.pulse)) {
     r.arm = document.querySelector('input[name=arm]:checked').value;

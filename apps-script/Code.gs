@@ -258,7 +258,7 @@ function addRecord(rec) {
       if (k === 'id') return id;
       if (k === 'createdAt') return new Date();
       if (k === 'datetime') return isNaN(d.getTime()) ? new Date() : d;
-      if (k === 'med') return rec.med ? 'ใช่' : '';
+      if (k === 'med') return rec.med === true ? 'ใช่' : (rec.med ? clean_(rec, 'med') : ''); // เช่น "เช้า หลังอาหาร, เย็น ก่อนอาหาร"
       return clean_(rec, k);
     });
     sh.appendRow(row);

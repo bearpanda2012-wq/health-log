@@ -68,6 +68,11 @@ textarea{resize:vertical;min-height:64px}
 .rec-title{font-family:'Kanit',sans-serif;font-weight:600;font-size:18px}
 .when{width:auto;border:0;background:none;padding:0;font-size:13px;color:var(--muted);text-align:right;min-width:0;max-width:60%}
 .qchips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:14px 0 2px}
+.medrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0}
+.medrow+.medrow{border-top:1px dashed var(--line)}
+.medrow .check{font-weight:600;min-height:40px}
+.medrow select{width:auto;min-width:140px;padding:8px 10px}
+.medrow select:disabled{opacity:.45}
 .qpanel{margin-top:10px;background:var(--field);border:1px solid var(--line);border-radius:16px;padding:12px}
 .qchip{font:inherit;font-size:13px;font-weight:600;color:var(--accent-text);background:var(--accent-soft);border:1.5px solid transparent;border-radius:99px;padding:7px 2px;min-height:38px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qchip.on{border-color:var(--accent-text);background:var(--card)}
@@ -194,6 +199,15 @@ nav button.on svg{stroke-width:2.4}
             <select id="sugarTiming"><option value="งดอาหาร">งดอาหาร (เช้า)</option><option value="ก่อนอาหาร">ก่อนอาหาร</option><option value="หลังอาหาร 2 ชม.">หลังอาหาร 2 ชม.</option><option value="สุ่ม">สุ่ม</option></select></div>
         </div>
       </div>
+      <div class="qpanel" id="p-med" hidden>
+        <label class="f">กินยาแล้ว (ติ๊กมื้อที่กิน)</label>
+        <div class="medrow"><label class="check"><input type="checkbox" class="medck" value="เช้า"> เช้า</label>
+          <select class="medtm" aria-label="ช่วงเวลากินยามื้อเช้า"><option>ก่อนอาหาร</option><option selected>หลังอาหาร</option></select></div>
+        <div class="medrow"><label class="check"><input type="checkbox" class="medck" value="กลางวัน"> กลางวัน</label>
+          <select class="medtm" aria-label="ช่วงเวลากินยามื้อกลางวัน"><option>ก่อนอาหาร</option><option selected>หลังอาหาร</option></select></div>
+        <div class="medrow"><label class="check"><input type="checkbox" class="medck" value="เย็น"> เย็น</label>
+          <select class="medtm" aria-label="ช่วงเวลากินยามื้อเย็น"><option>ก่อนอาหาร</option><option selected>หลังอาหาร</option></select></div>
+      </div>
       <div class="qpanel" id="p-sym" hidden>
         <label class="f">อาการ (เลือกได้หลายข้อ)</label>
         <div class="chips" id="symChips"></div>
@@ -206,7 +220,6 @@ nav button.on svg{stroke-width:2.4}
           <div><label class="f" for="spo2">ออกซิเจน SpO2 (%)</label><input id="spo2" type="number" inputmode="numeric"></div>
           <div><label class="f" for="sleep">นอน (ชม.)</label><input id="sleep" type="number" step="0.5" inputmode="decimal"></div>
         </div>
-        <div class="row"><label class="check"><input type="checkbox" id="med"> กินยาประจำวันแล้ว</label></div>
         <div class="row"><label class="f" for="note">โน้ต</label><textarea id="note" placeholder="เช่น ดื่มกาแฟก่อนวัด, นอนน้อย, เครียด"></textarea></div>
       </details>
 
@@ -292,7 +305,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 11 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 12 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -317,7 +330,7 @@ const demo = {
   save(){ try { localStorage.setItem('hl_demo', JSON.stringify(mem.data)); } catch(e){} },
   getRecords(){ return this.load().slice(); },
   addRecord(r){ const id = 'd' + Date.now() + Math.random().toString(36).slice(2,6);
-    this.load().push(Object.assign({}, r, { id, med: r.med ? 'ใช่' : null, createdAt: new Date().toISOString() })); this.save(); return { ok:true, id }; },
+    this.load().push(Object.assign({}, r, { id, med: r.med || null, createdAt: new Date().toISOString() })); this.save(); return { ok:true, id }; },
   deleteRecord(id){ const d = this.load(); const i = d.findIndex(x => x.id === id); if (i >= 0) d.splice(i,1); this.save(); return { ok: i >= 0 }; }
 };
 /* ---------- การตั้งค่าการเชื่อมต่อ (เก็บในเครื่องนี้) ---------- */
@@ -415,27 +428,43 @@ function updateLive(){
 }
 ['sys','dia'].forEach(id => $('#'+id).addEventListener('input', updateLive));
 
-function syncMedChip(){ $('#qMed').classList.toggle('on', $('#med').checked); $('#qMed').textContent = $('#med').checked ? '✓ กินยา' : '+ กินยา'; }
-$('#med').addEventListener('change', syncMedChip);
+/* ---------- ยา: เช้า/กลางวัน/เย็น + ก่อน/หลังอาหาร ---------- */
+const medRows = () => [...document.querySelectorAll('.medrow')];
+function collectMed(){
+  const v = medRows().filter(r => r.querySelector('.medck').checked)
+    .map(r => r.querySelector('.medck').value + ' ' + r.querySelector('.medtm').value);
+  return v.length ? v.join(', ') : null;
+}
+function syncMedChip(){
+  const b = $('#qMed'), open = !$('#p-med').hidden, n = medRows().filter(r => r.querySelector('.medck').checked).length;
+  medRows().forEach(r => r.querySelector('.medtm').disabled = !r.querySelector('.medck').checked);
+  b.classList.toggle('on', open || n > 0);
+  b.textContent = open ? '− กินยา' : n ? '✓ กินยา' : '+ กินยา';
+}
+function saveMedPrefs(){ store.set('hl_medtm', JSON.stringify(medRows().map(r => r.querySelector('.medtm').value))); }
+try { JSON.parse(store.get('hl_medtm') || '[]').forEach((v, i) => { const r = medRows()[i]; if (r && v) r.querySelector('.medtm').value = v; }); } catch(e){}
+medRows().forEach(r => { r.querySelector('.medck').addEventListener('change', syncMedChip); r.querySelector('.medtm').addEventListener('change', saveMedPrefs); });
+
 document.querySelectorAll('.qchip').forEach(b => b.addEventListener('click', () => {
   const q = b.dataset.q;
-  if (q === 'med') { $('#med').checked = !$('#med').checked; syncMedChip(); return; }
   const panel = $('#p-' + q), open = panel.hidden;
   panel.hidden = !open;
-  b.classList.toggle('on', open);
   b.setAttribute('aria-expanded', open);
+  if (q === 'med') { syncMedChip(); return; }
+  b.classList.toggle('on', open);
   b.textContent = (open ? '− ' : '+ ') + b.textContent.slice(2);
   if (open) { const f = panel.querySelector('input'); if (f && f.type !== 'checkbox') setTimeout(() => f.focus(), 50); }
 }));
 function closePanels(){
   document.querySelectorAll('.qpanel').forEach(p => p.hidden = true);
   document.querySelectorAll('.qchip:not(#qMed)').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-expanded', false); b.textContent = '+ ' + b.textContent.slice(2); });
+  syncMedChip();
 }
 
 function resetForm(){
   ['sys','dia','pulse','weight','temp','sugar','spo2','sleep','note'].forEach(id => $('#'+id).value = '');
   document.querySelectorAll('#symChips input').forEach(i => i.checked = false);
-  $('#med').checked = false; syncMedChip(); closePanels(); $('#more').open = false;
+  document.querySelectorAll('.medck').forEach(i => i.checked = false); closePanels(); $('#more').open = false;
   $('#datetime').value = localInput(new Date());
   updateLive();
 }
@@ -462,7 +491,7 @@ $('#form').addEventListener('submit', async e => {
     arm: null, posture: null,
     weight: num('weight'), sugar: num('sugar'), sugarTiming: null,
     temp: num('temp'), spo2: num('spo2'), sleep: num('sleep'),
-    med: $('#med').checked, symptoms: syms || null, note: $('#note').value.trim() || null
+    med: collectMed(), symptoms: syms || null, note: $('#note').value.trim() || null
   };
   if (has(r.sys) || has(r.pulse)) {
     r.arm = document.querySelector('input[name=arm]:checked').value;
@@ -475,7 +504,7 @@ $('#form').addEventListener('submit', async e => {
   const btn = $('#saveBtn'); btn.disabled = true; btn.textContent = 'กำลังบันทึก…';
   try {
     const res = await api('addRecord', r);
-    records.unshift(Object.assign({}, r, { id: res.id, med: r.med ? 'ใช่' : null }));
+    records.unshift(Object.assign({}, r, { id: res.id, med: r.med || null }));
     sortRecords();
     if (r.arm) store.set('hl_prefs', JSON.stringify({ arm: r.arm, posture: r.posture }));
     resetForm(); renderAll();
@@ -497,6 +526,7 @@ function tagsFor(r){
   if (has(r.spo2)) t.push(`O₂ ${r.spo2}%`);
   if (has(r.sleep)) t.push(`😴 ${r.sleep} ชม.`);
   if (r.med === 'ใช่' || r.med === true) t.push('💊 กินยาแล้ว');
+  else if (has(r.med)) t.push('💊 ' + r.med);
   if (has(r.symptoms)) t.push(`⚠️ ${r.symptoms}`);
   if (has(r.sys) && (r.arm || r.posture)) t.push([r.arm && 'แขน'+r.arm, r.posture].filter(Boolean).join(' · '));
   return t.map(x => `<span class="tag">${esc(x)}</span>`).join('');

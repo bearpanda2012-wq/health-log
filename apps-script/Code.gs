@@ -165,7 +165,7 @@ function menuResetKey() {
 
 /* ================= อ่านค่าจากรูป (Gemini) ================= */
 
-const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
 
 function menuOcr() {
   const has = !!PropertiesService.getScriptProperties().getProperty('GEMINI_KEY');
@@ -182,39 +182,69 @@ function menuOcr() {
     + '<script>function save(){var k=document.getElementById("k").value.trim(),m=document.getElementById("m"),b=document.getElementById("go");'
     + 'if(!/^[\\w.\\-]{20,}$/.test(k)){m.style.color="#C93B46";m.textContent="รหัสไม่ถูกต้อง ลองกด Copy key แล้ววางใหม่";return;}'
     + 'b.disabled=true;m.style.color="";m.textContent="⏳ กำลังทดสอบ…";'
-    + 'google.script.run.withSuccessHandler(function(r){b.disabled=false;m.style.color=r.ok?"#1FA38A":"#C93B46";m.textContent=r.ok?"✓ ใช้ได้แล้ว! ในแอปจะมีปุ่ม 📷 อ่านจากรูป":"ใช้ไม่ได้: "+r.error;})'
+    + 'google.script.run.withSuccessHandler(function(r){b.disabled=false;m.style.color=r.ok?"#1FA38A":"#C93B46";m.textContent=r.ok?"✓ ใช้ได้แล้ว! ("+r.model+") ในแอปกดปุ่ม 📷 อ่านค่าจากรูปได้เลย":"ใช้ไม่ได้: "+r.error;})'
     + '.withFailureHandler(function(e){b.disabled=false;m.style.color="#C93B46";m.textContent="ผิดพลาด: "+e.message;}).saveGeminiKey(k);}</script>',
     'ดันดี — อ่านค่าจากรูป', 470);
 }
 
 function saveGeminiKey(k) {
   k = String(k || '').trim();
+  PropertiesService.getScriptProperties().deleteProperty('GEMINI_MODEL');
   const r = gemini_(k, null, null, 'ตอบคำว่า ok เป็น JSON {"ok":true}');
   if (!r.ok) return r;
   PropertiesService.getScriptProperties().setProperty('GEMINI_KEY', k);
-  return { ok: true };
+  return { ok: true, model: r.model };
 }
 
-function gemini_(key, b64, mime, prompt) {
+// หารุ่น Gemini ที่บัญชีนี้ใช้ได้ (ชื่อรุ่นเปลี่ยนบ่อย) — เลือกรุ่น flash ใหม่สุด
+function geminiModels_(key) {
+  const props = PropertiesService.getScriptProperties();
+  const saved = props.getProperty('GEMINI_MODEL');
+  let list = [];
+  try {
+    const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',
+      { muteHttpExceptions: true, headers: { 'x-goog-api-key': key } });
+    if (res.getResponseCode() === 200) {
+      const ver = function (n) { const m = n.match(/gemini-(\d+(?:\.\d+)?)/); return m ? parseFloat(m[1]) : 0; };
+      list = (JSON.parse(res.getContentText()).models || [])
+        .filter(function (m) { return (m.supportedGenerationMethods || []).indexOf('generateContent') >= 0; })
+        .map(function (m) { return String(m.name).replace(/^models\//, ''); })
+        .filter(function (n) { return /flash/.test(n) && !/(preview|exp|tts|image|audio|live|thinking|embedding)/.test(n); })
+        .sort(function (a, b) { return (ver(b) - ver(a)) || (/lite/.test(a) - /lite/.test(b)); });
+    }
+  } catch (e) {}
+  const all = [saved].concat(list, GEMINI_MODELS).filter(function (x, i, a) { return x && a.indexOf(x) === i; });
+  return all;
+}
+
+function gemini_(key, b64, mime, prompt, full) {
   const parts = [{ text: prompt }];
   if (b64) parts.unshift({ inline_data: { mime_type: mime || 'image/jpeg', data: b64 } });
   const body = JSON.stringify({ contents: [{ parts: parts }],
     generationConfig: { temperature: 0, responseMimeType: 'application/json' } });
+  const saved = PropertiesService.getScriptProperties().getProperty('GEMINI_MODEL');
+  const models = (saved && !full) ? [saved] : geminiModels_(key);
   let last = 'no_model';
-  for (let i = 0; i < GEMINI_MODELS.length; i++) {
-    const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODELS[i] + ':generateContent',
+  for (let i = 0; i < models.length && i < 6; i++) {
+    const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + models[i] + ':generateContent',
       { method: 'post', contentType: 'application/json', payload: body, muteHttpExceptions: true, headers: { 'x-goog-api-key': key } });
     const code = res.getResponseCode(), txt = res.getContentText();
-    if (code === 404) { last = 'model_not_found'; continue; }
     if (code === 400 && /API key not valid|API_KEY_INVALID/.test(txt)) return { ok: false, error: 'รหัส Gemini ไม่ถูกต้อง' };
+    if (code === 401 || code === 403) return { ok: false, error: 'รหัสนี้ใช้กับ Gemini ไม่ได้ (' + code + ') ' + errMsg_(txt) };
     if (code === 429) return { ok: false, error: 'ใช้เกินโควตาวันนี้ ลองใหม่พรุ่งนี้' };
-    if (code !== 200) { last = 'HTTP ' + code; continue; }
+    if (code !== 200) { last = models[i] + ': HTTP ' + code + ' ' + errMsg_(txt); continue; }
+    PropertiesService.getScriptProperties().setProperty('GEMINI_MODEL', models[i]);
     try {
       const j = JSON.parse(txt), t = j.candidates[0].content.parts.map(function (x) { return x.text || ''; }).join('');
-      return { ok: true, data: JSON.parse(t.replace(/^```(json)?|```$/g, '').trim()) };
+      return { ok: true, model: models[i], data: JSON.parse(t.replace(/^```(json)?|```$/g, '').trim()) };
     } catch (e) { return { ok: false, error: 'อ่านคำตอบไม่ได้' }; }
   }
+  if (saved && !full) return gemini_(key, b64, mime, prompt, true); // รุ่นที่จำไว้ใช้ไม่ได้แล้ว → หาใหม่
   return { ok: false, error: last };
+}
+
+function errMsg_(txt) {
+  try { return String(JSON.parse(txt).error.message || '').slice(0, 160); } catch (e) { return String(txt || '').slice(0, 120); }
 }
 
 const OCR_PROMPT = 'This is a photo of a home blood pressure monitor display (seven-segment LCD). '

@@ -163,7 +163,17 @@ details[open] summary{margin-bottom:12px}
 #printArea .rp-top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #D63F4B;padding-bottom:6px}
 #printArea .rp-meta{text-align:right;font-size:10pt;color:#444}
 #printArea .rp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-#printArea .rp-t{border:1px solid #ddd;border-radius:8px;padding:6px 8px}
+#printArea{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#printArea .rp-t{border:1px solid #ddd;border-left-width:5px;border-radius:8px;padding:6px 8px;position:relative}
+#printArea .rp-t.s-ok{border-color:#1FA38A;background:#EAF7F3}#printArea .rp-t.s-ok b{color:#0F6353}
+#printArea .rp-t.s-lo{border-color:#D97706;background:#FEF3E2}#printArea .rp-t.s-lo b{color:#9A4A06}
+#printArea .rp-t.s-mid{border-color:#E8A317;background:#FFF7DD}#printArea .rp-t.s-mid b{color:#8A5A00}
+#printArea .rp-t.s-hi{border-color:#DC2626;background:#FDECEC}#printArea .rp-t.s-hi b{color:#B91C1C}
+#printArea .rp-pill{position:absolute;top:6px;right:6px;font-size:8.5pt;font-weight:700;color:#fff;border-radius:99px;padding:0 7px}
+#printArea .s-ok .rp-pill{background:#147A66}#printArea .s-lo .rp-pill{background:#B45309}#printArea .s-mid .rp-pill{background:#A16207}#printArea .s-hi .rp-pill{background:#C62828}
+#printArea .c-ok{color:#0F6353;font-weight:700}#printArea .c-lo{color:#9A4A06;font-weight:700}#printArea .c-hi{color:#B91C1C;font-weight:700}
+#printArea .rp-legend{display:flex;gap:12px;font-size:9pt;margin-top:6px;color:#444}
+#printArea .rp-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 #printArea .rp-t small{display:block;color:#555;font-size:9pt}
 #printArea .rp-t b{font-family:Kanit,sans-serif;font-size:15pt}
 #printArea table{width:100%;border-collapse:collapse;font-size:9.5pt}
@@ -496,7 +506,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 19 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 20 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -1343,7 +1353,10 @@ function buildReport(days){
   const bp = asc.filter(r => has(r.sys)), sg = asc.filter(r => has(r.sugar)), wt = asc.filter(r => has(r.weight));
   const R = v => Math.round(v), name = $('#rpName').value.trim();
   const dfmt = d => d.toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'numeric' });
-  const tile = (t, v, sub) => `<div class="rp-t"><small>${t}</small><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+  const tile = (t, v, sub, st) => `<div class="rp-t${st ? ' s-' + st.s : ''}">${st && st.t ? `<span class="rp-pill">${st.t}</span>` : ''}<small>${t}</small><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+  const bpSt = (sy, di) => { const c = bpClass(sy, di); if (!c) return null;
+    return { good:{s:'ok',t:'ปกติ'}, ok:{s:'ok',t:'ปกติ'}, hn:{s:'mid',t:'ค่อนข้างสูง'}, h1:{s:'hi',t:'สูง'}, h2:{s:'hi',t:'สูง'}, crit:{s:'hi',t:'สูงมาก'}, low:{s:'lo',t:'ต่ำ'} }[c.c]; };
+  const sgSt = v => { const L = sugarLevel(v); return L ? { 'ต่ำ':{s:'lo',t:'ต่ำ'}, 'ปกติ':{s:'ok',t:'ปกติ'}, 'สูง':{s:'hi',t:'สูง'} }[L.t] : null; };
   let h = `<div class="rp-top"><div><h1>รายงานสุขภาพ</h1><div>${name ? '<b>' + esc(name) + '</b> · ' : ''}ช่วง ${dfmt(from)} – ${dfmt(to)} (${days} วัน)</div></div>
     <div class="rp-meta">ดันดี · บันทึกสุขภาพ<br>พิมพ์เมื่อ ${dfmt(to)} ${fmtTime(to)}</div></div>`;
   // สรุป
@@ -1353,22 +1366,27 @@ function buildReport(days){
     const mx = bp.reduce((a, r) => +r.sys > +a.sys ? r : a), mn = bp.reduce((a, r) => +r.sys < +a.sys ? r : a);
     const am = bp.filter(r => new Date(r.datetime).getHours() < 12), pm = bp.filter(r => new Date(r.datetime).getHours() >= 12);
     const pl = bp.filter(r => has(r.pulse));
-    h += tile('ความดันเฉลี่ย', `${R(aS)}/${R(aD)}`, `${bp.length} ครั้ง · ${(bpClass(R(aS), R(aD)) || {}).t || ''}`)
-      + tile('สูงสุด / ต่ำสุด', `${mx.sys}/${mx.dia}`, `ต่ำสุด ${mn.sys}/${mn.dia}`)
-      + tile('เกิน 140/90', `${high} ครั้ง`, `${R(high * 100 / bp.length)}% ของการวัด`)
-      + tile('เช้า / บ่าย-เย็น', `${am.length ? R(avg(am.map(r => +r.sys))) + '/' + R(avg(am.map(r => +r.dia))) : '–'}`, `บ่าย-เย็น ${pm.length ? R(avg(pm.map(r => +r.sys))) + '/' + R(avg(pm.map(r => +r.dia))) : '–'}`);
-    if (pl.length) h += tile('ชีพจรเฉลี่ย', R(avg(pl.map(r => +r.pulse))), 'ครั้ง/นาที');
+    const aAm = am.length ? [R(avg(am.map(r => +r.sys))), R(avg(am.map(r => +r.dia)))] : null, aPm = pm.length ? [R(avg(pm.map(r => +r.sys))), R(avg(pm.map(r => +r.dia)))] : null;
+    const cls = st => st ? 'c-' + (st.s === 'mid' ? 'lo' : st.s) : '';
+    const mnSt = bpSt(+mn.sys, +mn.dia), pmSt = aPm && bpSt(aPm[0], aPm[1]);
+    const pAvg = pl.length ? R(avg(pl.map(r => +r.pulse))) : null;
+    h += tile('ความดันเฉลี่ย', `${R(aS)}/${R(aD)}`, `${bp.length} ครั้ง`, bpSt(R(aS), R(aD)))
+      + tile('สูงสุด', `${mx.sys}/${mx.dia}`, `ต่ำสุด <span class="${cls(mnSt)}">${mn.sys}/${mn.dia}${mnSt ? ' ' + mnSt.t : ''}</span>`, bpSt(+mx.sys, +mx.dia))
+      + tile('เกิน 140/90', `${high} ครั้ง`, `${R(high * 100 / bp.length)}% ของการวัด`, high ? { s: high * 100 / bp.length >= 25 ? 'hi' : 'mid', t: 'สูง' } : { s:'ok', t:'ไม่เกิน' })
+      + tile('เช้า (เฉลี่ย)', aAm ? aAm.join('/') : '–', `บ่าย-เย็น <span class="${cls(pmSt)}">${aPm ? aPm.join('/') + (pmSt ? ' ' + pmSt.t : '') : '–'}</span>`, aAm && bpSt(aAm[0], aAm[1]));
+    if (pAvg) h += tile('ชีพจรเฉลี่ย', pAvg, 'ครั้ง/นาที', pAvg < 60 ? { s:'lo', t:'ต่ำ' } : pAvg > 100 ? { s:'hi', t:'สูง' } : { s:'ok', t:'ปกติ' });
   }
   if (sg.length) {
     const lv = r => (sugarLevel(r.sugar, r.sugarTiming) || {}).t;
     const c = t => sg.filter(r => lv(r) === t).length;
-    h += tile('น้ำตาลเฉลี่ย', R(avg(sg.map(r => +r.sugar))), `mg/dL · ${sg.length} ครั้ง`)
-      + tile('ระดับน้ำตาล', `${c('ปกติ')}/${sg.length} ปกติ`, `ต่ำ ${c('ต่ำ')} · สูง ${c('สูง')}`);
+    const sAvg = R(avg(sg.map(r => +r.sugar))), okN = c('ปกติ');
+    h += tile('น้ำตาลเฉลี่ย', sAvg, `mg/dL · ${sg.length} ครั้ง`, sgSt(sAvg))
+      + tile('ระดับน้ำตาล', `${okN}/${sg.length} ปกติ`, `<span class="c-lo">ต่ำ ${c('ต่ำ')}</span> · <span class="c-hi">สูง ${c('สูง')}</span>`, okN * 2 >= sg.length ? { s:'ok' } : { s:'mid' });
   }
   if (wt.length) h += tile('น้ำหนัก', `${(+wt[wt.length - 1].weight).toFixed(1)} กก.`, wt.length > 1 ? `เริ่ม ${(+wt[0].weight).toFixed(1)} กก.` : '');
   const dayKeys = new Set(rows.map(r => dayKey(r.datetime))), medDays = new Set(rows.filter(r => has(r.med)).map(r => dayKey(r.datetime)));
   if (medDays.size) h += tile('วันที่กินยา', `${medDays.size}/${dayKeys.size} วัน`, 'ของวันที่มีบันทึก');
-  h += '</div>';
+  h += '</div><div class="rp-legend"><span><i style="background:#1FA38A"></i>ปกติ</span><span><i style="background:#E8A317"></i>ค่อนข้างสูง</span><span><i style="background:#DC2626"></i>สูง</span><span><i style="background:#D97706"></i>ต่ำ</span></div>';
   const names = [...new Set(rows.filter(r => has(r.med) && r.med !== 'ใช่').map(r => String(r.med).split(' · ').slice(1).join(' · ')).filter(Boolean))];
   if (names.length) h += `<p style="margin:8px 0 0"><b>ยาที่บันทึก:</b> ${names.map(esc).join(', ')}</p>`;
   // กราฟ

@@ -13,14 +13,14 @@ const APP_URL = 'https://bearpanda2012-wq.github.io/health-log/';
 
 const KEYS = ['id', 'datetime', 'sys', 'dia', 'pulse', 'arm', 'posture',
   'weight', 'sugar', 'sugarTiming', 'temp', 'spo2', 'sleep', 'med',
-  'symptoms', 'note', 'createdAt'];
+  'symptoms', 'note', 'createdAt', 'sugarLevel'];
 
 const HEADERS = ['id', 'วันเวลาที่วัด', 'ตัวบน SYS (mmHg)', 'ตัวล่าง DIA (mmHg)',
   'ชีพจร (ครั้ง/นาที)', 'แขน', 'ท่า', 'น้ำหนัก (กก.)', 'น้ำตาล (mg/dL)',
   'ช่วงวัดน้ำตาล', 'อุณหภูมิ (°C)', 'SpO2 (%)', 'นอน (ชม.)', 'กินยาแล้ว',
-  'อาการ', 'โน้ต', 'บันทึกเมื่อ'];
+  'อาการ', 'โน้ต', 'บันทึกเมื่อ', 'ระดับน้ำตาล'];
 
-const TEXT_FIELDS = ['arm', 'posture', 'sugarTiming', 'symptoms', 'note'];
+const TEXT_FIELDS = ['arm', 'posture', 'sugarTiming', 'sugarLevel', 'symptoms', 'note'];
 const NUM_FIELDS = ['sys', 'dia', 'pulse', 'weight', 'sugar', 'temp', 'spo2', 'sleep'];
 
 /* ================= ตั้งค่าครั้งแรก ================= */
@@ -214,6 +214,13 @@ function getSheet_() {
     sh.getRange('B:B').setNumberFormat('yyyy-mm-dd hh:mm');
     sh.getRange('Q:Q').setNumberFormat('yyyy-mm-dd hh:mm');
   }
+  // ชีตเก่าที่ยังไม่มีคอลัมน์ใหม่ (เช่น ระดับน้ำตาล) → เติมหัวคอลัมน์ให้
+  const lastCol = sh.getLastColumn();
+  if (lastCol < HEADERS.length) {
+    sh.getRange(1, lastCol + 1, 1, HEADERS.length - lastCol)
+      .setValues([HEADERS.slice(lastCol)])
+      .setFontWeight('bold').setBackground('#FDE6E7').setWrap(true);
+  }
   return sh;
 }
 
@@ -221,7 +228,7 @@ function getRecords() {
   const sh = getSheet_();
   const n = sh.getLastRow() - 1;
   if (n <= 0) return [];
-  const vals = sh.getRange(2, 1, n, KEYS.length).getValues();
+  const vals = sh.getRange(2, 1, n, Math.min(KEYS.length, sh.getMaxColumns())).getValues();
   return vals
     .filter(r => r[0] !== '')
     .map(r => {
@@ -229,7 +236,7 @@ function getRecords() {
       KEYS.forEach((k, i) => {
         let v = r[i];
         if (v instanceof Date) v = v.toISOString();
-        o[k] = v === '' ? null : v;
+        o[k] = (v === '' || v === undefined) ? null : v;
       });
       return o;
     });

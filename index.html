@@ -89,6 +89,14 @@ textarea{resize:vertical;min-height:64px}
 .b-good{background:#147A66}.b-ok{background:var(--ok)}.b-hn{background:var(--hn)}.b-h1{background:var(--h1)}
 .b-h2{background:var(--h2)}.b-crit{background:var(--crit)}.b-low{background:var(--low)}
 #bpLive{margin-top:12px;text-align:center}
+#sugarLive{margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+#sugarLive:empty{display:none}
+.b-sg-low{background:#B45309}.b-sg-ok{background:#147A66}.b-sg-hi{background:#C62828}
+#sugar.sg-low{border-color:var(--hn);box-shadow:0 0 0 3px color-mix(in srgb,var(--hn) 22%,transparent)}
+#sugar.sg-ok{border-color:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 22%,transparent)}
+#sugar.sg-hi{border-color:var(--h2);box-shadow:0 0 0 3px color-mix(in srgb,var(--h2) 22%,transparent)}
+.sgdot{display:inline-block;width:8px;height:8px;border-radius:99px;margin:0 3px 1px 2px;vertical-align:middle}
+.sgdot.sg-low{background:var(--hn)}.sgdot.sg-ok{background:var(--good)}.sgdot.sg-hi{background:var(--h2)}
 #bpLive:empty{display:none}
 .warn{margin-top:10px;background:var(--accent-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px;display:none}
 details{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
@@ -263,8 +271,9 @@ nav button.on svg{stroke-width:2.4}
         <div class="grid2">
           <div><label class="f" for="sugar">น้ำตาลในเลือด (mg/dL)</label><input id="sugar" type="number" inputmode="numeric" placeholder="เช่น 98"></div>
           <div><label class="f" for="sugarTiming">ช่วงที่วัด</label>
-            <select id="sugarTiming"><option value="งดอาหาร">งดอาหาร (เช้า)</option><option value="ก่อนอาหาร">ก่อนอาหาร</option><option value="หลังอาหาร 2 ชม.">หลังอาหาร 2 ชม.</option><option value="สุ่ม">สุ่ม</option></select></div>
+            <select id="sugarTiming"><option value="งดอาหาร">งดอาหาร (เช้า)</option><option value="ก่อนอาหาร">ก่อนอาหาร</option><option value="หลังอาหาร">หลังอาหาร</option><option value="หลังอาหาร 2 ชม.">หลังอาหาร 2 ชม.</option><option value="สุ่ม">สุ่ม</option></select></div>
         </div>
+        <div id="sugarLive" aria-live="polite"></div>
       </div>
       <div class="qpanel" id="p-med" hidden>
         <label class="f">กินยาแล้ว (ติ๊กมื้อที่กิน)</label>
@@ -439,7 +448,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 15 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 16 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -562,6 +571,27 @@ function updateLive(){
 }
 ['sys','dia'].forEach(id => $('#'+id).addEventListener('input', updateLive));
 
+/* ---------- น้ำตาล: ต่ำ / ปกติ / สูง ---------- */
+function sugarRange(t){
+  if (t === 'งดอาหาร' || t === 'ก่อนอาหาร') return { hi:100, txt:'เกณฑ์ 70–99' };
+  if (t === 'หลังอาหาร 2 ชม.') return { hi:140, txt:'เกณฑ์ 70–139' };
+  return { hi:180, txt:'เกณฑ์ 70–179' }; // หลังอาหาร / สุ่ม
+}
+function sugarLevel(v, t){
+  if (!has(v)) return null;
+  v = Number(v); if (!isFinite(v)) return null;
+  if (v < 70) return { t:'ต่ำ', c:'sg-low' };
+  return v >= sugarRange(t).hi ? { t:'สูง', c:'sg-hi' } : { t:'ปกติ', c:'sg-ok' };
+}
+const SG_CLS = { 'ต่ำ':'sg-low', 'ปกติ':'sg-ok', 'สูง':'sg-hi' };
+function updateSugar(){
+  const t = $('#sugarTiming').value, L = sugarLevel(num('sugar'), t), el = $('#sugar');
+  el.classList.remove('sg-low','sg-ok','sg-hi');
+  if (L) el.classList.add(L.c);
+  $('#sugarLive').innerHTML = L ? `<span class="badge b-${L.c}">น้ำตาล${L.t}</span><span>${sugarRange(t).txt} mg/dL</span>` : '';
+}
+['input','change'].forEach(e => { $('#sugar').addEventListener(e, updateSugar); $('#sugarTiming').addEventListener(e, updateSugar); });
+
 /* ---------- ยา: เช้า/กลางวัน/เย็น + ก่อน/หลังอาหาร ---------- */
 const medRows = () => [...document.querySelectorAll('.medrow')];
 function collectMed(){
@@ -600,7 +630,7 @@ function resetForm(){
   document.querySelectorAll('#symChips input').forEach(i => i.checked = false);
   document.querySelectorAll('.medck').forEach(i => i.checked = false); closePanels(); $('#more').open = false;
   $('#datetime').value = localInput(new Date());
-  updateLive();
+  updateLive(); updateSugar();
 }
 
 function validate(r){
@@ -631,7 +661,7 @@ $('#form').addEventListener('submit', async e => {
     r.arm = document.querySelector('input[name=arm]:checked').value;
     r.posture = document.querySelector('input[name=posture]:checked').value;
   }
-  if (has(r.sugar)) r.sugarTiming = $('#sugarTiming').value;
+  if (has(r.sugar)) { r.sugarTiming = $('#sugarTiming').value; const L = sugarLevel(r.sugar, r.sugarTiming); r.sugarLevel = L ? L.t : null; }
   const err = validate(r);
   if (err) return toast(err);
 
@@ -655,7 +685,7 @@ function tagsFor(r){
   const t = [];
   if (has(r.pulse) && !has(r.sys)) t.push([`ชีพจร ${r.pulse}`, '']);
   if (has(r.weight)) t.push([`น้ำหนัก ${r.weight} กก.`, 'weight']);
-  if (has(r.sugar)) t.push([`น้ำตาล ${r.sugar}${r.sugarTiming ? ' · ' + r.sugarTiming : ''}`, 'sugar']);
+  if (has(r.sugar)) { const lv = r.sugarLevel || (sugarLevel(r.sugar, r.sugarTiming) || {}).t; t.push([`น้ำตาล ${r.sugar}${r.sugarTiming ? ' · ' + r.sugarTiming : ''}`, 'sugar', lv]); }
   if (has(r.temp)) t.push([`อุณหภูมิ ${r.temp}°C`, 'temp']);
   if (has(r.spo2)) t.push([`SpO2 ${r.spo2}%`, 'spo2']);
   if (has(r.sleep)) t.push([`นอน ${r.sleep} ชม.`, 'sleep']);
@@ -663,7 +693,7 @@ function tagsFor(r){
   else if (has(r.med)) t.push(['ยา ' + r.med, 'med']);
   if (has(r.symptoms)) t.push([`อาการ: ${r.symptoms}`, 'sym']);
   if (has(r.sys) && (r.arm || r.posture)) t.push([[r.arm && 'แขน' + r.arm, r.posture].filter(Boolean).join(' · '), '']);
-  return t.map(([x, c]) => `<span class="tag${c ? ' t-' + c : ''}">${esc(x)}</span>`).join('');
+  return t.map(([x, c, lv]) => `<span class="tag${c ? ' t-' + c : ''}">${esc(x)}${lv && SG_CLS[lv] ? ` · <i class="sgdot ${SG_CLS[lv]}" aria-hidden="true"></i>${esc(lv)}` : ''}</span>`).join('');
 }
 
 function itemHTML(r){
@@ -1085,7 +1115,7 @@ $('#copyLink').addEventListener('click', async () => {
 
 $('#exportCsv').addEventListener('click', () => {
   if (!records.length) return toast('ยังไม่มีข้อมูล');
-  const cols = [['datetime','วันเวลา'],['sys','ตัวบน'],['dia','ตัวล่าง'],['pulse','ชีพจร'],['arm','แขน'],['posture','ท่า'],['weight','น้ำหนัก'],['sugar','น้ำตาล'],['sugarTiming','ช่วงวัดน้ำตาล'],['temp','อุณหภูมิ'],['spo2','SpO2'],['sleep','นอน'],['med','กินยา'],['symptoms','อาการ'],['note','โน้ต']];
+  const cols = [['datetime','วันเวลา'],['sys','ตัวบน'],['dia','ตัวล่าง'],['pulse','ชีพจร'],['arm','แขน'],['posture','ท่า'],['weight','น้ำหนัก'],['sugar','น้ำตาล'],['sugarTiming','ช่วงวัดน้ำตาล'],['sugarLevel','ระดับน้ำตาล'],['temp','อุณหภูมิ'],['spo2','SpO2'],['sleep','นอน'],['med','กินยา'],['symptoms','อาการ'],['note','โน้ต']];
   const q = v => { v = v == null ? '' : String(v); if (/^[=+\-@]/.test(v) && isNaN(+v)) v = "'" + v; return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   const rows = records.slice().reverse().map(r => cols.map(([k]) => k === 'datetime' ? localInput(new Date(r[k])).replace('T', ' ') : q(r[k])).join(','));
   const csv = '﻿' + cols.map(c => c[1]).join(',') + '\n' + rows.join('\n');

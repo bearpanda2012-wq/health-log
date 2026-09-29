@@ -165,7 +165,7 @@ function menuResetKey() {
 
 /* ================= อ่านค่าจากรูป (Gemini) ================= */
 
-const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
+const GEMINI_MODELS = ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.5-flash'];
 
 function menuOcr() {
   const has = !!PropertiesService.getScriptProperties().getProperty('GEMINI_KEY');
@@ -189,7 +189,7 @@ function menuOcr() {
 
 function saveGeminiKey(k) {
   k = String(k || '').trim();
-  PropertiesService.getScriptProperties().deleteProperty('GEMINI_MODEL');
+  PropertiesService.getScriptProperties().deleteProperty('GEMINI_MODEL2');
   const r = gemini_(k, null, null, 'ตอบคำว่า ok เป็น JSON {"ok":true}');
   if (!r.ok) return r;
   PropertiesService.getScriptProperties().setProperty('GEMINI_KEY', k);
@@ -199,7 +199,7 @@ function saveGeminiKey(k) {
 // หารุ่น Gemini ที่บัญชีนี้ใช้ได้ (ชื่อรุ่นเปลี่ยนบ่อย) — เลือกรุ่น flash ใหม่สุด
 function geminiModels_(key) {
   const props = PropertiesService.getScriptProperties();
-  const saved = props.getProperty('GEMINI_MODEL');
+  const saved = props.getProperty('GEMINI_MODEL2');
   let list = [];
   try {
     const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',
@@ -210,7 +210,7 @@ function geminiModels_(key) {
         .filter(function (m) { return (m.supportedGenerationMethods || []).indexOf('generateContent') >= 0; })
         .map(function (m) { return String(m.name).replace(/^models\//, ''); })
         .filter(function (n) { return /flash/.test(n) && !/(preview|exp|tts|image|audio|live|thinking|embedding)/.test(n); })
-        .sort(function (a, b) { return (ver(b) - ver(a)) || (/lite/.test(a) - /lite/.test(b)); });
+        .sort(function (a, b) { return (/lite/.test(b) - /lite/.test(a)) || (ver(b) - ver(a)); }); // รุ่น lite ตอบเร็วกว่า พออ่านตัวเลข
     }
   } catch (e) {}
   console.log('gemini models', list.join(', ') || '(list failed)');
@@ -223,11 +223,14 @@ function gemini_(key, b64, mime, prompt, full) {
   if (b64) parts.unshift({ inline_data: { mime_type: mime || 'image/jpeg', data: b64 } });
   const mk = function (think) {
     const gc = { temperature: 0, responseMimeType: 'application/json' };
-    if (think) gc.thinkingConfig = { thinkingLevel: 'minimal' }; // ให้ตอบเร็ว ไม่ต้องคิดนาน
+    if (think) {
+      gc.thinkingConfig = { thinkingLevel: 'minimal' }; // ให้ตอบเร็ว ไม่ต้องคิดนาน
+      if (b64) gc.mediaResolution = 'MEDIA_RESOLUTION_LOW'; // รูปใช้ token น้อยลง เร็วขึ้น
+    }
     return JSON.stringify({ contents: [{ parts: parts }], generationConfig: gc });
   };
   const t0 = Date.now();
-  const saved = PropertiesService.getScriptProperties().getProperty('GEMINI_MODEL');
+  const saved = PropertiesService.getScriptProperties().getProperty('GEMINI_MODEL2');
   const models = (saved && !full) ? [saved] : geminiModels_(key).filter(function (m) { return !(full && m === saved); });
   let last = 'no_model';
   for (let i = 0; i < models.length && i < 4; i++) {
@@ -237,7 +240,7 @@ function gemini_(key, b64, mime, prompt, full) {
     const t1 = Date.now();
     opt.payload = mk(true);
     let res = UrlFetchApp.fetch(url, opt);
-    if (res.getResponseCode() === 400 && /thinking/i.test(res.getContentText())) { opt.payload = mk(false); res = UrlFetchApp.fetch(url, opt); }
+    if (res.getResponseCode() === 400 && /thinking|media_?resolution/i.test(res.getContentText())) { opt.payload = mk(false); res = UrlFetchApp.fetch(url, opt); }
     if ([500, 502, 503, 504].indexOf(res.getResponseCode()) >= 0 && Date.now() - t0 < 40000) { // ไม่ว่างชั่วคราว → รอแล้วลองซ้ำ 1 ครั้ง
       Utilities.sleep(1500); res = UrlFetchApp.fetch(url, opt);
     }
@@ -247,7 +250,7 @@ function gemini_(key, b64, mime, prompt, full) {
     if (code === 401 || code === 403) return { ok: false, error: 'รหัสนี้ใช้กับ Gemini ไม่ได้ (' + code + ') ' + errMsg_(txt) };
     if (code === 429) return { ok: false, error: 'ใช้เกินโควตาวันนี้ ลองใหม่พรุ่งนี้' };
     if (code !== 200) { last = models[i] + ': HTTP ' + code + ' ' + errMsg_(txt); continue; }
-    PropertiesService.getScriptProperties().setProperty('GEMINI_MODEL', models[i]);
+    PropertiesService.getScriptProperties().setProperty('GEMINI_MODEL2', models[i]);
     try {
       const j = JSON.parse(txt), t = j.candidates[0].content.parts.map(function (x) { return x.text || ''; }).join('');
       return { ok: true, model: models[i], data: JSON.parse(t.replace(/^```(json)?|```$/g, '').trim()) };

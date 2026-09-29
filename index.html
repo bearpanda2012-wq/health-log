@@ -550,7 +550,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 28 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 29 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -1121,10 +1121,10 @@ async function shrinkImage(file){
   let src;
   try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
   catch(e) { src = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = URL.createObjectURL(file); }); }
-  const w = src.width, h = src.height, k = Math.min(1, 1280 / Math.max(w, h));
+  const w = src.width, h = src.height, k = Math.min(1, 900 / Math.max(w, h));
   const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
   c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
-  return c.toDataURL('image/jpeg', 0.85);
+  return c.toDataURL('image/jpeg', 0.78);
 }
 function scanTime(res, file){
   const now = new Date();
@@ -1156,7 +1156,10 @@ async function scanRun(file){
   const dlg = $('#scanDlg');
   $('#scanCancel').onclick = null;
   $('#scanTitle').textContent = 'กำลังอ่านค่า…'; $('#scanVal').innerHTML = '<span class="spin" aria-hidden="true">⏳</span>';
-  $('#scanSub').textContent = 'ใช้เวลาประมาณ 3–8 วินาที'; $('#scanOk').hidden = true; $('#scanBarWrap').hidden = true;
+  const tStart = Date.now(); clearInterval(scanRun._iv);
+  $('#scanSub').textContent = 'กำลังส่งรูป… 0 วินาที';
+  scanRun._iv = setInterval(() => { if ($('#scanDlg').hidden || !/วินาที$/.test($('#scanSub').textContent)) return clearInterval(scanRun._iv);
+    $('#scanSub').textContent = 'AI กำลังอ่าน… ' + Math.round((Date.now() - tStart) / 1000) + ' วินาที'; }, 500); $('#scanOk').hidden = true; $('#scanBarWrap').hidden = true;
   $('#scanCancel').textContent = 'ยกเลิก'; dlg.hidden = false;
   let res;
   try {

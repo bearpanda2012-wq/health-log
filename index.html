@@ -65,8 +65,9 @@ textarea{resize:vertical;min-height:64px}
 .rec-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:14px}
 .rec-title{font-family:'Kanit',sans-serif;font-weight:600;font-size:18px}
 .when{width:auto;border:0;background:none;padding:0;font-size:13px;color:var(--muted);text-align:right;min-width:0;max-width:60%}
-.qchips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 2px}
-.qchip{font:inherit;font-size:13px;font-weight:600;color:var(--accent-text);background:var(--accent-soft);border:1.5px solid transparent;border-radius:99px;padding:7px 11px;min-height:36px;cursor:pointer}
+.qchips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:14px 0 2px}
+.qpanel{margin-top:10px;background:var(--field);border:1px solid var(--line);border-radius:16px;padding:12px}
+.qchip{font:inherit;font-size:13px;font-weight:600;color:var(--accent-text);background:var(--accent-soft);border:1.5px solid transparent;border-radius:99px;padding:7px 2px;min-height:38px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qchip.on{border-color:var(--accent-text);background:var(--card)}
 .last{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .last .big{font-family:'Kanit',sans-serif;font-size:38px;font-weight:700;line-height:1.1}
@@ -173,6 +174,20 @@ nav button.on svg{stroke-width:2.4}
         <button type="button" class="qchip" data-q="med" id="qMed">+ กินยา</button>
         <button type="button" class="qchip" data-q="sym">+ อาการ</button>
       </div>
+      <div class="qpanel" id="p-weight" hidden>
+        <label class="f" for="weight">น้ำหนัก (กก.)</label><input id="weight" type="number" step="0.1" inputmode="decimal" placeholder="เช่น 65.5">
+      </div>
+      <div class="qpanel" id="p-sugar" hidden>
+        <div class="grid2">
+          <div><label class="f" for="sugar">น้ำตาลในเลือด (mg/dL)</label><input id="sugar" type="number" inputmode="numeric" placeholder="เช่น 98"></div>
+          <div><label class="f" for="sugarTiming">ช่วงที่วัด</label>
+            <select id="sugarTiming"><option value="งดอาหาร">งดอาหาร (เช้า)</option><option value="ก่อนอาหาร">ก่อนอาหาร</option><option value="หลังอาหาร 2 ชม.">หลังอาหาร 2 ชม.</option><option value="สุ่ม">สุ่ม</option></select></div>
+        </div>
+      </div>
+      <div class="qpanel" id="p-sym" hidden>
+        <label class="f">อาการ (เลือกได้หลายข้อ)</label>
+        <div class="chips" id="symChips"></div>
+      </div>
 
       <details id="more">
         <summary>รายละเอียดเพิ่มเติม</summary>
@@ -185,18 +200,11 @@ nav button.on svg{stroke-width:2.4}
           </div>
         </div>
         <div class="grid2 row">
-          <div><label class="f" for="weight">น้ำหนัก (กก.)</label><input id="weight" type="number" step="0.1" inputmode="decimal"></div>
           <div><label class="f" for="temp">อุณหภูมิ (°C)</label><input id="temp" type="number" step="0.1" inputmode="decimal"></div>
-          <div><label class="f" for="sugar">น้ำตาลในเลือด (mg/dL)</label><input id="sugar" type="number" inputmode="numeric"></div>
-          <div><label class="f" for="sugarTiming">ช่วงที่วัดน้ำตาล</label>
-            <select id="sugarTiming"><option value="งดอาหาร">งดอาหาร (เช้า)</option><option value="ก่อนอาหาร">ก่อนอาหาร</option><option value="หลังอาหาร 2 ชม.">หลังอาหาร 2 ชม.</option><option value="สุ่ม">สุ่ม</option></select></div>
           <div><label class="f" for="spo2">ออกซิเจน SpO2 (%)</label><input id="spo2" type="number" inputmode="numeric"></div>
           <div><label class="f" for="sleep">นอน (ชม.)</label><input id="sleep" type="number" step="0.5" inputmode="decimal"></div>
         </div>
         <div class="row"><label class="check"><input type="checkbox" id="med"> กินยาประจำวันแล้ว</label></div>
-        <div class="row" id="symRow"><label class="f">อาการ</label>
-          <div class="chips" id="symChips"></div>
-        </div>
         <div class="row"><label class="f" for="note">โน้ต</label><textarea id="note" placeholder="เช่น ดื่มกาแฟก่อนวัด, นอนน้อย, เครียด"></textarea></div>
       </details>
 
@@ -282,7 +290,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 9 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 10 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -410,16 +418,22 @@ $('#med').addEventListener('change', syncMedChip);
 document.querySelectorAll('.qchip').forEach(b => b.addEventListener('click', () => {
   const q = b.dataset.q;
   if (q === 'med') { $('#med').checked = !$('#med').checked; syncMedChip(); return; }
-  $('#more').open = true;
-  const target = q === 'sym' ? $('#symRow') : $('#' + q);
-  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  if (q !== 'sym') setTimeout(() => target.focus({ preventScroll: true }), 300);
+  const panel = $('#p-' + q), open = panel.hidden;
+  panel.hidden = !open;
+  b.classList.toggle('on', open);
+  b.setAttribute('aria-expanded', open);
+  b.textContent = (open ? '− ' : '+ ') + b.textContent.slice(2);
+  if (open) { const f = panel.querySelector('input'); if (f && f.type !== 'checkbox') setTimeout(() => f.focus(), 50); }
 }));
+function closePanels(){
+  document.querySelectorAll('.qpanel').forEach(p => p.hidden = true);
+  document.querySelectorAll('.qchip:not(#qMed)').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-expanded', false); b.textContent = '+ ' + b.textContent.slice(2); });
+}
 
 function resetForm(){
   ['sys','dia','pulse','weight','temp','sugar','spo2','sleep','note'].forEach(id => $('#'+id).value = '');
   document.querySelectorAll('#symChips input').forEach(i => i.checked = false);
-  $('#med').checked = false; syncMedChip();
+  $('#med').checked = false; syncMedChip(); closePanels(); $('#more').open = false;
   $('#datetime').value = localInput(new Date());
   updateLive();
 }

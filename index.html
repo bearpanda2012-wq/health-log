@@ -3,33 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>บันทึกสุขภาพ</title>
-<meta name="theme-color" content="#d6334f">
+<title>ดันดี — บันทึกความดัน</title>
+<meta name="theme-color" content="#E8505B">
 <meta name="robots" content="noindex">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="บันทึกสุขภาพ">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="apple-mobile-web-app-title" content="ดันดี">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f5f6f8;--card:#fff;--ink:#16191d;--muted:#6b7280;--line:#e5e7eb;
-  --accent:#d6334f;--accent-soft:#fde8ec;--field:#f9fafb;
-  --good:#12a150;--ok:#2f80ed;--hn:#d98a06;--h1:#ea580c;--h2:#dc2626;--crit:#9f1239;--low:#7c3aed;
+  --bg:#FFF8F3;--card:#fff;--ink:#1E2A3A;--muted:#6B7280;--line:#F0E4DC;
+  --accent:#E8505B;--accent-soft:#FDE6E7;--field:#FFFBF8;
+  --good:#1FA38A;--ok:#2f80ed;--hn:#d98a06;--h1:#ea580c;--h2:#dc2626;--crit:#9f1239;--low:#7c3aed;
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#0f1115;--card:#181b21;--ink:#eceef2;--muted:#9aa1ad;--line:#2a2f38;
-  --accent:#f0566f;--accent-soft:#3a1d24;--field:#1f232b;
+  --bg:#15131A;--card:#1E1B24;--ink:#F3EEEA;--muted:#A59DA3;--line:#2E2A33;
+  --accent:#F06A73;--accent-soft:#3A2227;--field:#24212A;
 }}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--ink);
   font-size:16px;line-height:1.5;padding-bottom:84px;-webkit-tap-highlight-color:transparent}
 header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 16px 10px;
   display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line)}
-header h1{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}
-header h1 .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+header h1{font-family:'Kanit',sans-serif;font-size:24px;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--accent);letter-spacing:.3px}
+header h1 img{width:32px;height:32px;border-radius:9px}
+header h1 small{font-family:'IBM Plex Sans Thai',sans-serif;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:0}
 .status{font-size:12px;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:3px 10px;border-radius:99px;white-space:nowrap}
 .status.on{color:var(--good)}
 main{max-width:640px;margin:0 auto;padding:16px}
@@ -111,7 +112,7 @@ nav button.on{color:var(--accent);font-weight:600}
 </head>
 <body>
 <header>
-  <h1><span class="dot"></span>บันทึกสุขภาพ</h1>
+  <h1><img src="icon-192.png" alt="">ดันดี<small>บันทึกความดัน</small></h1>
   <button class="status" id="status" type="button">กำลังโหลด…</button>
 </header>
 
@@ -233,7 +234,7 @@ nav button.on{color:var(--accent);font-weight:600}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">เวอร์ชัน 5</p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 6 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -629,7 +630,7 @@ $('#exportCsv').addEventListener('click', () => {
   const csv = '﻿' + cols.map(c => c[1]).join(',') + '\n' + rows.join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  a.download = 'health-log-' + localInput(new Date()).slice(0, 10) + '.csv';
+  a.download = 'dundee-' + localInput(new Date()).slice(0, 10) + '.csv';
   a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 });
 

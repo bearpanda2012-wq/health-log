@@ -1,5 +1,5 @@
 /**
- * บันทึกสุขภาพ — Backend API (Google Apps Script)
+ * ดันดี (DunDee) — Backend API (Google Apps Script)
  * หน้าเว็บอยู่บน GitHub Pages ส่วนไฟล์นี้ทำหน้าที่เป็น API อ่าน/เขียน Google Sheet
  *
  * ติดตั้ง: เปิด Google Sheet > ส่วนขยาย > Apps Script > วางไฟล์นี้เป็น Code.gs
@@ -94,7 +94,7 @@ function getSheet_() {
     sh.appendRow(HEADERS);
     sh.setFrozenRows(1);
     sh.getRange(1, 1, 1, HEADERS.length)
-      .setFontWeight('bold').setBackground('#fde8ec').setWrap(true);
+      .setFontWeight('bold').setBackground('#FDE6E7').setWrap(true);
     sh.hideColumns(1);
     sh.getRange('B:B').setNumberFormat('yyyy-mm-dd hh:mm');
     sh.getRange('Q:Q').setNumberFormat('yyyy-mm-dd hh:mm');

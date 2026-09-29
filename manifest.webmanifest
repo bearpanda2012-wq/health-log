@@ -1,11 +1,11 @@
 {
-  "name": "บันทึกสุขภาพ",
-  "short_name": "สุขภาพ",
+  "name": "ดันดี — บันทึกความดัน",
+  "short_name": "ดันดี",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f5f6f8",
-  "theme_color": "#d6334f",
+  "background_color": "#FFF8F3",
+  "theme_color": "#E8505B",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ดันดี — จดความดันง่าย ข้อมูลเป็นของคุณ</title>
+<meta name="description" content="แอปจดค่าความดันโลหิต ดูแนวโน้มเป็นกราฟ เก็บข้อมูลใน Google Sheets ของคุณเอง ใช้ได้ทั้งมือถือและคอมพิวเตอร์">
+<meta name="theme-color" content="#E8505B">
+<meta property="og:title" content="ดันดี — ความดันดี ชีวิตดี">
+<meta property="og:description" content="จดค่าความดันในไม่กี่วินาที ดูกราฟแนวโน้ม ข้อมูลอยู่ใน Google Sheets ของคุณเอง">
+<meta property="og:image" content="https://bearpanda2012-wq.github.io/health-log/assets/og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF8F3;--bg2:#FDEFE8;--card:#fff;--ink:#1E2A3A;--muted:#5F6673;--line:#F0E4DC;
+  --coral:#E8505B;--coral-d:#C93B46;--coral-soft:#FDE6E7;--teal:#1FA38A;--teal-soft:#DDF3EE;--blue:#2F80ED;--gold:#F4B740;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15131A;--bg2:#1B1820;--card:#1E1B24;--ink:#F3EEEA;--muted:#B0A8AE;--line:#2E2A33;
+  --coral:#F06A73;--coral-d:#F06A73;--coral-soft:#3A2227;--teal:#3CC4A8;--teal-soft:#1B312C;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+h1,h2,h3,.brand{font-family:'Kanit',sans-serif;font-weight:700;line-height:1.25}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:600;text-decoration:none;border-radius:14px;padding:14px 22px;border:2px solid transparent;cursor:pointer;transition:transform .15s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-main{background:var(--coral);color:#fff}
+.btn-main:hover{background:var(--coral-d)}
+.btn-ghost{border-color:var(--line);background:var(--card)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-size:26px;color:var(--coral);text-decoration:none}
+.brand img{width:36px;height:36px;border-radius:10px}
+nav .links{display:flex;gap:22px;align-items:center;font-size:15px}
+nav .links a:not(.btn){text-decoration:none;color:var(--muted)}
+nav .links a:not(.btn):hover{color:var(--ink)}
+nav .btn{padding:9px 16px;font-size:15px;border-radius:12px}
+@media (max-width:760px){nav .links a:not(.btn){display:none}}
+
+/* hero */
+.hero{padding:56px 0 40px;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--teal-soft);color:var(--teal);font-weight:600;font-size:14px;padding:6px 14px;border-radius:99px;margin-bottom:18px}
+.hero h1{font-size:clamp(40px,7vw,68px);letter-spacing:-.5px}
+.hero h1 em{font-style:normal;color:var(--coral)}
+.hero p.lead{font-size:clamp(17px,2.2vw,20px);color:var(--muted);margin:18px 0 28px;max-width:34em}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero .note{font-size:14px;color:var(--muted);margin-top:14px}
+.phone{position:relative;width:min(300px,78vw);margin:0 auto;border-radius:44px;padding:12px;background:#1E2A3A;box-shadow:0 30px 60px -20px rgba(232,80,91,.35),0 18px 36px -18px rgba(0,0,0,.3)}
+.phone img{display:block;width:100%;height:auto;border-radius:32px;aspect-ratio:390/844;object-fit:cover;object-position:top;background:#FFF8F3}
+.hero-art{position:relative}
+.blob{position:absolute;inset:8% -10% auto auto;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,var(--coral-soft),transparent 70%);z-index:-1}
+.float{position:absolute;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 14px;font-size:14px;box-shadow:0 10px 24px -12px rgba(30,42,58,.25)}
+.float b{font-family:'Kanit';font-size:20px;display:block;line-height:1.2}
+.f1{left:-6px;top:22%}.f2{right:-4px;bottom:18%}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+@media (max-width:860px){
+  .hero{padding-top:36px}
+  .hero .wrap{grid-template-columns:1fr}
+  .hero-art{margin-top:10px}
+  .f1{display:none}.f2{right:2%;bottom:10%}
+}
+
+/* trust */
+.trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--card)}
+.trust .wrap{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 34px;padding:18px 20px;font-weight:500;font-size:15px}
+.trust span{display:flex;align-items:center;gap:8px}
+
+section{padding:72px 0}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 40px}
+.sec-head h2{font-size:clamp(30px,4.5vw,42px)}
+.sec-head p{color:var(--muted);margin-top:10px}
+.kicker{font-family:'Kanit';font-weight:600;color:var(--coral);font-size:15px;letter-spacing:.5px;margin-bottom:6px}
+
+/* features */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:900px){.grid3{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid3{grid-template-columns:1fr}}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px}
+.feat .ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;margin-bottom:14px}
+.feat h3{font-size:20px;margin-bottom:6px}
+.feat p{color:var(--muted);font-size:15.5px}
+.c1{background:var(--coral-soft)}.c2{background:var(--teal-soft)}.c3{background:#E8F0FD}.c4{background:#FEF3DC}
+
+/* screens */
+.screens{background:var(--bg2)}
+.shots{display:flex;gap:28px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+.shot{text-align:center}
+.shot .phone{width:250px;border-radius:38px;padding:10px}
+.shot .phone img{border-radius:28px}
+.shot p{margin-top:16px;font-weight:600}
+.shot small{display:block;color:var(--muted);font-weight:400;font-size:14px}
+@media (max-width:860px){.shots{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scroll-snap-type:x mandatory;padding:0 20px 12px;margin:0 -20px}.shot{scroll-snap-align:center;flex:0 0 auto}}
+
+/* who */
+.who{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:860px){.who{grid-template-columns:1fr}}
+.who > div{border-radius:20px;padding:26px;border:1px solid var(--line);background:var(--card)}
+.who .em{font-size:36px}
+.who h3{font-size:21px;margin:8px 0 6px}
+.who p{color:var(--muted);font-size:15.5px}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:s}
+@media (max-width:860px){.steps{grid-template-columns:1fr}}
+.step{position:relative;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px 24px 24px}
+.step::before{counter-increment:s;content:counter(s);font-family:'Kanit';font-weight:700;font-size:20px;color:#fff;background:var(--coral);width:40px;height:40px;border-radius:12px;display:grid;place-items:center;margin-bottom:14px}
+.step h3{font-size:20px;margin-bottom:4px}
+.step p{color:var(--muted);font-size:15.5px}
+
+/* privacy */
+.privacy{background:var(--ink);color:#F3EEEA;border-radius:28px;padding:44px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
+.privacy .big{font-size:64px;line-height:1}
+.privacy h2{font-size:clamp(26px,3.6vw,34px);margin-bottom:10px}
+.privacy p{color:#C9C3C0}
+.privacy ul{list-style:none;margin-top:14px;display:grid;gap:6px}
+.privacy li::before{content:"✓";color:var(--teal);font-weight:700;margin-right:10px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .privacy{background:#241F2A}}
+@media (max-width:700px){.privacy{grid-template-columns:1fr;padding:30px 24px}}
+
+/* faq */
+.faq{max-width:760px;margin:0 auto}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 22px;margin-bottom:10px}
+.faq summary{cursor:pointer;list-style:none;padding:18px 0;font-weight:600;display:flex;justify-content:space-between;gap:12px}
+.faq summary::after{content:"＋";color:var(--coral);font-weight:700}
+.faq details[open] summary::after{content:"－"}
+.faq details p{color:var(--muted);padding-bottom:18px;font-size:15.5px}
+
+/* final cta */
+.final{text-align:center;background:linear-gradient(135deg,var(--coral),#F2777F);color:#fff;border-radius:28px;padding:56px 24px}
+.final img{width:84px;height:84px;border-radius:22px;box-shadow:0 10px 26px -10px rgba(0,0,0,.35)}
+.final h2{font-size:clamp(30px,5vw,46px);margin:16px 0 8px}
+.final p{opacity:.92;margin-bottom:26px}
+.final .btn-main{background:#fff;color:var(--coral-d)}
+
+footer{padding:40px 0 60px;color:var(--muted);font-size:14px;text-align:center}
+footer .brand{justify-content:center;font-size:22px;margin-bottom:10px}
+footer p{max-width:640px;margin:6px auto}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon-192.png" alt="">ดันดี</a>
+    <div class="links">
+      <a href="#features">ฟีเจอร์</a>
+      <a href="#how">วิธีใช้</a>
+      <a href="#faq">คำถาม</a>
+      <a class="btn btn-main" href="./">เปิดแอป</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <div class="pill">❤️ แอปจดความดันสำหรับทุกบ้าน</div>
+      <h1>ความดัน<em>ดี</em><br>ชีวิต<em>ดี</em></h1>
+      <p class="lead">จดค่าความดันในไม่กี่วินาที ดูแนวโน้มเป็นกราฟ ส่งให้หมอดูได้ทันที ข้อมูลทั้งหมดเก็บไว้ใน Google Sheets ของคุณเอง</p>
+      <div class="cta">
+        <a class="btn btn-main" href="./">ลองใช้ฟรี →</a>
+        <a class="btn btn-ghost" href="#how">ดูวิธีเริ่มต้น</a>
+      </div>
+      <p class="note">ไม่ต้องสมัครสมาชิก · เปิดในเบราว์เซอร์ได้เลย · ใช้ได้ทั้งมือถือและคอมพิวเตอร์</p>
+    </div>
+    <div class="hero-art">
+      <div class="blob"></div>
+      <div class="phone"><img src="assets/screen-add.webp" alt="หน้าจดค่าความดันของแอปดันดี" width="390" height="844"></div>
+      <div class="float f1"><span class="muted"><span class="dot" style="background:var(--blue)"></span>วันนี้</span><b>124/80</b></div>
+      <div class="float f2"><span><span class="dot" style="background:var(--teal)"></span>เฉลี่ย 30 วัน</span><b>130/84</b></div>
+    </div>
+  </div>
+</header>
+
+<div class="trust">
+  <div class="wrap">
+    <span>🔒 ข้อมูลอยู่ในชีตของคุณ</span>
+    <span>📱 เพิ่มไว้หน้าจอโฮมได้</span>
+    <span>🚫 ไม่มีโฆษณา</span>
+    <span>🌙 รองรับโหมดมืด</span>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">ฟีเจอร์</div>
+      <h2>ครบทุกอย่างที่ต้องใช้ ไม่มีอะไรเกิน</h2>
+      <p>ออกแบบมาให้ผู้สูงอายุก็ใช้ได้ ตัวเลขใหญ่ อ่านง่าย กดไม่กี่ครั้ง</p>
+    </div>
+    <div class="grid3">
+      <div class="feat"><div class="ic c1">🎯</div><h3>รู้ระดับทันที</h3><p>พิมพ์ตัวเลขปุ๊บ ขึ้นป้ายสีบอกระดับความดันปั๊บ ถ้าค่าสูงมากจะมีคำเตือนให้วัดซ้ำ</p></div>
+      <div class="feat"><div class="ic c2">📈</div><h3>กราฟแนวโน้ม</h3><p>ดูย้อนหลัง 7, 30, 90 วัน มีเส้นเกณฑ์ 140/90 ให้เห็นชัดว่าดีขึ้นหรือแย่ลง</p></div>
+      <div class="feat"><div class="ic c3">🧮</div><h3>สรุปให้อัตโนมัติ</h3><p>ค่าเฉลี่ยความดัน ชีพจร และจำนวนครั้งที่ค่าสูงเกินเกณฑ์ คำนวณให้ทุกช่วงเวลา</p></div>
+      <div class="feat"><div class="ic c4">🩺</div><h3>จดได้มากกว่าความดัน</h3><p>น้ำหนัก น้ำตาลในเลือด อุณหภูมิ ออกซิเจน ชั่วโมงนอน การกินยา อาการ และโน้ต</p></div>
+      <div class="feat"><div class="ic c1">👩‍⚕️</div><h3>ส่งให้หมอง่าย</h3><p>ดาวน์โหลดเป็นไฟล์ CSV เปิดใน Excel ได้ หรือเปิด Google Sheet ให้หมอดูตรงๆ</p></div>
+      <div class="feat"><div class="ic c2">📲</div><h3>ใช้เหมือนแอป</h3><p>เพิ่มไอคอนไว้หน้าจอโฮม เปิดปุ๊บจดได้เลย ข้อมูลตรงกันทั้งมือถือและคอมพิวเตอร์</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="screens">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">หน้าตาแอป</div>
+      <h2>เรียบง่าย ตัวใหญ่ อ่านสบายตา</h2>
+    </div>
+    <div class="shots">
+      <div class="shot"><div class="phone"><img src="assets/screen-add.webp" alt="หน้าจดค่า" loading="lazy" width="390" height="844"></div><p>จดค่า<small>กรอกตัวเลข 3 ช่องแล้วกดบันทึก</small></p></div>
+      <div class="shot"><div class="phone"><img src="assets/screen-history.webp" alt="หน้าประวัติ" loading="lazy" width="390" height="844"></div><p>ประวัติและสรุป<small>ค่าเฉลี่ยและรายการแยกตามวัน</small></p></div>
+      <div class="shot"><div class="phone"><img src="assets/screen-chart.webp" alt="หน้ากราฟ" loading="lazy" width="390" height="844"></div><p>กราฟแนวโน้ม<small>เห็นชัดว่าความดันไปทางไหน</small></p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">เหมาะกับใคร</div>
+      <h2>ดันดีทำมาเพื่อ…</h2>
+    </div>
+    <div class="who">
+      <div><div class="em">🧓</div><h3>คนที่ต้องคุมความดัน</h3><p>หมอสั่งให้วัดที่บ้านทุกวัน จดลงดันดีแทนสมุด ไม่หาย ไม่ลืม เปิดให้หมอดูได้ทุกครั้งที่ไปตามนัด</p></div>
+      <div><div class="em">👨‍👩‍👧</div><h3>ลูกหลานที่ดูแลพ่อแม่</h3><p>ตั้งให้พ่อแม่ใช้บนมือถือ แล้วเปิดดูค่าล่าสุดจาก Google Sheet ได้จากทุกที่ ไม่ต้องโทรถาม</p></div>
+      <div><div class="em">🏃</div><h3>คนรักสุขภาพ</h3><p>ติดตามความดัน น้ำหนัก และการนอนไปพร้อมกัน ดูว่าการออกกำลังกายช่วยได้จริงไหม</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">เริ่มต้นใช้งาน</div>
+      <h2>3 ขั้นตอน ครั้งเดียวจบ</h2>
+      <p>ลองใช้โหมดทดลองได้ทันทีโดยไม่ต้องตั้งค่าอะไร เมื่อพร้อมค่อยเชื่อมกับ Google Sheets</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>เปิดแอปแล้วลองจดเลย</h3><p>ไม่ต้องสมัคร ไม่ต้องติดตั้ง เปิดลิงก์แล้วจดค่าได้ทันทีในโหมดทดลอง</p></div>
+      <div class="step"><h3>เชื่อม Google Sheets</h3><p>ทำตามคู่มือในแอปประมาณ 5 นาที ข้อมูลจะถูกเก็บในชีตของคุณเอง ดูได้จากทุกเครื่อง</p></div>
+      <div class="step"><h3>สแกน QR ลงมือถือ</h3><p>สแกน QR จากหน้าตั้งค่า มือถือเชื่อมให้อัตโนมัติ แล้วเพิ่มไอคอนดันดีไว้หน้าจอโฮม</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="privacy">
+      <div class="big">🔐</div>
+      <div>
+        <h2>ข้อมูลสุขภาพของคุณ เป็นของคุณ</h2>
+        <p>ดันดีไม่มีเซิร์ฟเวอร์เก็บข้อมูลของใคร ทุกค่าที่จดจะถูกส่งตรงไปยัง Google Sheet ในบัญชี Google ของคุณเท่านั้น</p>
+        <ul>
+          <li>ไม่ต้องสมัครสมาชิก ไม่ต้องให้อีเมล</li>
+          <li>ป้องกันด้วยรหัสลับที่มีแค่คุณรู้</li>
+          <li>จะลบ แก้ไข หรือย้ายข้อมูลไปที่ไหนก็ได้ตามใจ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">คำถามที่พบบ่อย</div>
+      <h2>สงสัยอะไร ถามได้</h2>
+    </div>
+    <div class="faq">
+      <details><summary>ใช้กับเครื่องวัดความดันยี่ห้อไหนได้บ้าง?</summary><p>ได้ทุกยี่ห้อ เพราะคุณพิมพ์ตัวเลขที่เครื่องวัดได้ลงในแอปเอง ไม่ต้องเชื่อมบลูทูธ</p></details>
+      <details><summary>ต้องติดตั้งจาก App Store หรือ Play Store ไหม?</summary><p>ไม่ต้อง ดันดีเป็นเว็บแอป เปิดในเบราว์เซอร์ได้เลย แล้วกด "เพิ่มไปยังหน้าจอโฮม" จะได้ไอคอนเหมือนแอปทั่วไป</p></details>
+      <details><summary>ข้อมูลเก็บที่ไหน ปลอดภัยไหม?</summary><p>ในโหมดทดลอง ข้อมูลอยู่ในเบราว์เซอร์เครื่องนั้นเครื่องเดียว เมื่อเชื่อม Google Sheets ข้อมูลจะอยู่ในบัญชี Google ของคุณเอง ดันดีไม่ได้เก็บข้อมูลไว้ที่อื่น</p></details>
+      <details><summary>ใช้หลายเครื่องพร้อมกันได้ไหม?</summary><p>ได้ เมื่อเชื่อม Google Sheets แล้ว สแกน QR จากหน้าตั้งค่าไปเปิดบนเครื่องอื่น ข้อมูลจะตรงกันทุกเครื่อง</p></details>
+      <details><summary>ใช้แทนการไปหาหมอได้ไหม?</summary><p>ไม่ได้ ดันดีเป็นเครื่องมือช่วยจดและดูแนวโน้มเท่านั้น ไม่ใช่การวินิจฉัย ค่าเป้าหมายและการปรับยาควรปรึกษาแพทย์เสมอ</p></details>
+      <details><summary>ถ้าค่าความดันสูงมากต้องทำอย่างไร?</summary><p>นั่งพัก 5 นาทีแล้ววัดซ้ำ ถ้ายังสูงมากและมีอาการเจ็บหน้าอก ปวดหัวรุนแรง แขนขาอ่อนแรง พูดไม่ชัด หรือตามัว ให้โทร 1669 หรือไปโรงพยาบาลทันที</p></details>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="final">
+      <img src="icon-192.png" alt="">
+      <h2>เริ่มจดวันนี้ ความดันดีทุกวัน</h2>
+      <p>ลองใช้ฟรีได้ทันที ไม่ต้องสมัคร ไม่ต้องติดตั้ง</p>
+      <a class="btn btn-main" href="./">เปิดแอปดันดี →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon-192.png" alt="">ดันดี</a>
+    <p>ดันดีเป็นเครื่องมือช่วยบันทึกและติดตามแนวโน้มเท่านั้น ไม่ใช่เครื่องมือแพทย์ และไม่ใช้แทนคำแนะนำของแพทย์ เกณฑ์ระดับความดันที่แสดงเป็นเกณฑ์ทั่วไปสำหรับผู้ใหญ่</p>
+    <p>© 2026 ดันดี</p>
+  </div>
+</footer>
+
+</body>
+</html>

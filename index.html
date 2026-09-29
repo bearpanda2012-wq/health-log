@@ -110,10 +110,10 @@ details[open] summary{margin-bottom:12px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{background:var(--field);border-radius:12px;padding:10px 12px}
 .stat b{display:block;font-size:20px}
-.day{font-size:13px;color:var(--muted);font-weight:600;margin:16px 4px 6px}
-.item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.day{font-size:13px;color:var(--muted);font-weight:700;margin:14px 2px 6px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:8px}
 .item .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.item .v{font-size:20px;font-weight:700}
+.item .v{font-family:'Kanit',sans-serif;font-size:22px;font-weight:700}
 .item .v span{font-size:14px;font-weight:400;color:var(--muted)}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .tag{font-size:12px;background:var(--field);border:1px solid var(--line);border-radius:8px;padding:2px 8px}
@@ -121,7 +121,64 @@ details[open] summary{margin-bottom:12px}
 .del{font:inherit;font-size:12px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:3px 10px;cursor:pointer}
 .btn2.confirm,.del.confirm{border-color:var(--h2);color:#fff;background:var(--h2)}
 .filters{display:flex;gap:8px;margin-bottom:12px}
-.chartbox{position:relative;height:300px}
+.pagehead{display:flex;align-items:center;justify-content:space-between;margin:6px 2px 12px}
+.pagetitle{font-family:'Kanit',sans-serif;font-weight:600;font-size:26px}
+.viewseg{margin-bottom:14px}
+.pills{display:flex;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px;gap:2px;margin-bottom:12px}
+.pill{flex:1;font:inherit;font-size:13px;color:var(--muted);background:none;border:0;border-radius:99px;padding:7px 4px;min-height:34px;cursor:pointer;white-space:nowrap}
+.pill.on{background:var(--ink);color:var(--bg);font-weight:700}
+.mpills{display:flex;gap:6px;overflow-x:auto;margin:0 -20px 10px;padding:0 20px 2px;scrollbar-width:none}
+.mpills::-webkit-scrollbar{display:none}
+.mpill{flex:0 0 auto;font:inherit;font-size:13px;font-weight:600;color:var(--accent-text);background:var(--accent-soft);border:0;border-radius:99px;padding:7px 14px;min-height:36px;cursor:pointer}
+.mpill.on{background:var(--accent-ink);color:#fff}
+.tiles3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 12px;min-width:0}
+.tile .k{font-size:12px;color:var(--muted)}
+.tile .v{font-family:'Kanit',sans-serif;font-weight:700;font-size:21px;line-height:1.25;white-space:nowrap}
+.tile .s{font-size:11.5px;color:var(--muted)}
+.lv-good,.lv-ok{color:var(--good)}.lv-hn{color:#B26F00}.lv-h1{color:#C2410C}.lv-h2,.lv-crit{color:#B91C1C}.lv-low{color:#6D28D9}
+.rowhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:4px 2px 8px;font-family:'Kanit',sans-serif;font-weight:600;font-size:18px}
+.rowhead .muted{font-family:'IBM Plex Sans Thai',sans-serif;font-weight:400}
+.circbtn{width:38px;height:38px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:20px;line-height:1;cursor:pointer}
+.circbtn:disabled{opacity:.35}
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.caltitle{font-family:'Kanit',sans-serif;font-weight:600;font-size:19px}
+.calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.caldow{font-size:12px;color:var(--muted);margin-bottom:4px}
+.cday{font:inherit;font-size:14px;color:var(--ink);background:none;border:0;border-radius:12px;padding:5px 0 4px;min-height:44px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.cday .dot{visibility:hidden}.cday.has .dot{visibility:visible}
+.cday.today{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.cday.sel{background:var(--ink);color:var(--bg);font-weight:700}
+.cday.future{color:var(--muted);opacity:.5;cursor:default}
+.dot{display:inline-block;width:8px;height:8px;border-radius:99px;background:#B9AEA7}
+.d-good,.d-ok{background:#1FA38A}.d-hn{background:#D98A06}.d-h1{background:#EA580C}.d-h2,.d-crit{background:#DC2626}.d-low{background:#7C3AED}.d-other{background:#B9AEA7}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.wkhero{display:flex;align-items:center;gap:16px}
+.wkhero .big{font-family:'Kanit',sans-serif;font-weight:700;font-size:32px;line-height:1.15}
+.bars{display:flex;flex-direction:column;gap:12px}
+.barrow{display:flex;align-items:center;gap:10px}
+.barrow .lb{width:62px;font-size:13px;color:var(--muted)}
+.barrow .tr{flex:1;height:14px;background:var(--field);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.barrow .fl{height:100%;border-radius:99px;background:var(--accent)}
+.barrow .vl{width:62px;text-align:right;font-family:'Kanit',sans-serif;font-weight:700}
+.meddays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center;font-size:11.5px;color:var(--muted)}
+.meddays div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.meddays i{width:26px;height:26px;border-radius:99px;background:#1FA38A}
+.meddays i.no{background:none;border:2px dashed var(--line)}
+.cardtitle{font-family:'Kanit',sans-serif;font-weight:600;font-size:17px;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.cardtitle .muted{font-family:'IBM Plex Sans Thai',sans-serif;font-weight:400}
+.daterange{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.daterange label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.trend{display:flex;align-items:center;justify-content:space-between;gap:10px;border-radius:16px;padding:12px 14px;font-size:14px;font-weight:600;margin-bottom:14px}
+.trend.good{background:var(--good-soft);color:var(--good)}
+.trend.bad{background:#FEF3DC;color:#8A5600}
+.trend.neutral{background:var(--card);border:1px solid var(--line);color:var(--ink)}
+.item .ival{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.item .itime{font-size:13px;color:var(--muted);min-width:40px}
+.item .iright{display:flex;align-items:center;gap:8px}
+.item .tags{padding-left:50px}
+.chartbox{position:relative;height:260px}
 .empty{text-align:center;color:var(--muted);padding:40px 10px}
 nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);
   display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:6}
@@ -229,23 +286,90 @@ nav button.on svg{stroke-width:2.4}
 
   <!-- ===== ประวัติ ===== -->
   <section id="tab-history" hidden>
-    <div class="filters">
-      <select id="histRange"><option value="7">7 วัน</option><option value="30" selected>30 วัน</option><option value="90">90 วัน</option><option value="0">ทั้งหมด</option></select>
+    <div class="pagehead"><span class="pagetitle">ประวัติ</span></div>
+    <div class="seg viewseg" id="histView">
+      <input type="radio" name="hview" id="hvList" value="list" checked><label for="hvList">รายการ</label>
+      <input type="radio" name="hview" id="hvCal" value="cal"><label for="hvCal">ปฏิทิน</label>
+      <input type="radio" name="hview" id="hvWeek" value="week"><label for="hvWeek">สรุปสัปดาห์</label>
     </div>
-    <div class="card" id="summary"></div>
-    <div id="list"></div>
+
+    <!-- มุมมอง 1: รายการ -->
+    <div id="hv-list">
+      <div class="pills" id="histRange" role="group" aria-label="ช่วงเวลา">
+        <button type="button" class="pill" data-v="7">7 วัน</button>
+        <button type="button" class="pill on" data-v="30">30 วัน</button>
+        <button type="button" class="pill" data-v="90">90 วัน</button>
+        <button type="button" class="pill" data-v="0">ทั้งหมด</button>
+      </div>
+      <div class="tiles3" id="summary"></div>
+      <div id="list"></div>
+    </div>
+
+    <!-- มุมมอง 2: ปฏิทิน -->
+    <div id="hv-cal" hidden>
+      <div class="card cal">
+        <div class="calhead">
+          <button type="button" class="circbtn" id="calPrev" aria-label="เดือนก่อน">‹</button>
+          <span class="caltitle" id="calTitle"></span>
+          <button type="button" class="circbtn" id="calNext" aria-label="เดือนถัดไป">›</button>
+        </div>
+        <div class="calgrid caldow"><span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span></div>
+        <div class="calgrid" id="calGrid"></div>
+        <div class="legend">
+          <span><i class="dot d-ok"></i>ปกติ</span><span><i class="dot d-hn"></i>ค่อนข้างสูง</span><span><i class="dot d-h1"></i>สูง</span><span><i class="dot d-h2"></i>สูงมาก</span><span><i class="dot d-low"></i>ต่ำ</span>
+        </div>
+      </div>
+      <div class="rowhead"><span id="calDayTitle"></span><span class="muted" id="calDayCount"></span></div>
+      <div id="calDayList"></div>
+    </div>
+
+    <!-- มุมมอง 3: สรุปสัปดาห์ -->
+    <div id="hv-week" hidden>
+      <div class="calhead" style="margin-bottom:12px">
+        <button type="button" class="circbtn" id="wkPrev" aria-label="สัปดาห์ก่อน">‹</button>
+        <div style="text-align:center"><div class="caltitle" id="wkTitle"></div><div class="muted" id="wkRange"></div></div>
+        <button type="button" class="circbtn" id="wkNext" aria-label="สัปดาห์ถัดไป">›</button>
+      </div>
+      <div class="card" id="wkHero"></div>
+      <div class="card" id="wkAmPm"></div>
+      <div class="card" id="wkMed"></div>
+      <div class="btnrow" style="margin-top:0">
+        <button class="btn" type="button" id="shareReport">ส่งรายงานให้หมอ</button>
+        <button class="btn2" type="button" id="wkToList">ดูรายการ</button>
+      </div>
+      <p class="muted" style="margin-top:8px">ส่งเป็นข้อความสรุปผ่าน LINE หรือแอปอื่นได้ หรือคัดลอกไปวาง</p>
+    </div>
   </section>
 
   <!-- ===== กราฟ ===== -->
   <section id="tab-chart" hidden>
-    <div class="filters">
-      <select id="metric">
-        <option value="bp">ความดัน</option><option value="pulse">ชีพจร</option><option value="weight">น้ำหนัก</option>
-        <option value="sugar">น้ำตาล</option><option value="temp">อุณหภูมิ</option><option value="spo2">SpO2</option><option value="sleep">การนอน</option>
-      </select>
-      <select id="chartRange"><option value="7">7 วัน</option><option value="30" selected>30 วัน</option><option value="90">90 วัน</option><option value="0">ทั้งหมด</option></select>
+    <div class="pagehead"><span class="pagetitle">กราฟ</span></div>
+    <div class="mpills" id="metric" role="group" aria-label="เลือกค่าที่จะดู">
+      <button type="button" class="mpill on" data-m="bp">ความดัน</button>
+      <button type="button" class="mpill" data-m="pulse">ชีพจร</button>
+      <button type="button" class="mpill" data-m="weight">น้ำหนัก</button>
+      <button type="button" class="mpill" data-m="sugar">น้ำตาล</button>
+      <button type="button" class="mpill" data-m="temp">อุณหภูมิ</button>
+      <button type="button" class="mpill" data-m="spo2">SpO2</button>
+      <button type="button" class="mpill" data-m="sleep">การนอน</button>
     </div>
-    <div class="card"><div class="chartbox"><canvas id="chart"></canvas></div><div id="chartEmpty" class="empty" hidden>ยังไม่มีข้อมูลในช่วงนี้</div></div>
+    <div class="pills" id="chartRange" role="group" aria-label="ช่วงเวลา">
+      <button type="button" class="pill" data-v="7">7 วัน</button>
+      <button type="button" class="pill on" data-v="14">14 วัน</button>
+      <button type="button" class="pill" data-v="30">30 วัน</button>
+      <button type="button" class="pill" data-v="90">90 วัน</button>
+      <button type="button" class="pill" data-v="custom">เลือกวัน</button>
+    </div>
+    <div class="card daterange" id="dateRange" hidden>
+      <label>ตั้งแต่<input type="date" id="dFrom"></label>
+      <label>ถึง<input type="date" id="dTo"></label>
+    </div>
+    <div class="card">
+      <div class="rowhead" style="margin:0 0 6px"><span id="chartTitle"></span><span class="muted" id="chartUnit"></span></div>
+      <div class="chartbox"><canvas id="chart"></canvas></div><div id="chartEmpty" class="empty" hidden>ยังไม่มีข้อมูลในช่วงนี้</div>
+    </div>
+    <div class="tiles3" id="chartStats"></div>
+    <div class="trend" id="chartTrend" hidden></div>
     <div class="card muted" id="legendNote"></div>
   </section>
 
@@ -305,7 +429,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 12 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 13 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -520,26 +644,29 @@ function sortRecords(){ records.sort((a,b) => new Date(b.datetime) - new Date(a.
 function tagsFor(r){
   const t = [];
   if (has(r.pulse) && !has(r.sys)) t.push(`ชีพจร ${r.pulse}`);
-  if (has(r.weight)) t.push(`⚖️ ${r.weight} กก.`);
-  if (has(r.sugar)) t.push(`🩸 ${r.sugar} mg/dL${r.sugarTiming ? ' · ' + r.sugarTiming : ''}`);
-  if (has(r.temp)) t.push(`🌡️ ${r.temp}°C`);
-  if (has(r.spo2)) t.push(`O₂ ${r.spo2}%`);
-  if (has(r.sleep)) t.push(`😴 ${r.sleep} ชม.`);
-  if (r.med === 'ใช่' || r.med === true) t.push('💊 กินยาแล้ว');
-  else if (has(r.med)) t.push('💊 ' + r.med);
-  if (has(r.symptoms)) t.push(`⚠️ ${r.symptoms}`);
-  if (has(r.sys) && (r.arm || r.posture)) t.push([r.arm && 'แขน'+r.arm, r.posture].filter(Boolean).join(' · '));
+  if (has(r.weight)) t.push(`น้ำหนัก ${r.weight} กก.`);
+  if (has(r.sugar)) t.push(`น้ำตาล ${r.sugar}${r.sugarTiming ? ' · ' + r.sugarTiming : ''}`);
+  if (has(r.temp)) t.push(`อุณหภูมิ ${r.temp}°C`);
+  if (has(r.spo2)) t.push(`SpO2 ${r.spo2}%`);
+  if (has(r.sleep)) t.push(`นอน ${r.sleep} ชม.`);
+  if (r.med === 'ใช่' || r.med === true) t.push('กินยาแล้ว');
+  else if (has(r.med)) t.push('ยา ' + r.med);
+  if (has(r.symptoms)) t.push(`อาการ: ${r.symptoms}`);
+  if (has(r.sys) && (r.arm || r.posture)) t.push([r.arm && 'แขน' + r.arm, r.posture].filter(Boolean).join(' · '));
   return t.map(x => `<span class="tag">${esc(x)}</span>`).join('');
 }
 
 function itemHTML(r){
   const d = new Date(r.datetime);
-  const bp = has(r.sys) ? `<div class="v">${r.sys}/${r.dia}${has(r.pulse) ? ` <span>ชีพจร ${r.pulse}</span>` : ''}</div>` : `<div class="v"><span>${fmtTime(d)}</span></div>`;
+  const main = has(r.sys)
+    ? `<span class="v">${r.sys}/${r.dia}</span>${has(r.pulse) ? `<span class="muted">ชีพจร ${r.pulse}</span>` : ''}`
+    : `<span class="muted">บันทึกสุขภาพ</span>`;
+  const tags = tagsFor(r);
   return `<div class="item">
-    <div class="top"><div>${has(r.sys) ? `<div class="muted">${fmtTime(d)}</div>` : ''}${bp}</div>
-      <div style="text-align:right">${badge(bpClass(r.sys, r.dia))}<div style="margin-top:6px"><button class="del" data-id="${esc(r.id)}">ลบ</button></div></div></div>
-    <div class="tags">${tagsFor(r)}</div>
-    ${has(r.note) ? `<div class="note">${esc(r.note)}</div>` : ''}
+    <div class="top"><div class="ival"><span class="itime">${fmtTime(d)}</span>${main}</div>
+      <div class="iright">${badge(bpClass(r.sys, r.dia))}<button class="del" data-id="${esc(r.id)}" aria-label="ลบรายการ ${fmtTime(d)}">ลบ</button></div></div>
+    ${tags ? `<div class="tags">${tags}</div>` : ''}
+    ${has(r.note) ? `<div class="note" style="padding-left:50px">${esc(r.note)}</div>` : ''}
   </div>`;
 }
 
@@ -580,32 +707,170 @@ function renderLast(){
 
 function avg(arr){ return arr.length ? arr.reduce((a,b) => a + b, 0) / arr.length : null; }
 
-function renderHistory(){
-  const days = +$('#histRange').value;
-  const rows = inRange(days);
+/* ================= ประวัติ ================= */
+let histDays = 30, histView = 'list';
+const dayKey = d => { const x = new Date(d); return x.getFullYear() + '-' + pad(x.getMonth() + 1) + '-' + pad(x.getDate()); };
+const RANK = { good:0, ok:0, low:1, hn:2, h1:3, h2:4, crit:5 };
+function worstClass(rows){
+  let w = null;
+  rows.filter(r => has(r.sys)).forEach(r => { const c = bpClass(+r.sys, +r.dia); if (c && (!w || RANK[c.c] > RANK[w.c])) w = c; });
+  return w;
+}
+const tile = (k, v, sub, cls) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s ${cls || ''}">${sub || ''}</div></div>`;
+function statTiles(rows){
   const bp = rows.filter(r => has(r.sys));
   const aS = avg(bp.map(r => +r.sys)), aD = avg(bp.map(r => +r.dia));
   const pul = rows.filter(r => has(r.pulse)).map(r => +r.pulse);
   const high = bp.filter(r => r.sys >= 140 || r.dia >= 90).length;
-  const w = rows.filter(r => has(r.weight));
-  $('#summary').innerHTML = `<h2>สรุป <small>${days ? days + ' วันล่าสุด' : 'ทั้งหมด'} · ${rows.length} รายการ</small></h2>
-    <div class="stats">
-      <div class="stat"><span class="muted">ความดันเฉลี่ย</span><b>${aS ? Math.round(aS) + '/' + Math.round(aD) : '–'}</b>${aS ? badge(bpClass(aS, aD)) : ''}</div>
-      <div class="stat"><span class="muted">ชีพจรเฉลี่ย</span><b>${pul.length ? Math.round(avg(pul)) : '–'}</b></div>
-      <div class="stat"><span class="muted">ครั้งที่ ≥ 140/90</span><b>${bp.length ? `${high} <span class="muted">(${Math.round(high / bp.length * 100)}%)</span>` : '–'}</b></div>
-      <div class="stat"><span class="muted">น้ำหนักล่าสุด</span><b>${w.length ? w[0].weight + ' กก.' : '–'}</b></div>
-    </div>`;
-  if (!rows.length) { $('#list').innerHTML = '<div class="empty">ยังไม่มีบันทึกในช่วงนี้</div>'; return; }
-  let html = '', lastDay = '';
+  const c = aS ? bpClass(aS, aD) : null;
+  return tile('ความดันเฉลี่ย', aS ? Math.round(aS) + '/' + Math.round(aD) : '–', c ? c.t : '', c ? 'lv-' + c.c : '')
+    + tile('ชีพจรเฉลี่ย', pul.length ? Math.round(avg(pul)) : '–', 'ครั้ง/นาที')
+    + tile('เกิน 140/90', bp.length ? high + ' <span style="font-size:14px;font-weight:500">ครั้ง</span>' : '–', bp.length ? `จาก ${bp.length} ครั้ง` : '');
+}
+function dayHeader(d){ const rel = relDay(d); return (rel === 'วันนี้' || rel === 'เมื่อวาน') ? `${rel} · ${fmtDay(d)}` : fmtDay(d); }
+function listHTML(rows){
+  let html = '', last = '';
   rows.forEach(r => {
-    const day = fmtDay(new Date(r.datetime));
-    if (day !== lastDay) { html += `<div class="day">${day}</div>`; lastDay = day; }
+    const d = new Date(r.datetime), k = dayKey(d);
+    if (k !== last) { html += `<div class="day">${dayHeader(d)}</div>`; last = k; }
     html += itemHTML(r);
   });
-  $('#list').innerHTML = html;
+  return html;
+}
+function renderList(){
+  const rows = inRange(histDays);
+  $('#summary').innerHTML = statTiles(rows);
+  $('#list').innerHTML = rows.length ? listHTML(rows) : '<div class="empty">ยังไม่มีบันทึกในช่วงนี้</div>';
 }
 
-$('#list').addEventListener('click', async e => {
+/* ---- ปฏิทิน ---- */
+let calMonth = new Date(); calMonth.setDate(1); calMonth.setHours(0,0,0,0);
+let calSel = dayKey(new Date());
+function renderCal(){
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  $('#calTitle').textContent = calMonth.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+  const byDay = {};
+  records.forEach(r => { const k = dayKey(r.datetime); (byDay[k] = byDay[k] || []).push(r); });
+  const todayK = dayKey(new Date()), days = new Date(y, m + 1, 0).getDate();
+  let html = '<span></span>'.repeat(new Date(y, m, 1).getDay());
+  for (let d = 1; d <= days; d++) {
+    const k = y + '-' + pad(m + 1) + '-' + pad(d), rs = byDay[k] || [], w = worstClass(rs);
+    const future = k > todayK;
+    const cls = ['cday', rs.length ? 'has' : '', k === todayK ? 'today' : '', k === calSel ? 'sel' : '', future ? 'future' : ''].join(' ');
+    html += `<button type="button" class="${cls}" data-k="${k}" ${future ? 'disabled' : ''} aria-label="${d} ${rs.length ? rs.length + ' รายการ' : 'ไม่มีบันทึก'}">${d}<i class="dot ${w ? 'd-' + w.c : 'd-other'}"></i></button>`;
+  }
+  $('#calGrid').innerHTML = html;
+  const now = new Date(); $('#calNext').disabled = y > now.getFullYear() || (y === now.getFullYear() && m >= now.getMonth());
+  const sel = (byDay[calSel] || []).slice().sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+  const sd = new Date(calSel + 'T00:00:00');
+  $('#calDayTitle').textContent = dayHeader(sd);
+  $('#calDayCount').textContent = sel.length ? sel.length + ' รายการ' : '';
+  $('#calDayList').innerHTML = sel.length ? sel.map(itemHTML).join('') : '<div class="empty" style="padding:24px 10px">ไม่มีบันทึกในวันนี้</div>';
+}
+$('#calGrid').addEventListener('click', e => { const b = e.target.closest('.cday'); if (!b || b.disabled) return; calSel = b.dataset.k; renderCal(); });
+$('#calPrev').addEventListener('click', () => { calMonth.setMonth(calMonth.getMonth() - 1); renderCal(); });
+$('#calNext').addEventListener('click', () => { calMonth.setMonth(calMonth.getMonth() + 1); renderCal(); });
+
+/* ---- สรุปสัปดาห์ (7 วันย้อนหลัง) ---- */
+let wkOffset = 0;
+function weekWindow(off){
+  const end = new Date(); end.setHours(23,59,59,999); end.setDate(end.getDate() - 7 * off);
+  const start = new Date(end); start.setDate(start.getDate() - 6); start.setHours(0,0,0,0);
+  return { start, end, rows: records.filter(r => { const t = new Date(r.datetime); return t >= start && t <= end; }) };
+}
+function weekStats(rows){
+  const bp = rows.filter(r => has(r.sys));
+  const days = {}; bp.forEach(r => { (days[dayKey(r.datetime)] = days[dayKey(r.datetime)] || []).push(r); });
+  const dk = Object.keys(days), normalDays = dk.filter(k => days[k].every(r => r.sys < 140 && r.dia < 90)).length;
+  const am = bp.filter(r => new Date(r.datetime).getHours() < 12), pm = bp.filter(r => new Date(r.datetime).getHours() >= 12);
+  const pul = rows.filter(r => has(r.pulse)).map(r => +r.pulse);
+  return { bp, dk, normalDays, aS: avg(bp.map(r => +r.sys)), aD: avg(bp.map(r => +r.dia)), pulse: avg(pul),
+    am: { s: avg(am.map(r => +r.sys)), d: avg(am.map(r => +r.dia)), n: am.length }, pm: { s: avg(pm.map(r => +r.sys)), d: avg(pm.map(r => +r.dia)), n: pm.length } };
+}
+const R = n => Math.round(n);
+const fmtRange = (a, b) => `${a.getDate()} ${a.toLocaleDateString('th-TH', { month: 'short' })} – ${b.getDate()} ${b.toLocaleDateString('th-TH', { month: 'short', year: 'numeric' })}`;
+function renderWeek(){
+  const W = weekWindow(wkOffset), P = weekWindow(wkOffset + 1), st = weekStats(W.rows), pv = weekStats(P.rows);
+  $('#wkTitle').textContent = wkOffset === 0 ? 'สรุปสัปดาห์นี้' : wkOffset === 1 ? 'สัปดาห์ก่อน' : `${wkOffset} สัปดาห์ก่อน`;
+  $('#wkRange').textContent = fmtRange(W.start, W.end);
+  $('#wkNext').disabled = wkOffset === 0;
+  if (!st.bp.length) {
+    $('#wkHero').innerHTML = '<div class="empty" style="padding:24px 10px">ยังไม่มีค่าความดันในสัปดาห์นี้</div>';
+  } else {
+    const pct = st.dk.length ? st.normalDays / st.dk.length : 0, C = 226.2;
+    const c = bpClass(st.aS, st.aD);
+    let cmp = '';
+    if (pv.aS) {
+      const diff = R(st.aS) - R(pv.aS);
+      cmp = diff === 0 ? `<span class="muted">เท่ากับสัปดาห์ก่อน (${R(pv.aS)}/${R(pv.aD)})</span>`
+        : `<span class="${diff < 0 ? 'lv-ok' : 'lv-hn'}" style="font-size:13px;font-weight:700">${diff < 0 ? '↓ ลดลง' : '↑ เพิ่มขึ้น'} ${Math.abs(diff)} จากสัปดาห์ก่อน (${R(pv.aS)}/${R(pv.aD)})</span>`;
+    }
+    $('#wkHero').innerHTML = `<div class="wkhero">
+      <svg width="92" height="92" viewBox="0 0 92 92" role="img" aria-label="อยู่ในเกณฑ์ปกติ ${R(pct * 100)} เปอร์เซ็นต์" style="flex:none">
+        <circle cx="46" cy="46" r="36" fill="none" stroke="var(--line)" stroke-width="10"/>
+        <circle cx="46" cy="46" r="36" fill="none" stroke="#1FA38A" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(pct * C).toFixed(1)} ${C}" transform="rotate(-90 46 46)"/>
+        <text x="46" y="52" text-anchor="middle" font-family="Kanit, sans-serif" font-weight="700" font-size="${pct >= 1 ? 18 : 21}" fill="currentColor">${R(pct * 100)}%</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+        <span class="muted">อยู่ในเกณฑ์ปกติ ${st.normalDays} จาก ${st.dk.length} วัน</span>
+        <span class="big">${R(st.aS)}/${R(st.aD)}</span>
+        <span class="lv-${c.c}" style="font-size:13px;font-weight:700">${c.t}${st.pulse ? ` <span class="muted" style="font-weight:400">· ชีพจร ${R(st.pulse)}</span>` : ''}</span>
+        ${cmp}
+      </div></div>`;
+  }
+  const bar = (lb, v, color) => `<div class="barrow"><span class="lb">${lb}</span><div class="tr"><div class="fl" style="width:${v.s ? Math.min(100, v.s / 180 * 100).toFixed(0) : 0}%;background:${color}"></div></div><span class="vl">${v.s ? R(v.s) + '/' + R(v.d) : '–'}</span></div>`;
+  $('#wkAmPm').innerHTML = `<div class="cardtitle">เช้า เทียบ บ่าย–เย็น <span class="muted">ค่าเฉลี่ย</span></div>
+    <div class="bars">${bar('เช้า', st.am, 'var(--accent)')}${bar('บ่าย–เย็น', st.pm, '#F29CA2')}</div>`;
+  let medHtml = '', medDays = 0;
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(W.end); d.setDate(d.getDate() - i);
+    const k = dayKey(d), took = W.rows.some(r => dayKey(r.datetime) === k && has(r.med));
+    if (took) medDays++;
+    medHtml += `<div><i class="${took ? '' : 'no'}" aria-label="${took ? 'กินยาแล้ว' : 'ไม่มีบันทึกกินยา'}"></i>${d.toLocaleDateString('th-TH', { weekday: 'narrow' })}</div>`;
+  }
+  $('#wkMed').innerHTML = `<div class="cardtitle">กินยา <span class="muted">${medDays}/7 วัน</span></div><div class="meddays">${medHtml}</div>`;
+}
+$('#wkPrev').addEventListener('click', () => { wkOffset++; renderWeek(); });
+$('#wkNext').addEventListener('click', () => { if (wkOffset > 0) { wkOffset--; renderWeek(); } });
+$('#wkToList').addEventListener('click', () => { document.querySelector('#hvList').checked = true; setHistView('list'); });
+$('#shareReport').addEventListener('click', async () => {
+  const W = weekWindow(wkOffset), st = weekStats(W.rows);
+  if (!st.bp.length) return toast('ยังไม่มีค่าความดันในสัปดาห์นี้');
+  const c = bpClass(st.aS, st.aD);
+  const lines = [
+    'รายงานความดันโลหิต (แอปดันดี)', fmtRange(W.start, W.end), '',
+    `เฉลี่ย ${R(st.aS)}/${R(st.aD)} mmHg (${c.t})${st.pulse ? ` · ชีพจรเฉลี่ย ${R(st.pulse)}` : ''}`,
+    `อยู่ในเกณฑ์ปกติ ${st.normalDays}/${st.dk.length} วัน`,
+    st.am.n ? `เช้าเฉลี่ย ${R(st.am.s)}/${R(st.am.d)} (${st.am.n} ครั้ง)` : '',
+    st.pm.n ? `บ่าย–เย็นเฉลี่ย ${R(st.pm.s)}/${R(st.pm.d)} (${st.pm.n} ครั้ง)` : '',
+    '', 'รายการ:'
+  ].filter((x, i, a) => x !== '' || a[i - 1] !== '');
+  st.bp.slice().reverse().forEach(r => { const d = new Date(r.datetime); lines.push(`${d.getDate()}/${d.getMonth() + 1} ${fmtTime(d)}  ${r.sys}/${r.dia}${has(r.pulse) ? '  ชีพจร ' + r.pulse : ''}${has(r.med) && r.med !== 'ใช่' ? '  ยา ' + r.med : ''}`); });
+  const text = lines.join('\n');
+  try {
+    if (navigator.share) { await navigator.share({ title: 'รายงานความดัน', text }); return; }
+  } catch(e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text); toast('คัดลอกรายงานแล้ว วางใน LINE ส่งหมอได้เลย'); }
+  catch(e) { prompt('คัดลอกรายงานนี้:', text); }
+});
+
+function setHistView(v){
+  histView = v;
+  ['list', 'cal', 'week'].forEach(x => $('#hv-' + x).hidden = x !== v);
+  renderHistory();
+}
+document.querySelectorAll('input[name=hview]').forEach(i => i.addEventListener('change', () => setHistView(i.value)));
+$('#histRange').addEventListener('click', e => {
+  const b = e.target.closest('.pill'); if (!b) return;
+  histDays = +b.dataset.v;
+  $('#histRange').querySelectorAll('.pill').forEach(x => x.classList.toggle('on', x === b));
+  renderList();
+});
+function renderHistory(){
+  if (histView === 'list') renderList(); else if (histView === 'cal') renderCal(); else renderWeek();
+}
+
+async function onDelete(e){
   const b = e.target.closest('.del'); if (!b) return;
   if (!b.classList.contains('confirm')) {
     b.classList.add('confirm'); b.textContent = 'ยืนยันลบ?';
@@ -618,61 +883,116 @@ $('#list').addEventListener('click', async e => {
     records = records.filter(r => r.id !== b.dataset.id);
     renderAll(); toast('ลบแล้ว');
   } catch(err) { toast('ลบไม่สำเร็จ'); b.disabled = false; b.textContent = 'ลบ'; }
-});
+}
+$('#list').addEventListener('click', onDelete);
+$('#calDayList').addEventListener('click', onDelete);
 
+/* ================= กราฟ ================= */
 const METRICS = {
-  bp:     { label:'ความดัน (mmHg)', note:'เส้นประ = เกณฑ์ความดันสูง 140/90 mmHg' },
-  pulse:  { key:'pulse',  label:'ชีพจร (ครั้ง/นาที)', note:'ชีพจรขณะพักของผู้ใหญ่ส่วนใหญ่อยู่ราว 60–100 ครั้ง/นาที' },
-  weight: { key:'weight', label:'น้ำหนัก (กก.)', note:'ชั่งเวลาเดิมทุกวัน เช่น ตอนเช้าหลังเข้าห้องน้ำ จะเทียบได้แม่นกว่า' },
-  sugar:  { key:'sugar',  label:'น้ำตาล (mg/dL)', note:'ค่างดอาหารปกติมักต่ำกว่า 100 mg/dL · ค่าเป้าหมายของแต่ละคนควรถามแพทย์' },
-  temp:   { key:'temp',   label:'อุณหภูมิ (°C)', note:'ตั้งแต่ราว 37.5°C ขึ้นไปถือว่ามีไข้' },
-  spo2:   { key:'spo2',   label:'SpO2 (%)', note:'ปกติมักอยู่ 95–100% ถ้าต่ำกว่า 94% ต่อเนื่องควรปรึกษาแพทย์' },
-  sleep:  { key:'sleep',  label:'การนอน (ชม.)', note:'ผู้ใหญ่ส่วนใหญ่ต้องการนอนราว 7–9 ชั่วโมง' }
+  bp:     { title:'ความดัน', unit:'mmHg', note:'เส้นประ = เกณฑ์ความดันสูง 140/90 mmHg · พื้นที่สีชมพู = โซนความดันสูง' },
+  pulse:  { key:'pulse',  title:'ชีพจร', unit:'ครั้ง/นาที', note:'ชีพจรขณะพักของผู้ใหญ่ส่วนใหญ่อยู่ราว 60–100 ครั้ง/นาที' },
+  weight: { key:'weight', title:'น้ำหนัก', unit:'กก.', dec:1, note:'ชั่งเวลาเดิมทุกวัน เช่น ตอนเช้าหลังเข้าห้องน้ำ จะเทียบได้แม่นกว่า' },
+  sugar:  { key:'sugar',  title:'น้ำตาล', unit:'mg/dL', note:'ค่างดอาหารปกติมักต่ำกว่า 100 mg/dL · ค่าเป้าหมายของแต่ละคนควรถามแพทย์' },
+  temp:   { key:'temp',   title:'อุณหภูมิ', unit:'°C', dec:1, note:'ตั้งแต่ราว 37.5°C ขึ้นไปถือว่ามีไข้' },
+  spo2:   { key:'spo2',   title:'SpO2', unit:'%', note:'ปกติมักอยู่ 95–100% ถ้าต่ำกว่า 94% ต่อเนื่องควรปรึกษาแพทย์' },
+  sleep:  { key:'sleep',  title:'การนอน', unit:'ชม.', dec:1, note:'ผู้ใหญ่ส่วนใหญ่ต้องการนอนราว 7–9 ชั่วโมง' }
 };
-
+let chartMetric = 'bp', chartRange = '14';
+const isoDate = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+(function initDates(){ const t = new Date(), f = new Date(); f.setDate(f.getDate() - 30); $('#dFrom').value = isoDate(f); $('#dTo').value = isoDate(t); $('#dFrom').max = $('#dTo').max = isoDate(t); })();
+function chartRows(){
+  if (chartRange !== 'custom') return inRange(+chartRange);
+  let a = $('#dFrom').value, b = $('#dTo').value;
+  if (a && b && a > b) [a, b] = [b, a];
+  const from = a ? new Date(a + 'T00:00:00') : new Date(0), to = b ? new Date(b + 'T23:59:59') : new Date();
+  return records.filter(r => { const t = new Date(r.datetime); return t >= from && t <= to; });
+}
+const highZone = {
+  id: 'highZone',
+  beforeDatasetsDraw(c, args, o){
+    if (!o || !o.on) return;
+    const y = c.scales.y, a = c.chartArea, top = Math.max(a.top, Math.min(a.bottom, y.getPixelForValue(140)));
+    c.ctx.save(); c.ctx.fillStyle = o.color; c.ctx.fillRect(a.left, a.top, a.right - a.left, top - a.top); c.ctx.restore();
+  }
+};
+function fmtNum(v, cfg){ return cfg.dec ? (+v).toFixed(cfg.dec) : Math.round(v); }
 function drawChart(){
-  const m = $('#metric').value, days = +$('#chartRange').value, cfg = METRICS[m];
+  const m = chartMetric, cfg = METRICS[m];
   $('#legendNote').textContent = cfg.note;
-  const rows = inRange(days).filter(r => m === 'bp' ? has(r.sys) : has(r[cfg.key])).slice().reverse();
+  $('#chartUnit').textContent = cfg.unit;
+  const rows = chartRows().filter(r => m === 'bp' ? has(r.sys) : has(r[cfg.key])).slice().reverse();
+  $('#chartTitle').textContent = chartRange === 'custom' ? 'ช่วงที่เลือก' : `${chartRange} วันล่าสุด`;
   const empty = !rows.length;
   $('#chartEmpty').hidden = !empty; $('#chart').parentElement.style.display = empty ? 'none' : '';
   if (chart) { chart.destroy(); chart = null; }
-  if (empty) return;
+  // ตัวเลขสรุป
+  if (empty) { $('#chartStats').innerHTML = ''; $('#chartTrend').hidden = true; return; }
+  const val = r => m === 'bp' ? +r.sys : +r[cfg.key];
+  let mx = rows[0], mn = rows[0];
+  rows.forEach(r => { if (val(r) > val(mx)) mx = r; if (val(r) < val(mn)) mn = r; });
+  const dt = r => fmtShort(new Date(r.datetime));
+  const show = r => m === 'bp' ? `${r.sys}/${r.dia}` : fmtNum(val(r), cfg);
+  const av = m === 'bp' ? `${Math.round(avg(rows.map(r => +r.sys)))}/${Math.round(avg(rows.map(r => +r.dia)))}` : fmtNum(avg(rows.map(val)), cfg);
+  $('#chartStats').innerHTML = tile('สูงสุด', show(mx), dt(mx)) + tile('ต่ำสุด', show(mn), dt(mn)) + tile('เฉลี่ย', av, `${rows.length} ครั้ง`);
+  // แนวโน้ม: ครึ่งแรก vs ครึ่งหลัง
+  const tr = $('#chartTrend');
+  if (rows.length >= 4) {
+    const h = Math.floor(rows.length / 2), a1 = avg(rows.slice(0, h).map(val)), a2 = avg(rows.slice(-h).map(val)), d = a2 - a1;
+    const thr = cfg.dec ? 0.3 : 2;
+    const name = m === 'bp' ? 'ตัวบน' : cfg.title;
+    if (Math.abs(d) < thr) { tr.className = 'trend neutral'; tr.textContent = `${name}ค่อนข้างคงที่ในช่วงนี้`; }
+    else {
+      const down = d < 0, goodDir = (m === 'bp' || m === 'sugar') ? down : null;
+      tr.className = 'trend ' + (goodDir === null ? 'neutral' : goodDir ? 'good' : 'bad');
+      tr.textContent = `${name}${down ? 'ลดลง' : 'เพิ่มขึ้น'}เฉลี่ย ${cfg.dec ? Math.abs(d).toFixed(1) : Math.round(Math.abs(d))} ${cfg.unit} ในช่วงนี้`;
+    }
+    tr.hidden = false;
+  } else tr.hidden = true;
   if (!window.Chart) { $('#chartEmpty').hidden = false; $('#chartEmpty').textContent = 'โหลดไลบรารีกราฟไม่ได้ ตรวจสอบอินเทอร์เน็ต'; return; }
   const labels = rows.map(r => { const d = new Date(r.datetime); return fmtShort(d) + ' ' + fmtTime(d); });
-  const accent = cssVar('--accent'), ok = cssVar('--ok'), muted = cssVar('--muted'), line = cssVar('--line');
-  const ds = (label, data, color, extra) => Object.assign({ label, data, borderColor: color, backgroundColor: color, tension: .3, pointRadius: 3, borderWidth: 2, spanGaps: true }, extra || {});
-  let datasets;
-  if (m === 'bp') {
-    datasets = [
-      ds('ตัวบน', rows.map(r => +r.sys), accent),
-      ds('ตัวล่าง', rows.map(r => +r.dia), ok),
-      ds('140', rows.map(() => 140), accent, { borderDash:[5,5], borderWidth:1, pointRadius:0, tension:0 }),
-      ds('90', rows.map(() => 90), ok, { borderDash:[5,5], borderWidth:1, pointRadius:0, tension:0 })
-    ];
-  } else {
-    datasets = [ds(cfg.label, rows.map(r => +r[cfg.key]), accent)];
-  }
+  const accent = cssVar('--accent'), blue = '#2F6FD6', muted = cssVar('--muted'), line = cssVar('--line');
+  const ds = (label, data, color, extra) => Object.assign({ label, data, borderColor: color, backgroundColor: color, tension: .3, pointRadius: rows.length > 40 ? 0 : 3, pointHoverRadius: 5, borderWidth: 2.5, spanGaps: true }, extra || {});
+  const datasets = m === 'bp' ? [
+    ds('ตัวบน', rows.map(r => +r.sys), accent),
+    ds('ตัวล่าง', rows.map(r => +r.dia), blue),
+    ds('140', rows.map(() => 140), accent, { borderDash:[5,5], borderWidth:1.2, pointRadius:0, pointHoverRadius:0, tension:0 }),
+    ds('90', rows.map(() => 90), blue, { borderDash:[5,5], borderWidth:1.2, pointRadius:0, pointHoverRadius:0, tension:0 })
+  ] : [ds(cfg.title, rows.map(val), accent)];
   chart = new Chart($('#chart'), {
-    type: 'line', data: { labels, datasets },
+    type: 'line', data: { labels, datasets }, plugins: [highZone],
     options: {
       responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { labels: { color: muted, filter: i => !['140','90'].includes(i.text) } } },
+      plugins: {
+        highZone: { on: m === 'bp', color: effectiveTheme() === 'dark' ? 'rgba(240,106,115,.12)' : 'rgba(232,80,91,.08)' },
+        legend: { labels: { color: muted, boxWidth: 14, boxHeight: 3, filter: i => !['140','90'].includes(i.text) } },
+        tooltip: { filter: i => !['140','90'].includes(i.dataset.label) }
+      },
       scales: {
-        x: { ticks: { color: muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 6, callback(v){ return this.getLabelForValue(v).split(' ')[0] + ' ' + this.getLabelForValue(v).split(' ')[1]; } }, grid: { color: line } },
-        y: { ticks: { color: muted }, grid: { color: line } }
+        x: { ticks: { color: muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 5, callback(v){ const l = this.getLabelForValue(v).split(' '); return l[0] + ' ' + l[1]; } }, grid: { display: false } },
+        y: { ticks: { color: muted }, grid: { color: line }, suggestedMin: m === 'bp' ? 60 : undefined, suggestedMax: m === 'bp' ? 160 : undefined }
       }
     }
   });
 }
+$('#metric').addEventListener('click', e => {
+  const b = e.target.closest('.mpill'); if (!b) return;
+  chartMetric = b.dataset.m;
+  $('#metric').querySelectorAll('.mpill').forEach(x => x.classList.toggle('on', x === b));
+  drawChart();
+});
+$('#chartRange').addEventListener('click', e => {
+  const b = e.target.closest('.pill'); if (!b) return;
+  chartRange = b.dataset.v;
+  $('#chartRange').querySelectorAll('.pill').forEach(x => x.classList.toggle('on', x === b));
+  $('#dateRange').hidden = chartRange !== 'custom';
+  drawChart();
+});
+['dFrom', 'dTo'].forEach(id => $('#' + id).addEventListener('change', drawChart));
 
 function renderAll(){
   renderLast(); renderHistory();
   if (!$('#tab-chart').hidden) drawChart();
 }
-
-['histRange'].forEach(id => $('#'+id).addEventListener('change', renderHistory));
-['metric','chartRange'].forEach(id => $('#'+id).addEventListener('change', drawChart));
 
 function goTab(tab){
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.tab === tab));

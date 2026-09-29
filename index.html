@@ -116,7 +116,16 @@ details[open] summary{margin-bottom:12px}
 .item .v{font-family:'Kanit',sans-serif;font-size:22px;font-weight:700}
 .item .v span{font-size:14px;font-weight:400;color:var(--muted)}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.tag{font-size:12px;background:var(--field);border:1px solid var(--line);border-radius:8px;padding:2px 8px}
+.tag{font-size:12.5px;background:var(--field);border:1px solid var(--line);border-radius:8px;padding:2px 9px}
+.tag.t-weight{background:#E3EEFF;color:#1D4E9E;border-color:transparent;font-weight:600}
+.tag.t-sugar{background:#F3E6FF;color:#6B21A8;border-color:transparent;font-weight:600}
+.tag.t-temp{background:#FFE9DB;color:#9A3412;border-color:transparent;font-weight:600}
+.tag.t-spo2{background:#DDF4F8;color:#0E6272;border-color:transparent;font-weight:600}
+.tag.t-sleep{background:#E8E6FF;color:#3F37A8;border-color:transparent;font-weight:600}
+.tag.t-med{background:#DDF3EE;color:#0F6353;border-color:transparent;font-weight:600}
+.tag.t-sym{background:#FDE6E7;color:#A52E38;border-color:transparent;font-weight:600}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.t-weight{background:#1E2A40;color:#9CC3FF} :root:not([data-theme="light"]) .tag.t-sugar{background:#2E2140;color:#D8B4FE} :root:not([data-theme="light"]) .tag.t-temp{background:#3A2618;color:#FDBA8C} :root:not([data-theme="light"]) .tag.t-spo2{background:#16323A;color:#7DD9EA} :root:not([data-theme="light"]) .tag.t-sleep{background:#25234A;color:#B8B3FF} :root:not([data-theme="light"]) .tag.t-med{background:#1B312C;color:#7EDDC6} :root:not([data-theme="light"]) .tag.t-sym{background:#3A2227;color:#F59AA0}}
+:root[data-theme="dark"] .tag.t-weight{background:#1E2A40;color:#9CC3FF} :root[data-theme="dark"] .tag.t-sugar{background:#2E2140;color:#D8B4FE} :root[data-theme="dark"] .tag.t-temp{background:#3A2618;color:#FDBA8C} :root[data-theme="dark"] .tag.t-spo2{background:#16323A;color:#7DD9EA} :root[data-theme="dark"] .tag.t-sleep{background:#25234A;color:#B8B3FF} :root[data-theme="dark"] .tag.t-med{background:#1B312C;color:#7EDDC6} :root[data-theme="dark"] .tag.t-sym{background:#3A2227;color:#F59AA0}
 .note{display:flex;gap:8px;align-items:flex-start;font-size:15px;font-weight:600;line-height:1.45;color:var(--note-ink);background:var(--note-bg);border-radius:12px;padding:8px 12px;margin:8px 0 0 50px;white-space:pre-wrap}
 .note svg{flex:none;width:16px;height:16px;margin-top:3px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .del{font:inherit;font-size:12px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:3px 10px;cursor:pointer}
@@ -430,7 +439,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 14 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 15 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -644,17 +653,17 @@ function sortRecords(){ records.sort((a,b) => new Date(b.datetime) - new Date(a.
 
 function tagsFor(r){
   const t = [];
-  if (has(r.pulse) && !has(r.sys)) t.push(`ชีพจร ${r.pulse}`);
-  if (has(r.weight)) t.push(`น้ำหนัก ${r.weight} กก.`);
-  if (has(r.sugar)) t.push(`น้ำตาล ${r.sugar}${r.sugarTiming ? ' · ' + r.sugarTiming : ''}`);
-  if (has(r.temp)) t.push(`อุณหภูมิ ${r.temp}°C`);
-  if (has(r.spo2)) t.push(`SpO2 ${r.spo2}%`);
-  if (has(r.sleep)) t.push(`นอน ${r.sleep} ชม.`);
-  if (r.med === 'ใช่' || r.med === true) t.push('กินยาแล้ว');
-  else if (has(r.med)) t.push('ยา ' + r.med);
-  if (has(r.symptoms)) t.push(`อาการ: ${r.symptoms}`);
-  if (has(r.sys) && (r.arm || r.posture)) t.push([r.arm && 'แขน' + r.arm, r.posture].filter(Boolean).join(' · '));
-  return t.map(x => `<span class="tag">${esc(x)}</span>`).join('');
+  if (has(r.pulse) && !has(r.sys)) t.push([`ชีพจร ${r.pulse}`, '']);
+  if (has(r.weight)) t.push([`น้ำหนัก ${r.weight} กก.`, 'weight']);
+  if (has(r.sugar)) t.push([`น้ำตาล ${r.sugar}${r.sugarTiming ? ' · ' + r.sugarTiming : ''}`, 'sugar']);
+  if (has(r.temp)) t.push([`อุณหภูมิ ${r.temp}°C`, 'temp']);
+  if (has(r.spo2)) t.push([`SpO2 ${r.spo2}%`, 'spo2']);
+  if (has(r.sleep)) t.push([`นอน ${r.sleep} ชม.`, 'sleep']);
+  if (r.med === 'ใช่' || r.med === true) t.push(['กินยาแล้ว', 'med']);
+  else if (has(r.med)) t.push(['ยา ' + r.med, 'med']);
+  if (has(r.symptoms)) t.push([`อาการ: ${r.symptoms}`, 'sym']);
+  if (has(r.sys) && (r.arm || r.posture)) t.push([[r.arm && 'แขน' + r.arm, r.posture].filter(Boolean).join(' · '), '']);
+  return t.map(([x, c]) => `<span class="tag${c ? ' t-' + c : ''}">${esc(x)}</span>`).join('');
 }
 
 function itemHTML(r){

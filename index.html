@@ -148,6 +148,9 @@ details[open] summary{margin-bottom:12px}
 .pagetitle{font-family:'Kanit',sans-serif;font-weight:600;font-size:26px}
 .viewseg{margin-bottom:14px}
 .pdfcard{margin-top:14px}
+.pagehead:has(#goPdf){display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pdfbtn{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:14px;font-weight:700;color:#fff;background:var(--accent-d,#D63F4B);border:0;border-radius:99px;padding:8px 14px;min-height:40px;cursor:pointer}
+.pdfbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pdfhead{display:flex;align-items:center;gap:8px;font-family:Kanit,sans-serif;font-size:17px;margin-bottom:10px}
 .pdfhead svg{width:22px;height:22px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #printArea{display:none}
@@ -353,7 +356,7 @@ nav button.on svg{stroke-width:2.4}
 
   <!-- ===== ประวัติ ===== -->
   <section id="tab-history" hidden>
-    <div class="pagehead"><span class="pagetitle">ประวัติ</span></div>
+    <div class="pagehead"><span class="pagetitle">ประวัติ</span><button type="button" class="pdfbtn" id="goPdf"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>รายงาน PDF</button></div>
     <div class="seg viewseg" id="histView">
       <input type="radio" name="hview" id="hvList" value="list" checked><label for="hvList">รายการ</label>
       <input type="radio" name="hview" id="hvCal" value="cal"><label for="hvCal">ปฏิทิน</label>
@@ -506,7 +509,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 20 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 21 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -988,6 +991,10 @@ function setHistView(v){
   renderHistory();
 }
 document.querySelectorAll('input[name=hview]').forEach(i => i.addEventListener('change', () => setHistView(i.value)));
+$('#goPdf').addEventListener('click', () => {
+  $('#hvWeek').checked = true; setHistView('week');
+  setTimeout(() => { $('.pdfcard').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
+});
 $('#histRange').addEventListener('click', e => {
   const b = e.target.closest('.pill'); if (!b) return;
   histDays = +b.dataset.v;

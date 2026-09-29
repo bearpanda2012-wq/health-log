@@ -205,8 +205,15 @@ nav button.on{color:var(--accent);font-weight:600}
 
     <div class="card" id="phoneCard" hidden>
       <h2>ใช้บนเครื่องอื่น</h2>
-      <p class="muted">คัดลอกลิงก์นี้ไปเปิดบนมือถือ แอปจะตั้งค่าให้อัตโนมัติ ลิงก์นี้มีรหัสลับอยู่ข้างใน ห้ามส่งให้คนอื่น</p>
-      <div class="btnrow"><button class="btn2" type="button" id="copyLink">คัดลอกลิงก์ตั้งค่า</button></div>
+      <p class="muted">เปิดกล้องมือถือสแกน QR หรือคัดลอกลิงก์ไปเปิดบนมือถือ แอปจะตั้งค่าให้อัตโนมัติ QR/ลิงก์นี้มีรหัสลับอยู่ข้างใน ห้ามให้คนอื่นเห็น</p>
+      <div class="btnrow">
+        <button class="btn" type="button" id="showQr">แสดง QR code</button>
+        <button class="btn2" type="button" id="copyLink">คัดลอกลิงก์ตั้งค่า</button>
+      </div>
+      <div id="qrBox" hidden style="margin-top:14px;text-align:center">
+        <div id="qr" style="display:inline-block;background:#fff;padding:12px;border-radius:12px;width:240px;max-width:100%"></div>
+        <div class="muted" style="margin-top:6px">สแกนด้วยกล้องมือถือ แล้วแตะลิงก์ที่ขึ้นมา</div>
+      </div>
     </div>
 
     <div class="card">
@@ -544,6 +551,7 @@ function fillSettings(){
   $('#cfgUrl').value = c ? c.url : '';
   $('#cfgKey').value = c ? c.key : '';
   $('#phoneCard').hidden = !c;
+  $('#qrBox').hidden = true; $('#qr').innerHTML = ''; $('#showQr').textContent = 'แสดง QR code';
   $('#cfgClear').hidden = !c;
 }
 function setMsg(t, cls){ const m = $('#cfgMsg'); m.textContent = t; m.className = 'msg ' + (cls || ''); }
@@ -575,9 +583,24 @@ $('#cfgClear').addEventListener('click', async () => {
   await loadRecords();
 });
 
+function setupLink(){ const c = getCfg(); return c ? location.origin + location.pathname + '#setup=' + encodeURIComponent(btoa(JSON.stringify(c))) : null; }
+
+function loadScript(src){ return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+
+$('#showQr').addEventListener('click', async () => {
+  const box = $('#qrBox');
+  if (!box.hidden) { box.hidden = true; $('#qr').innerHTML = ''; $('#showQr').textContent = 'แสดง QR code'; return; }
+  const link = setupLink(); if (!link) return;
+  try {
+    if (!window.qrcode) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js');
+    const q = qrcode(0, 'M'); q.addData(link); q.make();
+    $('#qr').innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    box.hidden = false; $('#showQr').textContent = 'ซ่อน QR code';
+  } catch(e) { toast('โหลดตัวสร้าง QR ไม่ได้ ใช้ปุ่มคัดลอกลิงก์แทน'); }
+});
+
 $('#copyLink').addEventListener('click', async () => {
-  const c = getCfg(); if (!c) return;
-  const link = location.origin + location.pathname + '#setup=' + encodeURIComponent(btoa(JSON.stringify(c)));
+  const link = setupLink(); if (!link) return;
   try { await navigator.clipboard.writeText(link); toast('คัดลอกลิงก์แล้ว — เปิดบนมือถือได้เลย'); }
   catch(e) { prompt('คัดลอกลิงก์นี้:', link); }
 });

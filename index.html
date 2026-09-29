@@ -550,7 +550,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 26 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 27 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -1244,15 +1244,25 @@ async function onDelete(e){
   const b = e.target.closest('.del'); if (!b) return;
   if (!b.classList.contains('confirm')) {
     b.classList.add('confirm'); b.textContent = 'ยืนยันลบ?';
-    setTimeout(() => { b.classList.remove('confirm'); b.textContent = 'ลบ'; }, 3000);
+    b._t = setTimeout(() => { if (!b.disabled) { b.classList.remove('confirm'); b.textContent = 'ลบ'; } }, 4000);
     return;
   }
+  clearTimeout(b._t);
+  const id = b.dataset.id;
   b.disabled = true; b.textContent = 'กำลังลบ…';
   try {
-    await api('deleteRecord', b.dataset.id);
-    records = records.filter(r => r.id !== b.dataset.id);
+    if (!id || id === 'undefined' || id === 'null') throw new Error('no_id');
+    await api('deleteRecord', id);
+    records = records.filter(r => r.id !== id);
     renderAll(); toast('ลบแล้ว');
-  } catch(err) { toast('ลบไม่สำเร็จ'); b.disabled = false; b.textContent = 'ลบ'; }
+  } catch(err) {
+    const msg = String(err && err.message || err);
+    if (/ไม่พบรายการ|not_found|no_id/.test(msg)) {
+      // รายการในเครื่องไม่ตรงกับในชีต → โหลดใหม่จากชีต
+      toast('ไม่พบรายการนี้ในชีต กำลังโหลดข้อมูลใหม่…'); loadRecords();
+    } else { toast('ลบไม่สำเร็จ: ' + msg); }
+    b.disabled = false; b.classList.remove('confirm'); b.textContent = 'ลบ';
+  }
 }
 $('#list').addEventListener('click', onDelete);
 $('#calDayList').addEventListener('click', onDelete);

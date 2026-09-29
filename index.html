@@ -43,6 +43,10 @@ header h1 img{width:36px;height:36px;border-radius:10px}
 header h1 small{font-family:'IBM Plex Sans Thai',sans-serif;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:0}
 .status{font-size:12px;font-weight:600;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:5px 11px;border-radius:99px;white-space:nowrap}
 .status.on{color:var(--good);background:var(--good-soft);border-color:transparent}
+.status.ico{width:36px;height:36px;padding:0;display:grid;place-items:center;position:relative;color:var(--ink)}
+.status.ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.status.ico::after{content:"";position:absolute;right:3px;top:3px;width:10px;height:10px;border-radius:99px;border:2px solid var(--card);background:var(--sdot,#9CA3AF)}
+.status.s-ok{--sdot:#1FA38A;color:var(--good)}.status.s-off{--sdot:#D97706}.status.s-err{--sdot:#DC2626}.status.s-demo{--sdot:#9CA3AF}.status.s-load{--sdot:#9CA3AF}
 main{max-width:640px;margin:0 auto;padding:6px 20px 16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
 .card h2{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
@@ -284,7 +288,7 @@ nav button.on svg{stroke-width:2.4}
   <div class="hdr-r">
     <button class="themebtn textbtn" id="textBtn" type="button" aria-label="ขนาดตัวหนังสือ">Aa</button>
     <button class="themebtn" id="themeBtn" type="button" aria-label="สลับโหมดสว่าง/มืด"></button>
-    <button class="status" id="status" type="button">กำลังโหลด…</button>
+    <button class="status ico s-load" id="status" type="button" aria-label="กำลังโหลด…"></button>
   </div>
 </header>
 
@@ -529,7 +533,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 23 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 24 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -1287,7 +1291,19 @@ function goTab(tab){
 }
 document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => goTab(b.dataset.tab)));
 document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) goTab(g.dataset.go); });
-$('#status').addEventListener('click', () => goTab('settings'));
+$('#status').addEventListener('click', () => { goTab('settings'); toast($('#status').title); });
+const ST_ICON = {
+  ok:  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 8a4 4 0 0 1-.5 10z"/><path d="M9.5 13l2 2 3.5-3.5"/></svg>',
+  off: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 8a4 4 0 0 1-.5 10z"/><path d="M4 4l16 16"/></svg>',
+  err: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 8a4 4 0 0 1-.5 10z"/><path d="M12 10v3M12 15.5h.01"/></svg>',
+  demo:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/></svg>',
+  load:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 8a4 4 0 0 1-.5 10z"/></svg>'
+};
+function setStatus(k, label){
+  const st = $('#status');
+  st.className = 'status ico s-' + k; st.innerHTML = ST_ICON[k];
+  st.title = label; st.setAttribute('aria-label', label);
+}
 
 /* ---------- ตั้งค่า ---------- */
 function fillSettings(){
@@ -1372,14 +1388,13 @@ $('#exportCsv').addEventListener('click', () => {
 /* ---------- โหลดข้อมูล ---------- */
 function updateStatus(){
   const st = $('#status'), live = isLive();
-  if (!live) { st.textContent = 'โหมดทดลอง'; st.classList.remove('on'); return; }
+  if (!live) { setStatus('demo', 'โหมดทดลอง — ยังไม่ได้เชื่อม Google ชีต'); return; }
   const off = !online || navigator.onLine === false;
-  st.textContent = off ? '📴 ออฟไลน์' : '● Google Sheets';
-  st.classList.toggle('on', !off);
+  setStatus(off ? 'off' : 'ok', off ? 'ออฟไลน์ — บันทึกไว้ในเครื่องก่อน' : 'เชื่อม Google ชีตแล้ว');
 }
 async function loadRecords(){
   const st = $('#status'), live = isLive();
-  st.textContent = 'กำลังโหลด…'; st.classList.remove('on');
+  setStatus('load', 'กำลังโหลด…');
   $('#demoBanner').hidden = live;
   try {
     records = (await api('getRecords')) || [];
@@ -1390,7 +1405,7 @@ async function loadRecords(){
   } catch(e) {
     records = []; renderAll();
     lastError = e.message;
-    st.textContent = '⚠ เชื่อมต่อไม่ได้ (แตะดู)';
+    setStatus('err', 'เชื่อมต่อไม่ได้ — แตะเพื่อดูวิธีแก้');
     toast('โหลดข้อมูลไม่ได้: ' + e.message);
   }
 }

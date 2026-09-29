@@ -72,6 +72,7 @@ function onOpen() {
   SpreadsheetApp.getUi().createMenu('❤️ ดันดี')
     .addItem('1) เริ่มต้นใช้งาน', 'menuStart')
     .addItem('2) เชื่อมกับแอป (QR / ลิงก์)', 'menuConnect')
+    .addItem('3) เปิดอ่านค่าจากรูป (AI)', 'menuOcr')
     .addSeparator()
     .addItem('เปลี่ยนรหัสลับใหม่', 'menuResetKey')
     .addToUi();
@@ -162,6 +163,79 @@ function menuResetKey() {
   menuConnect();
 }
 
+/* ================= อ่านค่าจากรูป (Gemini) ================= */
+
+const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+
+function menuOcr() {
+  const has = !!PropertiesService.getScriptProperties().getProperty('GEMINI_KEY');
+  showDialog_(
+    '<h2>อ่านค่าจากรูปด้วย AI</h2>'
+    + (has ? '<p class="ok">✓ เปิดใช้งานอยู่แล้ว วางรหัสใหม่ด้านล่างถ้าต้องการเปลี่ยน</p>' : '')
+    + '<ol><li>เปิด <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> (ล็อกอินบัญชี Google เดียวกัน)</li>'
+    + '<li>กด <b class="hl">Create API key</b> แล้วกดคัดลอก (รหัสขึ้นต้นด้วย AIza…)</li>'
+    + '<li>วางด้านล่างแล้วกด <b class="hl">บันทึกและทดสอบ</b></li></ol>'
+    + '<input id="k" placeholder="AIza…" autocomplete="off"><p><button class="btn" id="go" onclick="save()">บันทึกและทดสอบ</button></p>'
+    + '<p id="m"></p>'
+    + '<p class="muted">รหัสเก็บในชีตนี้เท่านั้น · รูปจะถูกส่งให้ Google Gemini อ่านตัวเลข · รหัสฟรีมีโควตาต่อวันเพียงพอสำหรับใช้ที่บ้าน</p>'
+    + '<p class="muted">⚠️ หลังบันทึกครั้งแรก ต้อง Deploy เวอร์ชันใหม่: ส่วนขยาย → Apps Script → การทำให้ใช้งานได้ → จัดการ → ✏️ → เวอร์ชันใหม่</p>'
+    + '<script>function save(){var k=document.getElementById("k").value.trim(),m=document.getElementById("m"),b=document.getElementById("go");'
+    + 'if(!/^AIza[\\w-]{20,}$/.test(k)){m.style.color="#C93B46";m.textContent="รหัสไม่ถูกต้อง ต้องขึ้นต้นด้วย AIza";return;}'
+    + 'b.disabled=true;m.style.color="";m.textContent="⏳ กำลังทดสอบ…";'
+    + 'google.script.run.withSuccessHandler(function(r){b.disabled=false;m.style.color=r.ok?"#1FA38A":"#C93B46";m.textContent=r.ok?"✓ ใช้ได้แล้ว! ในแอปจะมีปุ่ม 📷 อ่านจากรูป":"ใช้ไม่ได้: "+r.error;})'
+    + '.withFailureHandler(function(e){b.disabled=false;m.style.color="#C93B46";m.textContent="ผิดพลาด: "+e.message;}).saveGeminiKey(k);}</script>',
+    'ดันดี — อ่านค่าจากรูป', 470);
+}
+
+function saveGeminiKey(k) {
+  k = String(k || '').trim();
+  const r = gemini_(k, null, null, 'ตอบคำว่า ok เป็น JSON {"ok":true}');
+  if (!r.ok) return r;
+  PropertiesService.getScriptProperties().setProperty('GEMINI_KEY', k);
+  return { ok: true };
+}
+
+function gemini_(key, b64, mime, prompt) {
+  const parts = [{ text: prompt }];
+  if (b64) parts.unshift({ inline_data: { mime_type: mime || 'image/jpeg', data: b64 } });
+  const body = JSON.stringify({ contents: [{ parts: parts }],
+    generationConfig: { temperature: 0, responseMimeType: 'application/json' } });
+  let last = 'no_model';
+  for (let i = 0; i < GEMINI_MODELS.length; i++) {
+    const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODELS[i] + ':generateContent',
+      { method: 'post', contentType: 'application/json', payload: body, muteHttpExceptions: true, headers: { 'x-goog-api-key': key } });
+    const code = res.getResponseCode(), txt = res.getContentText();
+    if (code === 404) { last = 'model_not_found'; continue; }
+    if (code === 400 && /API key not valid|API_KEY_INVALID/.test(txt)) return { ok: false, error: 'รหัส Gemini ไม่ถูกต้อง' };
+    if (code === 429) return { ok: false, error: 'ใช้เกินโควตาวันนี้ ลองใหม่พรุ่งนี้' };
+    if (code !== 200) { last = 'HTTP ' + code; continue; }
+    try {
+      const j = JSON.parse(txt), t = j.candidates[0].content.parts.map(function (x) { return x.text || ''; }).join('');
+      return { ok: true, data: JSON.parse(t.replace(/^```(json)?|```$/g, '').trim()) };
+    } catch (e) { return { ok: false, error: 'อ่านคำตอบไม่ได้' }; }
+  }
+  return { ok: false, error: last };
+}
+
+const OCR_PROMPT = 'This is a photo of a home blood pressure monitor display (seven-segment LCD). '
+  + 'Read the systolic (SYS, top, largest), diastolic (DIA, middle) and pulse (PUL, bottom, smallest) numbers. '
+  + 'Ignore faint unlit segments. If a date or time is shown on the display, read it too. '
+  + 'Answer JSON only: {"sys":int|null,"dia":int|null,"pulse":int|null,"date":"YYYY-MM-DD"|null,"time":"HH:MM"|null,"sure":true|false}. '
+  + 'Use null for anything you cannot read clearly. sure=false if the image is not a BP monitor or any digit is uncertain.';
+
+function ocrImage_(p) {
+  const key = PropertiesService.getScriptProperties().getProperty('GEMINI_KEY');
+  if (!key) return { ok: false, error: 'ocr_off' };
+  const b64 = String(p.image || '');
+  if (!b64 || b64.length > 4e6) return { ok: false, error: 'bad_image' };
+  const r = gemini_(key, b64, p.mime || 'image/jpeg', OCR_PROMPT);
+  if (!r.ok) return r;
+  const d = r.data || {}, n = function (v) { v = Number(v); return isFinite(v) && v > 0 ? Math.round(v) : null; };
+  return { ok: true, sys: n(d.sys), dia: n(d.dia), pulse: n(d.pulse),
+    date: /^\d{4}-\d{2}-\d{2}$/.test(d.date || '') ? d.date : null,
+    time: /^\d{1,2}:\d{2}$/.test(d.time || '') ? d.time : null, sure: d.sure !== false };
+}
+
 /* ================= API ================= */
 
 function doGet(e) {
@@ -183,7 +257,8 @@ function handle_(action, p) {
     if (!key) return json_({ ok: false, error: 'not_setup' });
     if (p.key !== key) return json_({ ok: false, error: 'bad_key' });
     switch (action) {
-      case 'ping':   return json_({ ok: true });
+      case 'ping':   return json_({ ok: true, ocr: !!PropertiesService.getScriptProperties().getProperty('GEMINI_KEY') });
+      case 'ocr':    return json_(ocrImage_(p));
       case 'list':   return json_({ ok: true, records: getRecords() });
       case 'add':    return json_(addRecord(p.record || {}));
       case 'delete': return json_(deleteRecord(p.id));

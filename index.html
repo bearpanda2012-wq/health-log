@@ -127,6 +127,19 @@ details[open] summary{margin-bottom:12px}
 .chips input:checked+label{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
 .check{display:flex;align-items:center;gap:10px;font-size:15px;cursor:pointer}
 .check input{width:20px;height:20px;accent-color:var(--accent)}
+.scanbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font:inherit;font-weight:700;font-size:15.5px;color:var(--accent);background:var(--card);border:1.5px dashed var(--accent);border-radius:14px;padding:11px;margin:0 0 14px;cursor:pointer;min-height:48px}
+.scanbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.scanbg{position:fixed;inset:0;z-index:60;background:rgba(10,10,15,.55);display:grid;place-items:center;padding:16px}
+.scanbox{background:var(--card);color:var(--ink);border-radius:22px;padding:18px;width:min(380px,100%);text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.scanbox img{display:block;width:100%;max-height:34vh;object-fit:contain;border-radius:12px;background:#000;margin-bottom:12px}
+.scantitle{font-weight:700;color:var(--muted);font-size:14px}
+.scanval{font-family:Kanit,sans-serif;font-weight:700;font-size:46px;line-height:1.15;margin:4px 0}
+.scanval small{font-size:18px;color:var(--muted);font-weight:600;display:block}
+.scansub{font-size:14px;color:var(--muted);min-height:20px}
+.scanbar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin:12px 0 4px}
+.scanbar i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left;transition:transform linear}
+.scanbtns{display:flex;gap:8px;margin-top:14px}
+.scanbtns>*{flex:1;margin:0}
 .btn{width:100%;font:inherit;font-weight:600;font-size:17px;border:0;border-radius:16px;padding:14px;
   background:var(--accent-ink);color:#fff;cursor:pointer}
 #saveBtn{font-family:'Kanit',sans-serif;font-size:20px;height:56px;margin-top:14px}
@@ -306,6 +319,8 @@ nav button.on svg{stroke-width:2.4}
         <span class="rec-title">จดค่าใหม่</span>
         <input id="datetime" class="when" type="datetime-local" aria-label="วันเวลาที่วัด">
       </div>
+      <button type="button" class="scanbtn" id="scanBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.5"/></svg>อ่านค่าจากรูปเครื่องวัด</button>
+      <input type="file" id="scanFile" accept="image/*" hidden>
       <div class="bp">
         <label for="sys">ตัวบน<input id="sys" type="number" inputmode="numeric" placeholder="120"></label>
         <label for="dia">ตัวล่าง<input id="dia" type="number" inputmode="numeric" placeholder="80"></label>
@@ -533,7 +548,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 24 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 25 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -544,6 +559,19 @@ nav button.on svg{stroke-width:2.4}
   <button data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>ตั้งค่า</button>
 </nav>
 <div id="printArea" aria-hidden="true"></div>
+<div class="scanbg" id="scanDlg" hidden role="dialog" aria-modal="true" aria-labelledby="scanTitle">
+  <div class="scanbox">
+    <img id="scanImg" alt="">
+    <div id="scanTitle" class="scantitle">กำลังอ่านค่า…</div>
+    <div id="scanVal" class="scanval"></div>
+    <div id="scanSub" class="scansub"></div>
+    <div class="scanbar" id="scanBarWrap" hidden><i id="scanBar"></i></div>
+    <div class="scanbtns">
+      <button type="button" class="btn2" id="scanCancel">ยกเลิก</button>
+      <button type="button" class="btn" id="scanOk" hidden>บันทึกเลย</button>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -579,7 +607,9 @@ const ERR_TH = {
   bad_key: 'รหัสลับไม่ถูกต้อง',
   not_setup: 'ยังไม่ได้รัน setup() ใน Apps Script',
   unknown_action: 'เวอร์ชันสคริปต์ไม่ตรง ลอง Deploy ใหม่',
-  not_found: 'ไม่พบรายการนี้ในชีต'
+  not_found: 'ไม่พบรายการนี้ในชีต',
+  ocr_off: 'ยังไม่ได้เปิดอ่านค่าจากรูป',
+  bad_image: 'รูปใหญ่หรือเสียเกินไป'
 };
 
 async function fetchNet(u, opt){
@@ -632,6 +662,7 @@ async function api(fn, arg){
     try { return await remote(cfg, 'add', { record: arg }); }
     catch(e) { if (!e.net) throw e; online = false; return { ok: true, id: queue.add(arg), queued: true }; }
   }
+  if (fn === 'ocr') return remote(cfg, 'ocr', arg);
   if (fn === 'deleteRecord') {
     if (String(arg).startsWith('q')) { queue.set(queue.get().filter(x => x.qid !== arg)); return { ok: true }; }
     return remote(cfg, 'delete', { id: arg });
@@ -1079,6 +1110,93 @@ $('#histRange').addEventListener('click', e => {
 function renderHistory(){
   if (histView === 'list') renderList(); else if (histView === 'cal') renderCal(); else renderWeek();
 }
+
+/* ---------- อ่านค่าจากรูปเครื่องวัด (Gemini ผ่านชีต) ---------- */
+let scanTimer = null;
+function scanClose(){ clearTimeout(scanTimer); scanTimer = null; $('#scanDlg').hidden = true; $('#scanFile').value = ''; }
+async function shrinkImage(file){
+  let src;
+  try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch(e) { src = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = URL.createObjectURL(file); }); }
+  const w = src.width, h = src.height, k = Math.min(1, 1280 / Math.max(w, h));
+  const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+  c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.85);
+}
+function scanTime(res, file){
+  const now = new Date();
+  if (res.time) {
+    const [hh, mm] = res.time.split(':').map(Number);
+    const d = res.date ? new Date(res.date + 'T00:00:00') : new Date(now);
+    d.setHours(hh, mm, 0, 0);
+    if (!isNaN(d) && d <= new Date(now.getTime() + 5 * 60e3) && now - d < 400 * 864e5) return d;
+  }
+  const lm = file && file.lastModified ? new Date(file.lastModified) : null;
+  if (lm && now - lm > 2 * 60e3 && now - lm < 400 * 864e5) return lm;
+  return now;
+}
+function scanFill(res, when){
+  if (has(res.sys)) $('#sys').value = res.sys;
+  if (has(res.dia)) $('#dia').value = res.dia;
+  if (has(res.pulse)) $('#pulse').value = res.pulse;
+  $('#datetime').value = localInput(when);
+  updateLive();
+}
+$('#scanBtn').addEventListener('click', () => {
+  if (!isLive()) return toast('ต้องเชื่อม Google ชีตก่อน ถึงจะอ่านค่าจากรูปได้');
+  if (navigator.onLine === false) return toast('ต้องมีอินเทอร์เน็ตถึงจะอ่านค่าจากรูปได้');
+  $('#scanFile').click();
+});
+$('#scanCancel').addEventListener('click', () => { scanClose(); });
+$('#scanFile').addEventListener('change', async () => {
+  const file = $('#scanFile').files[0]; if (!file) return;
+  const dlg = $('#scanDlg');
+  $('#scanCancel').onclick = null;
+  $('#scanTitle').textContent = 'กำลังอ่านค่า…'; $('#scanVal').innerHTML = '<span class="spin" aria-hidden="true">⏳</span>';
+  $('#scanSub').textContent = 'ใช้เวลาประมาณ 3–8 วินาที'; $('#scanOk').hidden = true; $('#scanBarWrap').hidden = true;
+  $('#scanCancel').textContent = 'ยกเลิก'; dlg.hidden = false;
+  let res;
+  try {
+    const url = await shrinkImage(file);
+    $('#scanImg').src = url;
+    res = await api('ocr', { image: url.split(',')[1], mime: 'image/jpeg' });
+  } catch(e) {
+    if ($('#scanDlg').hidden) return;
+    const off = /ยังไม่ได้เปิดอ่านค่าจากรูป/.test(e.message), old = /เวอร์ชันสคริปต์ไม่ตรง/.test(e.message);
+    $('#scanTitle').textContent = 'อ่านไม่สำเร็จ';
+    $('#scanVal').innerHTML = '';
+    $('#scanSub').innerHTML = off ? 'ยังไม่ได้เปิดฟีเจอร์นี้<br>ที่ Google ชีต เมนู <b>❤️ ดันดี → 3) เปิดอ่านค่าจากรูป</b>'
+      : old ? 'โค้ดในชีตยังเป็นรุ่นเก่า<br>อัปเดตโค้ดแล้ว Deploy เวอร์ชันใหม่ก่อน' : esc(e.message);
+    $('#scanCancel').textContent = 'ปิด';
+    return;
+  }
+  if ($('#scanDlg').hidden) return; // ผู้ใช้กดยกเลิกระหว่างรอ
+  const when = scanTime(res, file);
+  const ok = has(res.sys) && has(res.dia) && res.sys >= 60 && res.sys <= 280 && res.dia >= 30 && res.dia <= 180 && res.sys > res.dia
+    && (!has(res.pulse) || (res.pulse >= 25 && res.pulse <= 250));
+  const c = ok ? bpClass(res.sys, res.dia) : null;
+  $('#scanVal').innerHTML = (has(res.sys) || has(res.dia))
+    ? `${has(res.sys) ? res.sys : '–'}/${has(res.dia) ? res.dia : '–'}<small>${has(res.pulse) ? 'ชีพจร ' + res.pulse : 'อ่านชีพจรไม่ได้'}</small>` : '–';
+  if (!ok) {
+    $('#scanTitle').textContent = 'อ่านได้ไม่ครบหรือไม่แน่ใจ';
+    $('#scanSub').textContent = 'ลองถ่ายใหม่ให้ตรงและไม่มีแสงสะท้อน หรือกด "แก้เอง"';
+    $('#scanOk').hidden = false; $('#scanOk').textContent = 'แก้เอง';
+    $('#scanOk').onclick = () => { scanFill(res, when); scanClose(); window.scrollTo({ top: 0 }); };
+    $('#scanCancel').textContent = 'ปิด';
+    return;
+  }
+  $('#scanTitle').innerHTML = (c ? badge(c) + ' ' : '') + (res.sure ? '' : '<span style="color:#B45309">ไม่ค่อยชัด โปรดตรวจ</span>');
+  $('#scanSub').textContent = `${fmtShort(when)} ${fmtTime(when)} · จะบันทึกใน 3 วินาที`;
+  const save = () => { clearTimeout(scanTimer); scanFill(res, when); scanClose(); $('#form').requestSubmit(); };
+  $('#scanOk').hidden = false; $('#scanOk').textContent = 'บันทึกเลย'; $('#scanOk').onclick = save;
+  $('#scanCancel').textContent = 'ยกเลิก / แก้เอง';
+  $('#scanCancel').onclick = () => { scanFill(res, when); scanClose(); $('#scanCancel').onclick = null; toast('ใส่ค่าไว้ในฟอร์มแล้ว ตรวจแล้วกดบันทึก'); };
+  if (!res.sure) { $('#scanSub').textContent = `${fmtShort(when)} ${fmtTime(when)} · ตรวจตัวเลขแล้วกดบันทึก`; return; }
+  const bar = $('#scanBar'); $('#scanBarWrap').hidden = false;
+  bar.style.transition = 'none'; bar.style.transform = 'scaleX(1)'; void bar.offsetWidth;
+  bar.style.transition = 'transform 3s linear'; bar.style.transform = 'scaleX(0)';
+  scanTimer = setTimeout(save, 3000);
+});
 
 /* ---------- แก้ไขรายการ ---------- */
 let editingId = null, editingOrig = null;

@@ -448,7 +448,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 16 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 17 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -573,9 +573,7 @@ function updateLive(){
 
 /* ---------- น้ำตาล: ต่ำ / ปกติ / สูง ---------- */
 function sugarRange(t){
-  if (t === 'งดอาหาร' || t === 'ก่อนอาหาร') return { hi:100, txt:'เกณฑ์ 70–99' };
-  if (t === 'หลังอาหาร 2 ชม.') return { hi:140, txt:'เกณฑ์ 70–139' };
-  return { hi:180, txt:'เกณฑ์ 70–179' }; // หลังอาหาร / สุ่ม
+  return { hi:131, txt:'เกณฑ์ 70–130' }; // ต่ำ < 70 · ปกติ 70–130 · สูง > 130 (ทุกช่วงที่วัด)
 }
 function sugarLevel(v, t){
   if (!has(v)) return null;

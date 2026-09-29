@@ -509,7 +509,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 21 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 22 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -1075,7 +1075,7 @@ const METRICS = {
   bp:     { title:'ความดัน', unit:'mmHg', note:'เส้นประ = เกณฑ์ความดันสูง 140/90 mmHg · พื้นที่สีชมพู = โซนความดันสูง' },
   pulse:  { key:'pulse',  title:'ชีพจร', unit:'ครั้ง/นาที', note:'ชีพจรขณะพักของผู้ใหญ่ส่วนใหญ่อยู่ราว 60–100 ครั้ง/นาที' },
   weight: { key:'weight', title:'น้ำหนัก', unit:'กก.', dec:1, note:'ชั่งเวลาเดิมทุกวัน เช่น ตอนเช้าหลังเข้าห้องน้ำ จะเทียบได้แม่นกว่า' },
-  sugar:  { key:'sugar',  title:'น้ำตาล', unit:'mg/dL', note:'แถบเขียว = ปกติ 70–130 mg/dL · จุดส้ม = ต่ำ · จุดแดง = สูง' },
+  sugar:  { key:'sugar',  title:'น้ำตาล', unit:'mg/dL', note:'เขียว = ปกติ 70–130 mg/dL · ส้ม = ต่ำกว่า 70 · แดง = สูงกว่า 130' },
   temp:   { key:'temp',   title:'อุณหภูมิ', unit:'°C', dec:1, note:'ตั้งแต่ราว 37.5°C ขึ้นไปถือว่ามีไข้' },
   spo2:   { key:'spo2',   title:'SpO2', unit:'%', note:'ปกติมักอยู่ 95–100% ถ้าต่ำกว่า 94% ต่อเนื่องควรปรึกษาแพทย์' },
   sleep:  { key:'sleep',  title:'การนอน', unit:'ชม.', dec:1, note:'ผู้ใหญ่ส่วนใหญ่ต้องการนอนราว 7–9 ชั่วโมง' }
@@ -1094,9 +1094,21 @@ const sugarBand = {
   id: 'sugarBand',
   beforeDatasetsDraw(c, args, o){
     if (!o || !o.on) return;
-    const y = c.scales.y, a = c.chartArea, clamp = v => Math.max(a.top, Math.min(a.bottom, y.getPixelForValue(v)));
-    const t = clamp(130), b = clamp(70);
-    c.ctx.save(); c.ctx.fillStyle = o.color; c.ctx.fillRect(a.left, t, a.right - a.left, b - t); c.ctx.restore();
+    const y = c.scales.y, a = c.chartArea, ctx = c.ctx, clamp = v => Math.max(a.top, Math.min(a.bottom, y.getPixelForValue(v)));
+    const t = clamp(130), b = clamp(70), w = a.right - a.left;
+    ctx.save();
+    ctx.fillStyle = o.hi;  ctx.fillRect(a.left, a.top, w, t - a.top);
+    ctx.fillStyle = o.ok;  ctx.fillRect(a.left, t, w, b - t);
+    ctx.fillStyle = o.lo;  ctx.fillRect(a.left, b, w, a.bottom - b);
+    ctx.setLineDash([5, 4]); ctx.lineWidth = 1.2;
+    ctx.strokeStyle = '#DC2626'; ctx.beginPath(); ctx.moveTo(a.left, t); ctx.lineTo(a.right, t); ctx.stroke();
+    ctx.strokeStyle = '#D97706'; ctx.beginPath(); ctx.moveTo(a.left, b); ctx.lineTo(a.right, b); ctx.stroke();
+    ctx.setLineDash([]); ctx.font = '600 12px "IBM Plex Sans Thai", sans-serif'; ctx.textAlign = 'right';
+    const lab = (txt, col, yy) => { if (yy > a.top + 8 && yy < a.bottom - 2) { ctx.fillStyle = col; ctx.fillText(txt, a.right - 6, yy); } };
+    lab('สูง > 130', o.hiT, Math.max(a.top + 16, t - 6));
+    lab('ปกติ 70–130', o.okT, (t + b) / 2 + 4);
+    lab('ต่ำ < 70', o.loT, Math.min(a.bottom - 6, b + 16));
+    ctx.restore();
   }
 };
 const highZone = {
@@ -1149,7 +1161,8 @@ function drawChart(){
     ds('ตัวล่าง', rows.map(r => +r.dia), blue),
     ds('140', rows.map(() => 140), accent, { borderDash:[5,5], borderWidth:1.2, pointRadius:0, pointHoverRadius:0, tension:0 }),
     ds('90', rows.map(() => 90), blue, { borderDash:[5,5], borderWidth:1.2, pointRadius:0, pointHoverRadius:0, tension:0 })
-  ] : m === 'sugar' ? [ds(cfg.title, rows.map(val), accent, {
+  ] : m === 'sugar' ? [ds(cfg.title, rows.map(val), '#8B5CF6', {
+      segment: { borderColor: g => { const v = (g.p0.parsed.y + g.p1.parsed.y) / 2; return v < 70 ? '#D97706' : v > 130 ? '#DC2626' : '#1FA38A'; } },
       pointRadius: rows.length > 40 ? 2 : 4,
       pointBackgroundColor: rows.map(r => { const v = val(r); return v < 70 ? '#D97706' : v > 130 ? '#DC2626' : '#1FA38A'; }),
       pointBorderColor: rows.map(r => { const v = val(r); return v < 70 ? '#D97706' : v > 130 ? '#DC2626' : '#1FA38A'; })
@@ -1160,13 +1173,15 @@ function drawChart(){
     options: {
       responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
       plugins: {
-        sugarBand: { on: m === 'sugar', color: effectiveTheme() === 'dark' ? 'rgba(60,196,168,.14)' : 'rgba(31,163,138,.12)' },
+        sugarBand: Object.assign({ on: m === 'sugar' }, effectiveTheme() === 'dark'
+          ? { hi:'rgba(248,113,113,.13)', ok:'rgba(60,196,168,.16)', lo:'rgba(251,191,36,.13)', hiT:'#FCA5A5', okT:'#7EDDC6', loT:'#FCD34D' }
+          : { hi:'rgba(220,38,38,.08)', ok:'rgba(31,163,138,.16)', lo:'rgba(217,119,6,.10)', hiT:'#B91C1C', okT:'#0F6353', loT:'#9A4A06' }),
         highZone: { on: m === 'bp', color: effectiveTheme() === 'dark' ? 'rgba(240,106,115,.12)' : 'rgba(232,80,91,.08)' },
-        legend: { labels: { color: muted, boxWidth: 14, boxHeight: 3, filter: i => !['140','90'].includes(i.text) } },
+        legend: { display: m !== 'sugar', labels: { color: muted, boxWidth: 14, boxHeight: 3, filter: i => !['140','90'].includes(i.text) } },
         tooltip: { filter: i => !['140','90'].includes(i.dataset.label) }
       },
       scales: {
-        x: { ticks: { color: muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 5, callback(v){ const l = this.getLabelForValue(v).split(' '); return l[0] + ' ' + l[1]; } }, grid: { display: false } },
+        x: { offset: rows.length < 3, ticks: { color: muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 5, callback(v){ const l = this.getLabelForValue(v).split(' '); return l[0] + ' ' + l[1]; } }, grid: { display: false } },
         y: { ticks: { color: muted }, grid: { color: line }, suggestedMin: m === 'bp' ? 60 : m === 'sugar' ? 50 : undefined, suggestedMax: m === 'bp' ? 160 : m === 'sugar' ? 160 : undefined }
       }
     }

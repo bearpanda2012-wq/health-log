@@ -191,13 +191,24 @@ nav button.on{color:var(--accent);font-weight:600}
 
   <!-- ===== ตั้งค่า ===== -->
   <section id="tab-settings" hidden>
+    <div class="card" id="guideCard">
+      <h2>เริ่มต้นใช้งาน <small>ประมาณ 5 นาที · ทำบนคอมพิวเตอร์</small></h2>
+      <ol class="steps">
+        <li><b>ทำสำเนาชีตดันดี</b> ไปไว้ใน Google Drive ของคุณ<br>
+          <a class="btn" style="display:inline-block;margin-top:8px;text-decoration:none;font-size:15px;padding:10px 16px" href="https://docs.google.com/spreadsheets/d/1qoTxQgcbnnwNsfsQoccjLh4WGTBi4KMBWnpVQI_vmqE/copy" target="_blank" rel="noopener">📄 ทำสำเนาชีตดันดี</a></li>
+        <li>ในชีต รอเมนู <b>❤️ ดันดี</b> ขึ้นที่แถบด้านบน แล้วกด <b>1) เริ่มต้นใช้งาน</b> ทำตามหน้าต่างที่ขึ้นมา</li>
+        <li>กดเมนู <b>❤️ ดันดี → 2) เชื่อมกับแอป</b> แล้วสแกน QR ด้วยมือถือ หรือกด "เปิดแอปบนเครื่องนี้" เสร็จเลย!</li>
+      </ol>
+      <p class="muted" style="margin-top:8px">ข้อมูลทั้งหมดอยู่ในชีตของคุณเอง ไม่มีใครเห็นนอกจากคุณ</p>
+    </div>
+
     <div class="card">
       <h2>เชื่อมกับ Google Sheets</h2>
       <label class="f" for="cfgUrl">Web App URL หรือ ลิงก์ตั้งค่า</label>
       <input id="cfgUrl" type="text" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" autocapitalize="off" spellcheck="false">
       <div class="muted" style="margin-top:4px">บนมือถือ: วาง "ลิงก์ตั้งค่า" จากคอมพิวเตอร์ลงช่องนี้ได้เลย ไม่ต้องใส่รหัสลับ</div>
       <div class="row"><label class="f" for="cfgKey">รหัสลับ (API key)</label>
-        <input id="cfgKey" type="password" placeholder="ได้จาก setup() ใน Apps Script" autocomplete="off" spellcheck="false"></div>
+        <input id="cfgKey" type="password" placeholder="ไม่ต้องใส่ ถ้าใช้ QR หรือลิงก์ตั้งค่า" autocomplete="off" spellcheck="false"></div>
       <div class="btnrow">
         <button class="btn" type="button" id="cfgSave">ทดสอบและบันทึก</button>
         <button class="btn2" type="button" id="cfgClear">ยกเลิกการเชื่อม</button>
@@ -218,16 +229,6 @@ nav button.on{color:var(--accent);font-weight:600}
       </div>
     </div>
 
-    <div class="card">
-      <h2>วิธีตั้งค่า (ครั้งเดียว)</h2>
-      <ol class="steps">
-        <li>สร้าง Google Sheet ใหม่ → เมนู <b>ส่วนขยาย → Apps Script</b></li>
-        <li>วางโค้ดจากไฟล์ <a href="https://github.com/bearpanda2012-wq/health-log/blob/main/apps-script/Code.gs" target="_blank" rel="noopener"><code>apps-script/Code.gs</code></a> → บันทึก</li>
-        <li>เลือกฟังก์ชัน <code>setup</code> → <b>Run</b> → อนุญาตสิทธิ์ → คัดลอก <b>รหัสลับ</b> จาก Execution log</li>
-        <li><b>Deploy → New deployment → Web app</b><br>Execute as: <b>Me</b> · Who has access: <b>Anyone</b></li>
-        <li>คัดลอก <b>Web App URL</b> (ลงท้ายด้วย <code>/exec</code>) มาใส่ด้านบนพร้อมรหัสลับ</li>
-      </ol>
-    </div>
 
     <div class="card">
       <h2>ส่งออก</h2>
@@ -561,6 +562,7 @@ function fillSettings(){
   $('#cfgUrl').value = c ? c.url : '';
   $('#cfgKey').value = c ? c.key : '';
   $('#phoneCard').hidden = !c;
+  $('#guideCard').hidden = !!c;
   if (c && lastError) setMsg('ล่าสุดเชื่อมต่อไม่ได้: ' + lastError, 'bad');
   $('#qrBox').hidden = true; $('#qr').innerHTML = ''; $('#showQr').textContent = 'แสดง QR code';
   $('#cfgClear').hidden = !c;

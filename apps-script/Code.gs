@@ -213,6 +213,7 @@ function geminiModels_(key) {
         .sort(function (a, b) { return (ver(b) - ver(a)) || (/lite/.test(a) - /lite/.test(b)); });
     }
   } catch (e) {}
+  console.log('gemini models', list.join(', ') || '(list failed)');
   const all = [saved].concat(list, GEMINI_MODELS).filter(function (x, i, a) { return x && a.indexOf(x) === i; });
   return all;
 }
@@ -220,15 +221,25 @@ function geminiModels_(key) {
 function gemini_(key, b64, mime, prompt, full) {
   const parts = [{ text: prompt }];
   if (b64) parts.unshift({ inline_data: { mime_type: mime || 'image/jpeg', data: b64 } });
-  const body = JSON.stringify({ contents: [{ parts: parts }],
-    generationConfig: { temperature: 0, responseMimeType: 'application/json' } });
+  const mk = function (think) {
+    const gc = { temperature: 0, responseMimeType: 'application/json' };
+    if (think) gc.thinkingConfig = { thinkingLevel: 'minimal' }; // ให้ตอบเร็ว ไม่ต้องคิดนาน
+    return JSON.stringify({ contents: [{ parts: parts }], generationConfig: gc });
+  };
+  const t0 = Date.now();
   const saved = PropertiesService.getScriptProperties().getProperty('GEMINI_MODEL');
   const models = (saved && !full) ? [saved] : geminiModels_(key);
   let last = 'no_model';
-  for (let i = 0; i < models.length && i < 6; i++) {
-    const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + models[i] + ':generateContent',
-      { method: 'post', contentType: 'application/json', payload: body, muteHttpExceptions: true, headers: { 'x-goog-api-key': key } });
+  for (let i = 0; i < models.length && i < 4; i++) {
+    if (Date.now() - t0 > 60000) { last = 'ช้าเกินไป (' + last + ')'; break; }
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + models[i] + ':generateContent';
+    const opt = { method: 'post', contentType: 'application/json', muteHttpExceptions: true, headers: { 'x-goog-api-key': key } };
+    const t1 = Date.now();
+    opt.payload = mk(true);
+    let res = UrlFetchApp.fetch(url, opt);
+    if (res.getResponseCode() === 400 && /thinking/i.test(res.getContentText())) { opt.payload = mk(false); res = UrlFetchApp.fetch(url, opt); }
     const code = res.getResponseCode(), txt = res.getContentText();
+    console.log('gemini', models[i], code, (Date.now() - t1) + 'ms', code === 200 ? '' : errMsg_(txt));
     if (code === 400 && /API key not valid|API_KEY_INVALID/.test(txt)) return { ok: false, error: 'รหัส Gemini ไม่ถูกต้อง' };
     if (code === 401 || code === 403) return { ok: false, error: 'รหัสนี้ใช้กับ Gemini ไม่ได้ (' + code + ') ' + errMsg_(txt) };
     if (code === 429) return { ok: false, error: 'ใช้เกินโควตาวันนี้ ลองใหม่พรุ่งนี้' };

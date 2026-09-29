@@ -233,6 +233,7 @@ nav button.on{color:var(--accent);font-weight:600}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
+    <p class="muted" style="text-align:center">เวอร์ชัน 5</p>
   </section>
 </main>
 
@@ -278,14 +279,21 @@ const ERR_TH = {
   not_found: 'ไม่พบรายการนี้ในชีต'
 };
 
+async function fetchNet(u, opt){
+  try { return await fetch(u, opt); }
+  catch(e) { throw new Error('ติดต่อ Google ไม่ได้ (' + (e && e.message || 'network') + ') — เช็กอินเทอร์เน็ต หรือ URL ผิด/ไม่ได้ตั้ง "ทุกคน"'); }
+}
+let lastError = '';
+
 async function remote(cfg, action, payload){
   let resp;
   if (action === 'list' || action === 'ping') {
     const u = cfg.url + (cfg.url.includes('?') ? '&' : '?') + 'action=' + action + '&key=' + encodeURIComponent(cfg.key) + '&t=' + Date.now();
-    resp = await fetch(u, { redirect: 'follow' });
+    resp = await fetchNet(u, { redirect: 'follow', credentials: 'omit', cache: 'no-store' });
   } else {
     // text/plain = simple request ไม่มี CORS preflight (Apps Script ไม่รองรับ OPTIONS)
-    resp = await fetch(cfg.url, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    // credentials:'omit' = ไม่ส่งคุกกี้ Google (กันปัญหาล็อกอินหลายบัญชี / iPhone)
+    resp = await fetchNet(cfg.url, { method: 'POST', redirect: 'follow', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(Object.assign({ action, key: cfg.key }, payload)) });
   }
   const text = await resp.text();
@@ -316,7 +324,7 @@ function num(id){ const v = $('#'+id).value.trim(); if (v === '') return null; c
 function fmtDay(d){ return d.toLocaleDateString('th-TH', { weekday:'short', day:'numeric', month:'short', year:'2-digit' }); }
 function fmtTime(d){ return d.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' }); }
 function fmtShort(d){ return d.toLocaleDateString('th-TH', { day:'numeric', month:'short' }); }
-function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2400); }
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), msg.length > 40 ? 6000 : 2400); }
 function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 
 /* เกณฑ์ความดัน (ผู้ใหญ่ วัดที่บ้าน/คลินิก ตามแนวทางสมาคมความดันโลหิตสูงแห่งประเทศไทย) */
@@ -552,6 +560,7 @@ function fillSettings(){
   $('#cfgUrl').value = c ? c.url : '';
   $('#cfgKey').value = c ? c.key : '';
   $('#phoneCard').hidden = !c;
+  if (c && lastError) setMsg('ล่าสุดเชื่อมต่อไม่ได้: ' + lastError, 'bad');
   $('#qrBox').hidden = true; $('#qr').innerHTML = ''; $('#showQr').textContent = 'แสดง QR code';
   $('#cfgClear').hidden = !c;
 }
@@ -632,11 +641,13 @@ async function loadRecords(){
   try {
     records = (await api('getRecords')) || [];
     sortRecords(); renderAll();
+    lastError = '';
     st.textContent = live ? '● Google Sheets' : 'โหมดทดลอง';
     st.classList.toggle('on', live);
   } catch(e) {
     records = []; renderAll();
-    st.textContent = '⚠ เชื่อมต่อไม่ได้';
+    lastError = e.message;
+    st.textContent = '⚠ เชื่อมต่อไม่ได้ (แตะดู)';
     toast('โหลดข้อมูลไม่ได้: ' + e.message);
   }
 }

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ดันดี — บันทึกความดัน</title>
 <meta name="theme-color" content="#E8505B">
-<script>try{var t=localStorage.getItem("hl_theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>try{var t=localStorage.getItem("hl_theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;var z=localStorage.getItem("hl_text");if(z==="l"||z==="xl")document.documentElement.dataset.text=z;}catch(e){}</script>
 <meta name="robots" content="noindex">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -60,6 +60,17 @@ textarea{resize:vertical;min-height:64px}
 .bp input{-moz-appearance:textfield}
 .when::-webkit-calendar-picker-indicator{filter:var(--cal)}
 .hdr-r{display:flex;align-items:center;gap:8px}
+:root[data-text="l"] body{zoom:1.15}
+:root[data-text="xl"] body{zoom:1.3}
+:root[data-text="l"] header{zoom:.9}
+:root[data-text="xl"] header{zoom:.8}
+:root[data-text] .qchips{grid-template-columns:repeat(2,minmax(0,1fr))}
+:root[data-text] .rec-head{flex-wrap:wrap}
+:root[data-text] .when{max-width:100%;text-align:left}
+.textbtn{font-family:Kanit,sans-serif;font-weight:700;font-size:15px;width:auto!important;padding:0 10px!important}
+.pend{display:inline-block;font-size:11.5px;font-weight:700;color:#8A5A00;background:#FFF1C9;border-radius:99px;padding:1px 8px;margin-left:6px;vertical-align:2px}
+.offbar{background:#FFF1C9;color:#5C3D00;font-size:13.5px;font-weight:600;border-radius:12px;padding:8px 12px;margin:0 0 12px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.offbar button{font:inherit;font-size:13px;background:#fff;border:1px solid #E8D29A;border-radius:10px;padding:4px 10px;cursor:pointer;color:#5C3D00}
 .themebtn{width:36px;height:36px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
 .themebtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .hello{margin:6px 2px 14px}
@@ -271,6 +282,7 @@ nav button.on svg{stroke-width:2.4}
 <header>
   <h1><img src="icon-192.png" alt="">ดันดี</h1>
   <div class="hdr-r">
+    <button class="themebtn textbtn" id="textBtn" type="button" aria-label="ขนาดตัวหนังสือ">Aa</button>
     <button class="themebtn" id="themeBtn" type="button" aria-label="สลับโหมดสว่าง/มืด"></button>
     <button class="status" id="status" type="button">กำลังโหลด…</button>
   </div>
@@ -283,6 +295,7 @@ nav button.on svg{stroke-width:2.4}
     <div class="hello"><div class="muted" id="greet">สวัสดี</div><div class="hello-q" id="helloQ">วันนี้วัดความดันหรือยัง?</div></div>
     <div class="card" id="lastCard" hidden></div>
 
+    <div class="offbar" id="offBar" hidden><span id="offTxt"></span><button type="button" id="offRetry">ส่งตอนนี้</button></div>
     <form id="form" class="card" autocomplete="off">
       <div class="editbar" id="editBar" hidden><span id="editTxt">กำลังแก้ไขรายการ</span><button type="button" id="editCancel">ยกเลิก</button></div>
       <div class="rec-head">
@@ -502,6 +515,13 @@ nav button.on svg{stroke-width:2.4}
         <input type="radio" name="theme" id="thDark" value="dark"><label for="thDark">มืด</label>
       </div>
       <p class="muted" style="margin-top:8px">อัตโนมัติ = ตามการตั้งค่าของมือถือ/คอม</p>
+      <label class="f" style="margin-top:14px">ขนาดตัวหนังสือ</label>
+      <div class="seg" id="textSeg">
+        <input type="radio" name="tsize" id="tsN" value="n"><label for="tsN" style="font-size:14px">ปกติ</label>
+        <input type="radio" name="tsize" id="tsL" value="l"><label for="tsL" style="font-size:16px">ใหญ่</label>
+        <input type="radio" name="tsize" id="tsXL" value="xl"><label for="tsXL" style="font-size:18px">ใหญ่มาก</label>
+      </div>
+      <p class="muted" style="margin-top:8px">กดปุ่ม <b>Aa</b> ด้านบนเพื่อสลับขนาดได้เร็ว ๆ</p>
     </div>
 
     <div class="card">
@@ -509,7 +529,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 22 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 23 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -560,7 +580,7 @@ const ERR_TH = {
 
 async function fetchNet(u, opt){
   try { return await fetch(u, opt); }
-  catch(e) { throw new Error('ติดต่อ Google ไม่ได้ (' + (e && e.message || 'network') + ') — เช็กอินเทอร์เน็ต หรือ URL ผิด/ไม่ได้ตั้ง "ทุกคน"'); }
+  catch(e) { const x = new Error('ติดต่อ Google ไม่ได้ (' + (e && e.message || 'network') + ') — เช็กอินเทอร์เน็ต หรือ URL ผิด/ไม่ได้ตั้ง "ทุกคน"'); x.net = true; throw x; }
 }
 let lastError = '';
 
@@ -583,16 +603,37 @@ async function remote(cfg, action, payload){
   return data;
 }
 
+/* ---------- คิวออฟไลน์: เก็บรายการที่ยังส่งไม่ได้ไว้ในเครื่อง ---------- */
+const queue = {
+  get(){ try { return JSON.parse(store.get('hl_queue') || '[]'); } catch(e){ return []; } },
+  set(q){ store.set('hl_queue', JSON.stringify(q)); },
+  add(rec){ const qid = 'q' + Date.now() + Math.random().toString(36).slice(2, 6); const q = this.get(); q.push({ qid, record: rec }); this.set(q); return qid; }
+};
+const cacheRecs = { get(){ try { return JSON.parse(store.get('hl_cache') || '[]'); } catch(e){ return []; } }, set(r){ store.set('hl_cache', JSON.stringify(r)); } };
+const withQueued = list => list.concat(queue.get().map(x => Object.assign({}, x.record, { id: x.qid, pending: true })));
+let online = true;
+
 async function api(fn, arg){
   const cfg = getCfg();
   if (!cfg) {
     await new Promise(r => setTimeout(r, 80));
     return demo[fn](arg);
   }
-  if (fn === 'getRecords') return (await remote(cfg, 'list')).records;
-  if (fn === 'addRecord')  return remote(cfg, 'add', { record: arg });
-  if (fn === 'deleteRecord') return remote(cfg, 'delete', { id: arg });
+  if (fn === 'getRecords') {
+    try { const recs = (await remote(cfg, 'list')).records; cacheRecs.set(recs); online = true; return withQueued(recs); }
+    catch(e) { if (!e.net) throw e; online = false; return withQueued(cacheRecs.get()); }
+  }
+  if (fn === 'addRecord') {
+    if (navigator.onLine === false) return { ok: true, id: queue.add(arg), queued: true };
+    try { return await remote(cfg, 'add', { record: arg }); }
+    catch(e) { if (!e.net) throw e; online = false; return { ok: true, id: queue.add(arg), queued: true }; }
+  }
+  if (fn === 'deleteRecord') {
+    if (String(arg).startsWith('q')) { queue.set(queue.get().filter(x => x.qid !== arg)); return { ok: true }; }
+    return remote(cfg, 'delete', { id: arg });
+  }
   if (fn === 'updateRecord') {
+    if (String(arg.id).startsWith('q')) { const q = queue.get(); const it = q.find(x => x.qid === arg.id); if (it) { it.record = arg.record; queue.set(q); } return { ok: true, id: arg.id, queued: true }; }
     try { return await remote(cfg, 'update', { id: arg.id, record: arg.record }); }
     catch(e) {
       // โค้ดในชีตรุ่นเก่ายังไม่มี "update" → เพิ่มใหม่แล้วลบของเดิม
@@ -603,6 +644,35 @@ async function api(fn, arg){
     }
   }
 }
+let flushing = false;
+async function flushQueue(){
+  const cfg = getCfg(); if (!cfg || flushing) return;
+  let q = queue.get(); if (!q.length) { updateOffBar(); return; }
+  flushing = true; let sent = 0;
+  try {
+    for (const it of q) {
+      const res = await remote(cfg, 'add', { record: it.record });
+      queue.set(queue.get().filter(x => x.qid !== it.qid));
+      const r = records.find(x => x.id === it.qid); if (r) { r.id = res.id; delete r.pending; }
+      sent++;
+    }
+    online = true;
+  } catch(e) { if (e.net) online = false; }
+  finally { flushing = false; }
+  if (sent) { renderAll(); toast(`ส่งเข้าชีตแล้ว ${sent} รายการ ✓`); }
+  updateOffBar(); updateStatus();
+}
+function updateOffBar(){
+  const n = isLive() ? queue.get().length : 0, off = isLive() && (!online || navigator.onLine === false);
+  $('#offBar').hidden = !n && !off;
+  $('#offTxt').textContent = n ? `⏳ รอส่งเข้าชีต ${n} รายการ — จะส่งเองเมื่อมีเน็ต` : '📴 ไม่มีเน็ต — บันทึกได้ตามปกติ จะเก็บไว้ในเครื่องก่อน';
+  $('#offRetry').hidden = !n;
+}
+$('#offRetry').addEventListener('click', flushQueue);
+window.addEventListener('online', () => { online = true; flushQueue(); });
+window.addEventListener('offline', () => { online = false; updateOffBar(); updateStatus(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) flushQueue(); });
+setInterval(() => { if (queue.get().length) flushQueue(); }, 60000);
 
 /* ---------- ตัวช่วย ---------- */
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -754,16 +824,16 @@ $('#form').addEventListener('submit', async e => {
       if (!r.med && editingOrig && editingOrig.med === 'ใช่') r.med = 'ใช่';
       const res = await api('updateRecord', { id: editingId, record: r });
       records = records.filter(x => x.id !== editingId);
-      records.unshift(Object.assign({}, r, { id: res.id || editingId, med: r.med || null }));
+      records.unshift(Object.assign({}, r, { id: res.id || editingId, med: r.med || null }, res.queued ? { pending: true } : {}));
       sortRecords(); endEdit(); renderAll(); toast('แก้ไขแล้ว ✓'); goTab('history');
       return;
     }
     const res = await api('addRecord', r);
-    records.unshift(Object.assign({}, r, { id: res.id, med: r.med || null }));
+    records.unshift(Object.assign({}, r, { id: res.id, med: r.med || null }, res.queued ? { pending: true } : {}));
     sortRecords();
     if (r.arm) store.set('hl_prefs', JSON.stringify({ arm: r.arm, posture: r.posture }));
     resetForm(); renderAll();
-    toast('บันทึกแล้ว ✓');
+    if (res.queued) { toast('ไม่มีเน็ต — เก็บไว้ในเครื่องแล้ว จะส่งเข้าชีตเองเมื่อมีเน็ต'); updateOffBar(); updateStatus(); } else toast('บันทึกแล้ว ✓');
   } catch(e) {
     toast('บันทึกไม่สำเร็จ: ' + (e && e.message || e));
   } finally { btn.disabled = false; btn.textContent = editingId ? 'บันทึกการแก้ไข' : 'บันทึก'; }
@@ -792,9 +862,10 @@ function itemHTML(r){
   const main = has(r.sys)
     ? `<span class="v">${r.sys}/${r.dia}</span>${has(r.pulse) ? `<span class="muted">ชีพจร ${r.pulse}</span>` : ''}`
     : `<span class="muted">บันทึกสุขภาพ</span>`;
+  const pend = r.pending ? '<span class="pend">รอส่ง</span>' : '';
   const tags = tagsFor(r);
   return `<div class="item">
-    <div class="top"><div class="ival"><span class="itime">${fmtTime(d)}</span>${main}</div>
+    <div class="top"><div class="ival"><span class="itime">${fmtTime(d)}</span>${main}${pend}</div>
       <div class="iright">${badge(bpClass(r.sys, r.dia))}<button class="edit" data-id="${esc(r.id)}" aria-label="แก้ไขรายการ ${fmtTime(d)}">แก้</button><button class="del" data-id="${esc(r.id)}" aria-label="ลบรายการ ${fmtTime(d)}">ลบ</button></div></div>
     ${tags ? `<div class="tags">${tags}</div>` : ''}
     ${has(r.note) ? `<div class="note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>${esc(r.note)}</span></div>` : ''}
@@ -1299,6 +1370,13 @@ $('#exportCsv').addEventListener('click', () => {
 });
 
 /* ---------- โหลดข้อมูล ---------- */
+function updateStatus(){
+  const st = $('#status'), live = isLive();
+  if (!live) { st.textContent = 'โหมดทดลอง'; st.classList.remove('on'); return; }
+  const off = !online || navigator.onLine === false;
+  st.textContent = off ? '📴 ออฟไลน์' : '● Google Sheets';
+  st.classList.toggle('on', !off);
+}
 async function loadRecords(){
   const st = $('#status'), live = isLive();
   st.textContent = 'กำลังโหลด…'; st.classList.remove('on');
@@ -1307,8 +1385,8 @@ async function loadRecords(){
     records = (await api('getRecords')) || [];
     sortRecords(); renderAll();
     lastError = '';
-    st.textContent = live ? '● Google Sheets' : 'โหมดทดลอง';
-    st.classList.toggle('on', live);
+    updateStatus(); updateOffBar();
+    if (live && online) flushQueue();
   } catch(e) {
     records = []; renderAll();
     lastError = e.message;
@@ -1334,6 +1412,16 @@ function applyTheme(){
   const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = eff === 'dark' ? '#15131A' : '#E8505B';
   if (!$('#tab-chart').hidden) drawChart();
 }
+function textPref(){ const z = store.get('hl_text'); return z === 'l' || z === 'xl' ? z : 'n'; }
+function applyText(){
+  const z = textPref();
+  if (z === 'n') delete document.documentElement.dataset.text; else document.documentElement.dataset.text = z;
+  const i = document.querySelector(`input[name=tsize][value="${z}"]`); if (i) i.checked = true;
+  if (chart) { chart.destroy(); chart = null; if (!$('#tab-chart').hidden) drawChart(); }
+}
+function setText(z){ z === 'n' ? store.del('hl_text') : store.set('hl_text', z); applyText(); }
+document.querySelectorAll('input[name=tsize]').forEach(i => i.addEventListener('change', () => setText(i.value)));
+$('#textBtn').addEventListener('click', () => { const nx = { n:'l', l:'xl', xl:'n' }[textPref()]; setText(nx); toast({ n:'ตัวหนังสือขนาดปกติ', l:'ตัวหนังสือใหญ่', xl:'ตัวหนังสือใหญ่มาก' }[nx]); });
 function setTheme(t){ t === 'auto' ? store.del('hl_theme') : store.set('hl_theme', t); applyTheme(); }
 $('#themeBtn').addEventListener('click', () => setTheme(effectiveTheme() === 'dark' ? 'light' : 'dark'));
 document.querySelectorAll('input[name=theme]').forEach(i => i.addEventListener('change', () => setTheme(i.value)));
@@ -1464,8 +1552,9 @@ $('#makePdf').addEventListener('click', () => {
     if (p.arm) document.querySelectorAll('input[name=arm]').forEach(i => i.checked = i.value === p.arm);
     if (p.posture) document.querySelectorAll('input[name=posture]').forEach(i => i.checked = i.value === p.posture);
   } catch(e){}
-  applyTheme();
+  applyTheme(); applyText();
   resetForm();
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   loadRecords();
 })();
 </script>

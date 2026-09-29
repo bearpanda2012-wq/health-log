@@ -127,6 +127,8 @@ details[open] summary{margin-bottom:12px}
 .chips input:checked+label{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
 .check{display:flex;align-items:center;gap:10px;font-size:15px;cursor:pointer}
 .check input{width:20px;height:20px;accent-color:var(--accent)}
+.bp input.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{box-shadow:0 0 0 4px color-mix(in srgb,var(--good) 45%,transparent);border-color:var(--good)}100%{box-shadow:none}}
 .scanbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font:inherit;font-weight:700;font-size:15.5px;color:var(--accent);background:var(--card);border:1.5px dashed var(--accent);border-radius:14px;padding:11px;margin:0 0 14px;cursor:pointer;min-height:48px}
 .scanbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
 .scanbg{position:fixed;inset:0;z-index:60;background:rgba(10,10,15,.55);display:grid;place-items:center;padding:16px}
@@ -548,7 +550,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 25 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 26 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -1177,25 +1179,17 @@ $('#scanFile').addEventListener('change', async () => {
   const c = ok ? bpClass(res.sys, res.dia) : null;
   $('#scanVal').innerHTML = (has(res.sys) || has(res.dia))
     ? `${has(res.sys) ? res.sys : '–'}/${has(res.dia) ? res.dia : '–'}<small>${has(res.pulse) ? 'ชีพจร ' + res.pulse : 'อ่านชีพจรไม่ได้'}</small>` : '–';
-  if (!ok) {
-    $('#scanTitle').textContent = 'อ่านได้ไม่ครบหรือไม่แน่ใจ';
-    $('#scanSub').textContent = 'ลองถ่ายใหม่ให้ตรงและไม่มีแสงสะท้อน หรือกด "แก้เอง"';
-    $('#scanOk').hidden = false; $('#scanOk').textContent = 'แก้เอง';
-    $('#scanOk').onclick = () => { scanFill(res, when); scanClose(); window.scrollTo({ top: 0 }); };
+  if (!has(res.sys) && !has(res.dia) && !has(res.pulse)) {
+    $('#scanTitle').textContent = 'อ่านตัวเลขไม่ได้';
+    $('#scanSub').textContent = 'ลองถ่ายใหม่ให้ตรงและไม่มีแสงสะท้อน';
     $('#scanCancel').textContent = 'ปิด';
     return;
   }
-  $('#scanTitle').innerHTML = (c ? badge(c) + ' ' : '') + (res.sure ? '' : '<span style="color:#B45309">ไม่ค่อยชัด โปรดตรวจ</span>');
-  $('#scanSub').textContent = `${fmtShort(when)} ${fmtTime(when)} · จะบันทึกใน 3 วินาที`;
-  const save = () => { clearTimeout(scanTimer); scanFill(res, when); scanClose(); $('#form').requestSubmit(); };
-  $('#scanOk').hidden = false; $('#scanOk').textContent = 'บันทึกเลย'; $('#scanOk').onclick = save;
-  $('#scanCancel').textContent = 'ยกเลิก / แก้เอง';
-  $('#scanCancel').onclick = () => { scanFill(res, when); scanClose(); $('#scanCancel').onclick = null; toast('ใส่ค่าไว้ในฟอร์มแล้ว ตรวจแล้วกดบันทึก'); };
-  if (!res.sure) { $('#scanSub').textContent = `${fmtShort(when)} ${fmtTime(when)} · ตรวจตัวเลขแล้วกดบันทึก`; return; }
-  const bar = $('#scanBar'); $('#scanBarWrap').hidden = false;
-  bar.style.transition = 'none'; bar.style.transform = 'scaleX(1)'; void bar.offsetWidth;
-  bar.style.transition = 'transform 3s linear'; bar.style.transform = 'scaleX(0)';
-  scanTimer = setTimeout(save, 3000);
+  // ใส่ค่าในฟอร์มให้ แต่ไม่บันทึก — ให้ผู้ใช้ตรวจแล้วกดบันทึกเอง
+  scanFill(res, when); scanClose();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  ['sys', 'dia', 'pulse'].forEach(id => { const el = $('#' + id); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); });
+  toast(ok && res.sure ? 'ใส่ค่าให้แล้ว ✓ ตรวจแล้วกดบันทึก' : 'ใส่ค่าให้แล้ว แต่บางตัวอ่านไม่ชัด โปรดตรวจก่อนบันทึก');
 });
 
 /* ---------- แก้ไขรายการ ---------- */

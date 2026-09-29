@@ -7,7 +7,7 @@
 <meta name="description" content="แอปจดค่าความดันโลหิต ดูแนวโน้มเป็นกราฟ เก็บข้อมูลใน Google Sheets ของคุณเอง ใช้ได้ทั้งมือถือและคอมพิวเตอร์">
 <meta name="theme-color" content="#E8505B">
 <meta property="og:title" content="ดันดี — ความดันดี ชีวิตดี">
-<meta property="og:description" content="จดค่าความดันในไม่กี่วินาที ดูกราฟแนวโน้ม ข้อมูลอยู่ใน Google Sheets ของคุณเอง">
+<meta property="og:description" content="จดความดัน น้ำตาล ยา ดูกราฟ ส่งรายงาน PDF ให้หมอ ข้อมูลอยู่ใน Google Sheets ของคุณเอง จ่ายครั้งเดียว ไม่มีรายเดือน">
 <meta property="og:image" content="https://bearpanda2012-wq.github.io/health-log/assets/og.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
@@ -95,7 +95,7 @@ section{padding:72px 0}
 .screens{background:var(--bg2)}
 .shots{display:flex;gap:28px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
 .shot{text-align:center}
-.shot .phone{width:250px;border-radius:38px;padding:10px}
+.shot .phone{width:220px;border-radius:38px;padding:10px}
 .shot .phone img{border-radius:28px}
 .shot p{margin-top:16px;font-weight:600}
 .shot small{display:block;color:var(--muted);font-weight:400;font-size:14px}
@@ -142,6 +142,30 @@ section{padding:72px 0}
 .final p{opacity:.92;margin-bottom:26px}
 .final .btn-main{background:#fff;color:var(--coral-d)}
 
+.report .rp-wrap{display:grid;grid-template-columns:1fr 1.05fr;gap:44px;align-items:center}
+.report h2{font-size:clamp(28px,4vw,38px);margin-bottom:10px}
+.report p{color:var(--muted)}
+.ticks{list-style:none;margin:16px 0;display:grid;gap:8px}
+.ticks li{padding-left:28px;position:relative}
+.ticks li::before{content:"✓";position:absolute;left:0;top:0;color:#fff;background:var(--teal);width:20px;height:20px;border-radius:99px;font-size:12px;font-weight:700;display:grid;place-items:center;margin-top:4px}
+.muted-s{font-size:15px}
+.paper{background:#fff;border-radius:14px;padding:10px;box-shadow:0 30px 60px -24px rgba(30,42,58,.35);border:1px solid var(--line);transform:rotate(1.2deg)}
+.paper img{display:block;width:100%;height:auto;border-radius:6px}
+@media (max-width:860px){.report .rp-wrap{grid-template-columns:1fr}.paper{transform:none}}
+.plans{display:grid;grid-template-columns:repeat(2,minmax(0,380px));gap:20px;justify-content:center}
+@media (max-width:760px){.plans{grid-template-columns:1fr}}
+.plan{position:relative;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:30px 26px;display:flex;flex-direction:column}
+.plan.hot{border:2px solid var(--coral);box-shadow:0 24px 48px -24px rgba(232,80,91,.45)}
+.plan .tag{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--coral);color:#fff;font-size:13px;font-weight:700;padding:4px 14px;border-radius:99px;white-space:nowrap}
+.plan h3{font-size:22px}
+.plan .price{font-family:'Kanit';font-weight:700;font-size:52px;line-height:1.1;margin-top:6px}
+.plan .price span{font-size:20px;color:var(--muted);font-weight:600}
+.plan .sub{color:var(--muted);font-size:15px}
+.plan .ticks{flex:1}
+.plan .btn{width:100%;margin-top:8px}
+.price-note{text-align:center;color:var(--muted);margin-top:22px}
+.price-note a{color:var(--coral-d);font-weight:600}
+.final .fbtn{background:transparent;color:#fff;border-color:rgba(255,255,255,.7)}
 footer{padding:40px 0 60px;color:var(--muted);font-size:14px;text-align:center}
 footer .brand{justify-content:center;font-size:22px;margin-bottom:10px}
 footer p{max-width:640px;margin:6px auto}
@@ -155,6 +179,7 @@ footer p{max-width:640px;margin:6px auto}
     <div class="links">
       <a href="#features">ฟีเจอร์</a>
       <a href="#how">วิธีใช้</a>
+      <a href="#price">ราคา</a>
       <a href="#faq">คำถาม</a>
       <a class="btn btn-main" href="./">เปิดแอป</a>
     </div>
@@ -166,17 +191,17 @@ footer p{max-width:640px;margin:6px auto}
     <div>
       <div class="pill">❤️ แอปจดความดันสำหรับทุกบ้าน</div>
       <h1>ความดัน<em>ดี</em><br>ชีวิต<em>ดี</em></h1>
-      <p class="lead">จดค่าความดันในไม่กี่วินาที ดูแนวโน้มเป็นกราฟ ส่งให้หมอดูได้ทันที ข้อมูลทั้งหมดเก็บไว้ใน Google Sheets ของคุณเอง</p>
+      <p class="lead">จดความดัน น้ำตาล และยาในไม่กี่วินาที ดูกราฟแนวโน้ม กดปุ่มเดียวได้รายงาน PDF ส่งหมอ ข้อมูลทั้งหมดอยู่ใน Google Sheets ของคุณเอง</p>
       <div class="cta">
         <a class="btn btn-main" href="./">ลองใช้ฟรี →</a>
-        <a class="btn btn-ghost" href="#how">ดูวิธีเริ่มต้น</a>
+        <a class="btn btn-ghost" href="#price">ดูราคา</a>
       </div>
-      <p class="note">ไม่ต้องสมัครสมาชิก · เปิดในเบราว์เซอร์ได้เลย · ใช้ได้ทั้งมือถือและคอมพิวเตอร์</p>
+      <p class="note">จ่ายครั้งเดียว ใช้ได้ตลอด · ไม่มีรายเดือน · ไม่ต้องสมัครสมาชิก</p>
     </div>
     <div class="hero-art">
       <div class="blob"></div>
       <div class="phone"><img src="assets/screen-add.webp" alt="หน้าจดค่าความดันของแอปดันดี" width="390" height="844"></div>
-      <div class="float f1"><span class="muted"><span class="dot" style="background:var(--blue)"></span>วันนี้</span><b>124/80</b></div>
+      <div class="float f1"><span class="muted"><span class="dot" style="background:var(--teal)"></span>น้ำตาล</span><b>96 ปกติ</b></div>
       <div class="float f2"><span><span class="dot" style="background:var(--teal)"></span>เฉลี่ย 30 วัน</span><b>130/84</b></div>
     </div>
   </div>
@@ -187,7 +212,8 @@ footer p{max-width:640px;margin:6px auto}
     <span>🔒 ข้อมูลอยู่ในชีตของคุณ</span>
     <span>📱 เพิ่มไว้หน้าจอโฮมได้</span>
     <span>🚫 ไม่มีโฆษณา</span>
-    <span>🌙 รองรับโหมดมืด</span>
+    <span>📴 ใช้ได้แม้ไม่มีเน็ต</span>
+    <span>💳 จ่ายครั้งเดียว</span>
   </div>
 </div>
 
@@ -196,15 +222,18 @@ footer p{max-width:640px;margin:6px auto}
     <div class="sec-head">
       <div class="kicker">ฟีเจอร์</div>
       <h2>ครบทุกอย่างที่ต้องใช้ ไม่มีอะไรเกิน</h2>
-      <p>ออกแบบมาให้ผู้สูงอายุก็ใช้ได้ ตัวเลขใหญ่ อ่านง่าย กดไม่กี่ครั้ง</p>
+      <p>ออกแบบมาให้ผู้สูงอายุก็ใช้ได้ ตัวเลขใหญ่ อ่านง่าย กดไม่กี่ครั้ง แต่ละเอียดพอให้หมอใช้ได้จริง</p>
     </div>
     <div class="grid3">
-      <div class="feat"><div class="ic c1">🎯</div><h3>รู้ระดับทันที</h3><p>พิมพ์ตัวเลขปุ๊บ ขึ้นป้ายสีบอกระดับความดันปั๊บ ถ้าค่าสูงมากจะมีคำเตือนให้วัดซ้ำ</p></div>
-      <div class="feat"><div class="ic c2">📈</div><h3>กราฟแนวโน้ม</h3><p>ดูย้อนหลัง 7, 30, 90 วัน มีเส้นเกณฑ์ 140/90 ให้เห็นชัดว่าดีขึ้นหรือแย่ลง</p></div>
-      <div class="feat"><div class="ic c3">🧮</div><h3>สรุปให้อัตโนมัติ</h3><p>ค่าเฉลี่ยความดัน ชีพจร และจำนวนครั้งที่ค่าสูงเกินเกณฑ์ คำนวณให้ทุกช่วงเวลา</p></div>
-      <div class="feat"><div class="ic c4">🩺</div><h3>จดได้มากกว่าความดัน</h3><p>น้ำหนัก น้ำตาลในเลือด อุณหภูมิ ออกซิเจน ชั่วโมงนอน การกินยา อาการ และโน้ต</p></div>
-      <div class="feat"><div class="ic c1">👩‍⚕️</div><h3>ส่งให้หมอง่าย</h3><p>ดาวน์โหลดเป็นไฟล์ CSV เปิดใน Excel ได้ หรือเปิด Google Sheet ให้หมอดูตรงๆ</p></div>
-      <div class="feat"><div class="ic c2">📲</div><h3>ใช้เหมือนแอป</h3><p>เพิ่มไอคอนไว้หน้าจอโฮม เปิดปุ๊บจดได้เลย ข้อมูลตรงกันทั้งมือถือและคอมพิวเตอร์</p></div>
+      <div class="feat"><div class="ic c1">🎯</div><h3>รู้ระดับทันที</h3><p>พิมพ์ตัวเลขปุ๊บ ขึ้นป้ายสีบอกระดับความดันและน้ำตาลปั๊บ ต่ำ ปกติ หรือสูง ถ้าค่าสูงมากจะเตือนให้วัดซ้ำ</p></div>
+      <div class="feat"><div class="ic c2">📄</div><h3>รายงาน PDF ให้หมอ</h3><p>กดปุ่มเดียว ได้สรุปค่าเฉลี่ย กราฟ และตารางทุกรายการ มีสีบอกระดับ ส่ง LINE ให้หมอหรือพิมพ์ไปวันนัดได้เลย</p></div>
+      <div class="feat"><div class="ic c3">📈</div><h3>กราฟแยกโซนสี</h3><p>ดูย้อนหลัง 7–90 วัน หรือเลือกวันเอง โซนเขียว ส้ม แดง เห็นชัดว่าวันไหนหลุดเกณฑ์</p></div>
+      <div class="feat"><div class="ic c4">💊</div><h3>จดยาได้ละเอียด</h3><p>ติ๊กมื้อเช้า กลางวัน เย็น เลือกก่อนหรือหลังอาหาร ใส่ชื่อยาได้ แอปจำให้ครั้งหน้าไม่ต้องพิมพ์ซ้ำ</p></div>
+      <div class="feat"><div class="ic c1">🩺</div><h3>จดได้มากกว่าความดัน</h3><p>น้ำตาลในเลือด น้ำหนัก อุณหภูมิ ออกซิเจน ชั่วโมงนอน อาการ และโน้ต ครบในที่เดียว</p></div>
+      <div class="feat"><div class="ic c2">🗓️</div><h3>ปฏิทินและสรุปสัปดาห์</h3><p>ดูเป็นรายการ ปฏิทินจุดสี หรือสรุปรายสัปดาห์ เทียบเช้ากับเย็น และดูว่ากินยาครบกี่วัน</p></div>
+      <div class="feat"><div class="ic c3">🔠</div><h3>ตัวหนังสือใหญ่ได้</h3><p>กดปุ่ม Aa เพื่อขยายตัวหนังสือ 3 ระดับ เหมาะกับผู้สูงอายุ มีโหมดมืดสบายตาตอนกลางคืน</p></div>
+      <div class="feat"><div class="ic c4">📴</div><h3>ไม่มีเน็ตก็จดได้</h3><p>บันทึกไว้ในเครื่องก่อน พอมีเน็ตแอปส่งเข้าชีตให้เอง ไม่มีข้อมูลหาย</p></div>
+      <div class="feat"><div class="ic c1">✏️</div><h3>แก้ไขย้อนหลังได้</h3><p>พิมพ์ผิดก็แก้ได้ทันที ข้อมูลตรงกันทั้งมือถือ แท็บเล็ต และคอมพิวเตอร์</p></div>
     </div>
   </div>
 </section>
@@ -216,10 +245,30 @@ footer p{max-width:640px;margin:6px auto}
       <h2>เรียบง่าย ตัวใหญ่ อ่านสบายตา</h2>
     </div>
     <div class="shots">
-      <div class="shot"><div class="phone"><img src="assets/screen-add.webp" alt="หน้าจดค่า" loading="lazy" width="390" height="844"></div><p>จดค่า<small>กรอกตัวเลข 3 ช่องแล้วกดบันทึก</small></p></div>
-      <div class="shot"><div class="phone"><img src="assets/screen-history.webp" alt="หน้าประวัติ" loading="lazy" width="390" height="844"></div><p>ประวัติและสรุป<small>ค่าเฉลี่ยและรายการแยกตามวัน</small></p></div>
-      <div class="shot"><div class="phone"><img src="assets/screen-chart.webp" alt="หน้ากราฟ" loading="lazy" width="390" height="844"></div><p>กราฟแนวโน้ม<small>เห็นชัดว่าความดันไปทางไหน</small></p></div>
+      <div class="shot"><div class="phone"><img src="assets/screen-add.webp" alt="หน้าจดค่าความดันและน้ำตาล" loading="lazy" width="390" height="844"></div><p>จดค่า<small>ป้ายสีบอกระดับทันที</small></p></div>
+      <div class="shot"><div class="phone"><img src="assets/screen-history.webp" alt="หน้าประวัติ" loading="lazy" width="390" height="844"></div><p>ประวัติ<small>แท็กสีแยกประเภท แก้ไขได้</small></p></div>
+      <div class="shot"><div class="phone"><img src="assets/screen-sugar.webp" alt="กราฟน้ำตาลแบบโซนสี" loading="lazy" width="390" height="844"></div><p>กราฟโซนสี<small>เห็นชัดว่าวันไหนหลุดเกณฑ์</small></p></div>
+      <div class="shot"><div class="phone"><img src="assets/screen-big.webp" alt="โหมดตัวหนังสือใหญ่" loading="lazy" width="390" height="844"></div><p>ตัวหนังสือใหญ่<small>กดปุ่ม Aa ขยายได้ 3 ระดับ</small></p></div>
     </div>
+  </div>
+</section>
+
+<section class="report">
+  <div class="wrap rp-wrap">
+    <div>
+      <div class="kicker">รายงานให้หมอ</div>
+      <h2>ไปหาหมอครั้งหน้า ยื่นรายงานนี้ได้เลย</h2>
+      <p>ไม่ต้องจดสมุด ไม่ต้องเปิดมือถือไล่ให้หมอดูทีละวัน ดันดีสรุปให้ในหน้าเดียว</p>
+      <ul class="ticks">
+        <li>ค่าเฉลี่ย สูงสุด ต่ำสุด และจำนวนครั้งที่เกิน 140/90</li>
+        <li>เทียบค่าช่วงเช้ากับบ่าย-เย็น</li>
+        <li>น้ำตาลแยกต่ำ ปกติ สูง พร้อมสีบอกระดับ</li>
+        <li>ชื่อยาที่กิน และจำนวนวันที่กินยาครบ</li>
+        <li>กราฟความดัน กราฟน้ำตาล และตารางทุกรายการ</li>
+      </ul>
+      <p class="muted-s">เลือกช่วง 7, 30 หรือ 90 วัน บันทึกเป็น PDF ส่ง LINE หรือพิมพ์ออกกระดาษ</p>
+    </div>
+    <div class="paper"><img src="assets/report.webp" alt="ตัวอย่างรายงาน PDF ให้หมอ" loading="lazy" width="911" height="798"></div>
   </div>
 </section>
 
@@ -269,6 +318,44 @@ footer p{max-width:640px;margin:6px auto}
   </div>
 </section>
 
+<section id="price" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">ราคา</div>
+      <h2>จ่ายครั้งเดียว ใช้ได้ตลอด</h2>
+      <p>ไม่มีค่ารายเดือน ไม่มีโฆษณา ข้อมูลอยู่ในบัญชี Google ของคุณเอง</p>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <h3>ตั้งค่าเอง</h3>
+        <div class="price">199<span> บาท</span></div>
+        <p class="sub">เหมาะกับคนที่ใช้ Google ชีตเป็น</p>
+        <ul class="ticks">
+          <li>ชีตดันดีพร้อมใช้ ทำสำเนาได้ทันที</li>
+          <li>วิดีโอสอนตั้งค่าทีละขั้น</li>
+          <li>ได้ทุกฟีเจอร์ รวมรายงาน PDF</li>
+          <li>อัปเดตฟรี</li>
+        </ul>
+        <a class="btn btn-ghost" href="LINE_URL" data-line>ซื้อผ่าน LINE</a>
+      </div>
+      <div class="plan hot">
+        <div class="tag">แนะนำสำหรับผู้สูงอายุ</div>
+        <h3>ตั้งค่าให้</h3>
+        <div class="price">399<span> บาท</span></div>
+        <p class="sub">เราช่วยตั้งให้จนใช้งานได้</p>
+        <ul class="ticks">
+          <li>ทุกอย่างในแบบตั้งค่าเอง</li>
+          <li>ช่วยตั้งค่าผ่าน LINE หรือแชร์หน้าจอ</li>
+          <li>เชื่อมมือถือให้ พร้อมเพิ่มไอคอนหน้าจอโฮม</li>
+          <li>สอนใช้จนคล่อง</li>
+        </ul>
+        <a class="btn btn-main" href="LINE_URL" data-line>ซื้อผ่าน LINE</a>
+      </div>
+    </div>
+    <p class="price-note">ไม่แน่ใจ? <a href="./">ลองใช้โหมดทดลองฟรี</a> ได้ก่อนตัดสินใจ</p>
+  </div>
+</section>
+
 <section id="faq" style="padding-top:0">
   <div class="wrap">
     <div class="sec-head">
@@ -278,7 +365,10 @@ footer p{max-width:640px;margin:6px auto}
     <div class="faq">
       <details><summary>ใช้กับเครื่องวัดความดันยี่ห้อไหนได้บ้าง?</summary><p>ได้ทุกยี่ห้อ เพราะคุณพิมพ์ตัวเลขที่เครื่องวัดได้ลงในแอปเอง ไม่ต้องเชื่อมบลูทูธ</p></details>
       <details><summary>ต้องติดตั้งจาก App Store หรือ Play Store ไหม?</summary><p>ไม่ต้อง ดันดีเป็นเว็บแอป เปิดในเบราว์เซอร์ได้เลย แล้วกด "เพิ่มไปยังหน้าจอโฮม" จะได้ไอคอนเหมือนแอปทั่วไป</p></details>
+      <details><summary>จ่ายแล้วต้องจ่ายเพิ่มทุกเดือนไหม?</summary><p>ไม่ต้อง จ่ายครั้งเดียวใช้ได้ตลอด เพราะข้อมูลอยู่ใน Google ชีตของคุณเอง เราไม่มีค่าเซิร์ฟเวอร์ที่ต้องเก็บจากคุณ</p></details>
+      <details><summary>ใช้กับผู้สูงอายุได้ไหม ตั้งค่ายากไหม?</summary><p>ใช้งานประจำวันง่ายมาก แค่พิมพ์ตัวเลขแล้วกดบันทึก และขยายตัวหนังสือได้ ส่วนการตั้งค่าครั้งแรกใช้เวลาราว 5–10 นาที ถ้าไม่สะดวกเลือกแบบ "ตั้งค่าให้" เราช่วยตั้งจนใช้ได้</p></details>
       <details><summary>ข้อมูลเก็บที่ไหน ปลอดภัยไหม?</summary><p>ในโหมดทดลอง ข้อมูลอยู่ในเบราว์เซอร์เครื่องนั้นเครื่องเดียว เมื่อเชื่อม Google Sheets ข้อมูลจะอยู่ในบัญชี Google ของคุณเอง ดันดีไม่ได้เก็บข้อมูลไว้ที่อื่น</p></details>
+      <details><summary>ถ้าไม่มีอินเทอร์เน็ตล่ะ?</summary><p>ยังจดได้ตามปกติ แอปเก็บไว้ในเครื่องก่อน แล้วส่งเข้าชีตให้เองเมื่อมีเน็ต</p></details>
       <details><summary>ใช้หลายเครื่องพร้อมกันได้ไหม?</summary><p>ได้ เมื่อเชื่อม Google Sheets แล้ว สแกน QR จากหน้าตั้งค่าไปเปิดบนเครื่องอื่น ข้อมูลจะตรงกันทุกเครื่อง</p></details>
       <details><summary>ใช้แทนการไปหาหมอได้ไหม?</summary><p>ไม่ได้ ดันดีเป็นเครื่องมือช่วยจดและดูแนวโน้มเท่านั้น ไม่ใช่การวินิจฉัย ค่าเป้าหมายและการปรับยาควรปรึกษาแพทย์เสมอ</p></details>
       <details><summary>ถ้าค่าความดันสูงมากต้องทำอย่างไร?</summary><p>นั่งพัก 5 นาทีแล้ววัดซ้ำ ถ้ายังสูงมากและมีอาการเจ็บหน้าอก ปวดหัวรุนแรง แขนขาอ่อนแรง พูดไม่ชัด หรือตามัว ให้โทร 1669 หรือไปโรงพยาบาลทันที</p></details>
@@ -291,8 +381,8 @@ footer p{max-width:640px;margin:6px auto}
     <div class="final">
       <img src="icon-192.png" alt="">
       <h2>เริ่มจดวันนี้ ความดันดีทุกวัน</h2>
-      <p>ลองใช้ฟรีได้ทันที ไม่ต้องสมัคร ไม่ต้องติดตั้ง</p>
-      <a class="btn btn-main" href="./">เปิดแอปดันดี →</a>
+      <p>ลองใช้ฟรีได้ทันที ชอบแล้วค่อยซื้อ จ่ายครั้งเดียว 199 บาท</p>
+      <div class="cta" style="justify-content:center"><a class="btn btn-main" href="./">ลองใช้ฟรี →</a><a class="btn btn-ghost fbtn" href="LINE_URL" data-line>ซื้อผ่าน LINE</a></div>
     </div>
   </div>
 </section>
@@ -305,5 +395,13 @@ footer p{max-width:640px;margin:6px auto}
   </div>
 </footer>
 
+<script>
+/* ใส่ลิงก์ LINE OA ตรงนี้ที่เดียว เช่น https://lin.ee/xxxx */
+var LINE_URL = '';
+document.querySelectorAll('[data-line]').forEach(function(a){
+  if (LINE_URL) { a.href = LINE_URL; a.target = '_blank'; a.rel = 'noopener'; }
+  else { a.href = '#price'; a.addEventListener('click', function(e){ e.preventDefault(); alert('ช่องทางสั่งซื้อกำลังจะเปิดเร็ว ๆ นี้'); }); }
+});
+</script>
 </body>
 </html>

@@ -123,8 +123,11 @@ function menuConnect() {
   const data = JSON.stringify({ url: webAppUrl_(), key: key, app: APP_URL }).replace(/</g, '\\u003c');
   showDialog_(
     '<h2>เชื่อมกับแอปดันดี</h2>'
-    + '<div id="ask" style="display:none"><p>วาง <b>URL ของเว็บแอป</b> (ลงท้ายด้วย <code>/exec</code>) ที่ได้ตอนกด "ทำให้ใช้งานได้"</p>'
-    + '<input id="u" placeholder="https://script.google.com/macros/s/…/exec"><p><button class="btn" onclick="useUrl()">สร้าง QR</button></p>'
+    + '<p id="chk" class="center">⏳ กำลังตรวจสอบการเชื่อมต่อ…</p>'
+    + '<div id="ask" style="display:none"><p>วาง <b>URL ของเว็บแอป</b> (ลงท้ายด้วย <code>/exec</code>)</p>'
+    + '<p class="muted">หาได้ที่ ส่วนขยาย → Apps Script → การทำให้ใช้งานได้ → <b>จัดการการทำให้ใช้งานได้</b> → กด "คัดลอก" ใต้ URL</p>'
+    + '<input id="u" placeholder="https://script.google.com/macros/s/…/exec"><p><button class="btn" id="go" onclick="useUrl()">ตรวจสอบและสร้าง QR</button></p>'
+    + '<p id="err" style="display:none;color:#C93B46"></p>'
     + '<p class="muted">ยังไม่ได้ Deploy? ดูเมนู ❤️ ดันดี → 1) เริ่มต้นใช้งาน</p></div>'
     + '<div id="done" style="display:none" class="center">'
     + '<p>📱 <b>มือถือ:</b> เปิดกล้องสแกน QR แล้วแตะลิงก์</p><div id="qr"></div>'
@@ -134,10 +137,20 @@ function menuConnect() {
     + '<script>var D=' + data + ',LINK="";'
     + 'function make(u){LINK=D.app+"#setup="+encodeURIComponent(btoa(JSON.stringify({url:u,key:D.key})));'
     + 'try{var q=qrcode(0,"M");q.addData(LINK);q.make();document.getElementById("qr").innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true});}catch(e){document.getElementById("qr").textContent="(สร้าง QR ไม่ได้ ใช้ปุ่มคัดลอกลิงก์แทน)";}'
-    + 'document.getElementById("open").href=LINK;document.getElementById("ask").style.display="none";document.getElementById("done").style.display="block";}'
-    + 'function useUrl(){var u=document.getElementById("u").value.trim();if(!/^https:\\/\\/script\\.google\\.com\\/.+\\/exec$/.test(u)){alert("URL ต้องขึ้นต้นด้วย https://script.google.com/ และลงท้ายด้วย /exec");return;}make(u);}'
+    + 'document.getElementById("open").href=LINK;document.getElementById("chk").style.display="none";document.getElementById("ask").style.display="none";document.getElementById("done").style.display="block";}'
+    // ทดสอบ URL จริงก่อนสร้าง QR (Google บางครั้งคืน URL ที่ใช้ไม่ได้)
+    + 'function $(i){return document.getElementById(i)}'
+    + 'function verify(u,cb){try{fetch(u+"?action=ping&key="+encodeURIComponent(D.key)+"&t="+Date.now(),{credentials:"omit",cache:"no-store"})'
+    + '.then(function(r){return r.text()}).then(function(t){var ok=false;try{ok=JSON.parse(t).ok===true}catch(e){}cb(ok?"ok":(/<html/i.test(t)?"html":"bad"))})'
+    + '.catch(function(){cb("net")})}catch(e){cb("net")}}'
+    + 'function ask(msg){$("chk").style.display="none";$("ask").style.display="block";if(msg){$("err").textContent=msg;$("err").style.display="block"}}'
+    + 'var FORCE="";'
+    + 'function useUrl(){var u=$("u").value.trim();if(!/^https:\\/\\/script\\.google\\.com\\/.+\\/exec$/.test(u)){ask("URL ต้องขึ้นต้นด้วย https://script.google.com/ และลงท้ายด้วย /exec");return;}'
+    + 'if(FORCE===u){make(u);return;}$("go").disabled=true;$("go").textContent="กำลังตรวจสอบ…";'
+    + 'verify(u,function(r){$("go").disabled=false;$("go").textContent="ตรวจสอบและสร้าง QR";if(r==="ok"){make(u);return;}FORCE=u;'
+    + 'ask(r==="html"?"URL นี้ยังใช้ไม่ได้: ตรวจว่า Deploy แบบ ผู้ที่มีสิทธิ์เข้าถึง = ทุกคน แล้วลองใหม่ (หรือกดปุ่มอีกครั้งเพื่อใช้ URL นี้อยู่ดี)":"ตรวจสอบไม่ผ่าน ลองใหม่อีกครั้ง หรือกดปุ่มอีกครั้งเพื่อใช้ URL นี้อยู่ดี")})}'
     + 'function copy(){var t=document.createElement("textarea");t.value=LINK;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();alert("คัดลอกลิงก์แล้ว ส่งเข้ามือถือตัวเองได้เลย");}'
-    + 'if(D.url)make(D.url);else document.getElementById("ask").style.display="block";</script>',
+    + 'if(D.url){verify(D.url,function(r){if(r==="ok"){$("chk").style.display="none";make(D.url)}else ask("")})}else ask("");</script>',
     'ดันดี — เชื่อมกับแอป', 480);
 }
 

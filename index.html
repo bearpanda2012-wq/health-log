@@ -549,7 +549,11 @@ function fillSettings(){
 function setMsg(t, cls){ const m = $('#cfgMsg'); m.textContent = t; m.className = 'msg ' + (cls || ''); }
 
 $('#cfgSave').addEventListener('click', async () => {
-  const url = $('#cfgUrl').value.trim(), key = $('#cfgKey').value.trim();
+  const url = $('#cfgUrl').value.trim();
+  const rawKey = $('#cfgKey').value.trim();
+  const hex = rawKey.match(/[0-9a-f]{32}/i); // เผื่อคัดลอกข้อความทั้งบรรทัดจาก log มา
+  const key = hex ? hex[0] : rawKey;
+  $('#cfgKey').value = key;
   if (!/^https:\/\/script\.google(usercontent)?\.com\/.+\/exec/.test(url)) return setMsg('URL ต้องขึ้นต้นด้วย https://script.google.com/… และลงท้ายด้วย /exec', 'bad');
   if (!key) return setMsg('ใส่รหัสลับด้วยครับ', 'bad');
   const b = $('#cfgSave'); b.disabled = true; setMsg('กำลังทดสอบ…');

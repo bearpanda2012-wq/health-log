@@ -364,6 +364,7 @@ nav button.on svg{stroke-width:2.4}
           <select class="medtm" aria-label="ช่วงเวลากินยามื้อกลางวัน"><option>ก่อนอาหาร</option><option selected>หลังอาหาร</option></select></div>
         <div class="medrow"><label class="check"><input type="checkbox" class="medck" value="เย็น"> เย็น</label>
           <select class="medtm" aria-label="ช่วงเวลากินยามื้อเย็น"><option>ก่อนอาหาร</option><option selected>หลังอาหาร</option></select></div>
+        <div class="medrow"><label class="check"><input type="checkbox" class="medck" value="ก่อนนอน"> ก่อนนอน</label><span class="muted" style="font-size:13px;padding-right:6px">🌙</span></div>
         <div class="medname"><label class="f" for="medName">ชื่อยา (ไม่บังคับ)</label>
           <input id="medName" type="text" list="medNames" maxlength="200" autocomplete="off" placeholder="เช่น อัมโลดิพีน 5 มก., เมทฟอร์มิน">
           <datalist id="medNames"></datalist>
@@ -550,7 +551,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 30 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 31 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -776,7 +777,7 @@ function updateSugar(){
 const medRows = () => [...document.querySelectorAll('.medrow')];
 function collectMed(){
   const v = medRows().filter(r => r.querySelector('.medck').checked)
-    .map(r => r.querySelector('.medck').value + ' ' + r.querySelector('.medtm').value);
+    .map(r => { const t = r.querySelector('.medtm'); return r.querySelector('.medck').value + (t ? ' ' + t.value : ''); });
   if (!v.length) return null;
   const name = $('#medName').value.trim().replace(/\s+/g, ' ');
   return name ? v.join(', ') + ' · ' + name : v.join(', ');
@@ -792,13 +793,13 @@ $('#medName').value = store.get('hl_medname') || '';
 renderMedNames();
 function syncMedChip(){
   const b = $('#qMed'), open = !$('#p-med').hidden, n = medRows().filter(r => r.querySelector('.medck').checked).length;
-  medRows().forEach(r => r.querySelector('.medtm').disabled = !r.querySelector('.medck').checked);
+  medRows().forEach(r => { const t = r.querySelector('.medtm'); if (t) t.disabled = !r.querySelector('.medck').checked; });
   b.classList.toggle('on', open || n > 0);
   b.textContent = open ? '− กินยา' : n ? '✓ กินยา' : '+ กินยา';
 }
-function saveMedPrefs(){ store.set('hl_medtm', JSON.stringify(medRows().map(r => r.querySelector('.medtm').value))); }
-try { JSON.parse(store.get('hl_medtm') || '[]').forEach((v, i) => { const r = medRows()[i]; if (r && v) r.querySelector('.medtm').value = v; }); } catch(e){}
-medRows().forEach(r => { r.querySelector('.medck').addEventListener('change', syncMedChip); r.querySelector('.medtm').addEventListener('change', saveMedPrefs); });
+function saveMedPrefs(){ store.set('hl_medtm', JSON.stringify(medRows().map(r => { const t = r.querySelector('.medtm'); return t ? t.value : ''; }))); }
+try { JSON.parse(store.get('hl_medtm') || '[]').forEach((v, i) => { const r = medRows()[i]; const t = r && r.querySelector('.medtm'); if (t && v) t.value = v; }); } catch(e){}
+medRows().forEach(r => { r.querySelector('.medck').addEventListener('change', syncMedChip); const t = r.querySelector('.medtm'); if (t) t.addEventListener('change', saveMedPrefs); });
 
 document.querySelectorAll('.qchip').forEach(b => b.addEventListener('click', () => {
   const q = b.dataset.q;
@@ -1230,7 +1231,7 @@ function startEdit(id){
     const [meals, ...nm] = String(r.med).split(' · ');
     meals.split(',').map(x => x.trim()).forEach(m => {
       const [meal, ...tm] = m.split(' '); const row = medRows().find(x => x.querySelector('.medck').value === meal);
-      if (row) { row.querySelector('.medck').checked = true; if (tm.length) row.querySelector('.medtm').value = tm.join(' '); }
+      if (row) { row.querySelector('.medck').checked = true; const t = row.querySelector('.medtm'); if (t && tm.length) t.value = tm.join(' '); }
     });
     $('#medName').value = nm.join(' · ');
     openPanel('med');

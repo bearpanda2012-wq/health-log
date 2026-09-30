@@ -551,7 +551,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 31 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 32 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -865,6 +865,25 @@ $('#form').addEventListener('submit', async e => {
       records = records.filter(x => x.id !== editingId);
       records.unshift(Object.assign({}, r, { id: res.id || editingId, med: r.med || null }, res.queued ? { pending: true } : {}));
       sortRecords(); endEdit(); renderAll(); toast('แก้ไขแล้ว ✓'); goTab('history');
+      return;
+    }
+    if (isLive()) {
+      // บันทึกแบบไม่ต้องรอ: ขึ้นในรายการทันที แล้วส่งเข้าชีตตามหลัง
+      const rec = Object.assign({}, r, { id: 't' + Date.now(), med: r.med || null, pending: true });
+      records.unshift(rec); sortRecords();
+      if (r.arm) store.set('hl_prefs', JSON.stringify({ arm: r.arm, posture: r.posture }));
+      resetForm(); renderAll(); toast('บันทึกแล้ว ✓');
+      api('addRecord', r).then(res => {
+        rec.id = res.id; if (!res.queued) delete rec.pending;
+        if (res.queued) { toast('ไม่มีเน็ต — เก็บไว้ในเครื่องแล้ว จะส่งเข้าชีตเองเมื่อมีเน็ต'); updateOffBar(); updateStatus(); }
+        renderAll();
+      }).catch(e => {
+        records = records.filter(x => x !== rec); renderAll();
+        ['sys','dia','pulse','weight','sugar','temp','spo2','sleep'].forEach(k => { if (has(r[k])) $('#' + k).value = r[k]; });
+        if (r.note) $('#note').value = r.note;
+        updateLive(); updateSugar(); goTab('add');
+        toast('ส่งเข้าชีตไม่สำเร็จ ค่ายังอยู่ในฟอร์ม ลองกดบันทึกอีกครั้ง (' + (e && e.message || e) + ')');
+      });
       return;
     }
     const res = await api('addRecord', r);
@@ -1251,7 +1270,7 @@ function endEdit(){
   resetForm();
 }
 $('#editCancel').addEventListener('click', () => { endEdit(); goTab('history'); });
-function onEdit(e){ const b = e.target.closest('.edit'); if (b) startEdit(b.dataset.id); }
+function onEdit(e){ const b = e.target.closest('.edit'); if (!b) return; if (/^t\d/.test(b.dataset.id)) return toast('กำลังส่งเข้าชีต รอสักครู่แล้วลองใหม่'); startEdit(b.dataset.id); }
 $('#list').addEventListener('click', onEdit);
 $('#calDayList').addEventListener('click', onEdit);
 
@@ -1264,6 +1283,7 @@ async function onDelete(e){
   }
   clearTimeout(b._t);
   const id = b.dataset.id;
+  if (/^t\d/.test(id)) { b.classList.remove('confirm'); b.textContent = 'ลบ'; return toast('กำลังส่งเข้าชีต รอสักครู่แล้วลองใหม่'); }
   b.disabled = true; b.textContent = 'กำลังลบ…';
   try {
     if (!id || id === 'undefined' || id === 'null') throw new Error('no_id');
@@ -1533,14 +1553,18 @@ async function loadRecords(){
   const st = $('#status'), live = isLive();
   setStatus('load', 'กำลังโหลด…');
   $('#demoBanner').hidden = live;
+  // แสดงข้อมูลที่เก็บไว้ในเครื่องทันที แล้วค่อยอัปเดตจากชีตตามหลัง
+  let shown = false;
+  if (live) { const c = cacheRecs.get(); if (c.length || queue.get().length) { records = withQueued(c); sortRecords(); renderAll(); shown = true; } }
   try {
-    records = (await api('getRecords')) || [];
+    const fresh = (await api('getRecords')) || [];
+    records = fresh.concat(records.filter(x => /^t\d/.test(x.id))); // เก็บรายการที่กำลังส่งไว้
     sortRecords(); renderAll();
     lastError = '';
     updateStatus(); updateOffBar();
     if (live && online) flushQueue();
   } catch(e) {
-    records = []; renderAll();
+    if (!shown) { records = []; renderAll(); }
     lastError = e.message;
     setStatus('err', 'เชื่อมต่อไม่ได้ — แตะเพื่อดูวิธีแก้');
     toast('โหลดข้อมูลไม่ได้: ' + e.message);

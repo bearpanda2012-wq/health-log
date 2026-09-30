@@ -127,7 +127,7 @@ details[open] summary{margin-bottom:12px}
 .chips input:checked+label{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
 .check{display:flex;align-items:center;gap:10px;font-size:15px;cursor:pointer}
 .check input{width:20px;height:20px;accent-color:var(--accent)}
-.bp input.flash{animation:flash 1.6s ease}
+.bp input.flash,#sugar.flash{animation:flash 1.6s ease}
 @keyframes flash{0%,40%{box-shadow:0 0 0 4px color-mix(in srgb,var(--good) 45%,transparent);border-color:var(--good)}100%{box-shadow:none}}
 .scanbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font:inherit;font-weight:700;font-size:15.5px;color:var(--accent);background:var(--card);border:1.5px dashed var(--accent);border-radius:14px;padding:11px;margin:0 0 14px;cursor:pointer;min-height:48px}
 .scanbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
@@ -321,7 +321,7 @@ nav button.on svg{stroke-width:2.4}
         <span class="rec-title">จดค่าใหม่</span>
         <input id="datetime" class="when" type="datetime-local" aria-label="วันเวลาที่วัด">
       </div>
-      <button type="button" class="scanbtn" id="scanBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.5"/></svg>อ่านค่าจากรูปเครื่องวัด</button>
+      <button type="button" class="scanbtn" id="scanBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.5"/></svg>อ่านค่าจากรูป (ความดัน / น้ำตาล)</button>
       <input type="file" id="scanFile" accept="image/*" hidden>
       <div class="bp">
         <label for="sys">ตัวบน<input id="sys" type="number" inputmode="numeric" placeholder="120"></label>
@@ -550,7 +550,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 29 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 30 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -1184,6 +1184,15 @@ async function scanRun(file){
   const c = ok ? bpClass(res.sys, res.dia) : null;
   $('#scanVal').innerHTML = (has(res.sys) || has(res.dia))
     ? `${has(res.sys) ? res.sys : '–'}/${has(res.dia) ? res.dia : '–'}<small>${has(res.pulse) ? 'ชีพจร ' + res.pulse : 'อ่านชีพจรไม่ได้'}</small>` : '–';
+  if (res.device === 'glucose' && has(res.glucose)) {
+    const gOk = res.glucose >= 10 && res.glucose <= 800;
+    $('#sugar').value = res.glucose; $('#datetime').value = localInput(when);
+    openPanel('sugar'); updateSugar(); scanClose();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => { const el = $('#sugar'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }, 250);
+    toast(gOk && res.sure ? `ใส่ค่าน้ำตาล ${res.glucose} ให้แล้ว ✓ เลือก "ช่วงที่วัด" แล้วกดบันทึก` : 'ใส่ค่าน้ำตาลให้แล้ว แต่อ่านไม่ชัด โปรดตรวจก่อนบันทึก');
+    return;
+  }
   if (!has(res.sys) && !has(res.dia) && !has(res.pulse)) {
     $('#scanTitle').textContent = 'อ่านตัวเลขไม่ได้';
     $('#scanSub').textContent = 'ลองถ่ายใหม่ให้ตรงและไม่มีแสงสะท้อน';

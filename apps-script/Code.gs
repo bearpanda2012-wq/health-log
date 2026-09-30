@@ -265,11 +265,12 @@ function errMsg_(txt) {
   try { return String(JSON.parse(txt).error.message || '').slice(0, 160); } catch (e) { return String(txt || '').slice(0, 120); }
 }
 
-const OCR_PROMPT = 'This is a photo of a home blood pressure monitor display (seven-segment LCD). '
-  + 'Read the systolic (SYS, top, largest), diastolic (DIA, middle) and pulse (PUL, bottom, smallest) numbers. '
-  + 'Ignore faint unlit segments. If a date or time is shown on the display, read it too. '
-  + 'Answer JSON only: {"sys":int|null,"dia":int|null,"pulse":int|null,"date":"YYYY-MM-DD"|null,"time":"HH:MM"|null,"sure":true|false}. '
-  + 'Use null for anything you cannot read clearly. sure=false if the image is not a BP monitor or any digit is uncertain.';
+const OCR_PROMPT = 'This photo shows the display of a home medical device: either a blood pressure monitor '
+  + '(SYS top/largest, DIA middle, PULSE bottom/smallest) or a blood glucose meter (one large number with mg/dL or mmol/L, e.g. Accu-Chek). '
+  + 'Read the lit digits only; ignore faint unlit segments. If a date or time is shown on the display, read it too. '
+  + 'Answer JSON only: {"device":"bp"|"glucose"|"other","sys":int|null,"dia":int|null,"pulse":int|null,'
+  + '"glucose":number|null,"unit":"mg/dL"|"mmol/L"|null,"date":"YYYY-MM-DD"|null,"time":"HH:MM"|null,"sure":true|false}. '
+  + 'Use null for anything you cannot read clearly. sure=false if any digit is uncertain or the device is not one of these.';
 
 function ocrImage_(p) {
   const key = PropertiesService.getScriptProperties().getProperty('GEMINI_KEY');
@@ -279,7 +280,13 @@ function ocrImage_(p) {
   const r = gemini_(key, b64, p.mime || 'image/jpeg', OCR_PROMPT);
   if (!r.ok) return r;
   const d = r.data || {}, n = function (v) { v = Number(v); return isFinite(v) && v > 0 ? Math.round(v) : null; };
-  return { ok: true, sys: n(d.sys), dia: n(d.dia), pulse: n(d.pulse),
+  let glu = Number(d.glucose);
+  if (!isFinite(glu) || glu <= 0) glu = null;
+  else if (d.unit === 'mmol/L' || glu < 35) glu = Math.round(glu * 18); // แปลง mmol/L → mg/dL
+  else glu = Math.round(glu);
+  const dev = d.device === 'glucose' || (glu && !d.sys && !d.dia) ? 'glucose' : d.device === 'bp' ? 'bp' : (d.sys || d.dia ? 'bp' : 'other');
+  return { ok: true, device: dev, glucose: dev === 'glucose' ? glu : null,
+    sys: dev === 'bp' ? n(d.sys) : null, dia: dev === 'bp' ? n(d.dia) : null, pulse: dev === 'bp' ? n(d.pulse) : null,
     date: /^\d{4}-\d{2}-\d{2}$/.test(d.date || '') ? d.date : null,
     time: /^\d{1,2}:\d{2}$/.test(d.time || '') ? d.time : null, sure: d.sure !== false };
 }

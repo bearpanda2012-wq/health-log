@@ -291,6 +291,74 @@ function ocrImage_(p) {
     time: /^\d{1,2}:\d{2}$/.test(d.time || '') ? d.time : null, sure: d.sure !== false };
 }
 
+/* ================= ยาของฉัน (รูปยา + ชื่อ + วิธีกิน) ================= */
+
+const MEDS_SHEET = 'ยาของฉัน';
+const MED_HEADERS = ['id', 'ชื่อยา', 'วิธีกิน / หมายเหตุ', 'รูป', 'เพิ่มเมื่อ'];
+
+function medSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(MEDS_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(MEDS_SHEET);
+    sh.appendRow(MED_HEADERS);
+    sh.setFrozenRows(1);
+    sh.getRange(1, 1, 1, MED_HEADERS.length).setFontWeight('bold').setBackground('#DDF3EE');
+    sh.hideColumns(1); sh.setColumnWidth(4, 80);
+  }
+  return sh;
+}
+
+function getMeds_() {
+  const sh = medSheet_(), n = sh.getLastRow() - 1;
+  if (n <= 0) return [];
+  return sh.getRange(2, 1, n, 5).getValues().filter(function (r) { return r[0]; }).map(function (r) {
+    return { id: r[0], name: String(r[1] || ''), note: String(r[2] || ''), photo: String(r[3] || ''),
+      createdAt: r[4] instanceof Date ? r[4].toISOString() : r[4] };
+  });
+}
+
+function addMed_(m) {
+  const name = clean_({ v: m.name }, 'v'), note = clean_({ v: m.note }, 'v');
+  let photo = String(m.photo || '');
+  if (photo && (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(photo) || photo.length > 49000)) return { ok: false, error: 'bad_image' };
+  if (!name && !photo) return { ok: false, error: 'empty' };
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try {
+    const id = Utilities.getUuid();
+    medSheet_().appendRow([id, name, note, photo, new Date()]);
+    return { ok: true, id: id };
+  } finally { lock.releaseLock(); }
+}
+
+function deleteMed_(id) {
+  if (!id) return { ok: false, error: 'no_id' };
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try {
+    const sh = medSheet_(), n = sh.getLastRow() - 1;
+    if (n <= 0) return { ok: false, error: 'not_found' };
+    const ids = sh.getRange(2, 1, n, 1).getValues();
+    for (let i = 0; i < ids.length; i++) if (ids[i][0] === id) { sh.deleteRow(i + 2); return { ok: true }; }
+    return { ok: false, error: 'not_found' };
+  } finally { lock.releaseLock(); }
+}
+
+const MED_PROMPT = 'This is a photo of a medicine package, blister pack, bottle or a pharmacy label (may be in Thai or English). '
+  + 'Extract the drug name (generic and/or brand) with strength, and the dosing instructions if printed. '
+  + 'Answer JSON only: {"name":string|null,"note":string|null}. Write "name" like "Amlodipine 5 mg" or the Thai name as printed. '
+  + 'Write "note" in short Thai (e.g. "ครั้งละ 1 เม็ด วันละ 1 ครั้ง หลังอาหารเช้า"). Use null if not readable.';
+
+function medOcr_(p) {
+  const key = PropertiesService.getScriptProperties().getProperty('GEMINI_KEY');
+  if (!key) return { ok: false, error: 'ocr_off' };
+  const b64 = String(p.image || '');
+  if (!b64 || b64.length > 4e6) return { ok: false, error: 'bad_image' };
+  const r = gemini_(key, b64, p.mime || 'image/jpeg', MED_PROMPT);
+  if (!r.ok) return r;
+  const d = r.data || {};
+  return { ok: true, name: d.name ? String(d.name).slice(0, 120) : null, note: d.note ? String(d.note).slice(0, 300) : null };
+}
+
 /* ================= API ================= */
 
 function doGet(e) {
@@ -318,6 +386,10 @@ function handle_(action, p) {
       case 'add':    return json_(addRecord(p.record || {}));
       case 'delete': return json_(deleteRecord(p.id));
       case 'update': return json_(updateRecord(p.id, p.record || {}));
+      case 'meds':   return json_({ ok: true, meds: getMeds_() });
+      case 'medAdd': return json_(addMed_(p.med || {}));
+      case 'medDel': return json_(deleteMed_(p.id));
+      case 'medOcr': return json_(medOcr_(p));
       default:       return json_({ ok: false, error: 'unknown_action' });
     }
   } catch (err) {

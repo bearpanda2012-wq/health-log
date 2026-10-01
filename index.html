@@ -129,6 +129,23 @@ details[open] summary{margin-bottom:12px}
 .check input{width:20px;height:20px;accent-color:var(--accent)}
 .bp input.flash,#sugar.flash{animation:flash 1.6s ease}
 @keyframes flash{0%,40%{box-shadow:0 0 0 4px color-mix(in srgb,var(--good) 45%,transparent);border-color:var(--good)}100%{box-shadow:none}}
+.mymeds{margin:2px 0 6px;padding-top:10px;border-top:1px dashed var(--line)}
+.mmhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.mmadd{font:inherit;font-size:13.5px;font-weight:700;color:var(--accent);background:var(--card);border:1.5px dashed var(--accent);border-radius:10px;padding:6px 10px;cursor:pointer;min-height:36px}
+.mmlist{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
+.mmlist:empty::after{content:"ยังไม่มีรูปยา กด “📷 เพิ่มยา” เพื่อเริ่ม";font-size:13px;color:var(--muted);padding:6px 0}
+.mmcard{position:relative;flex:0 0 92px;scroll-snap-align:start;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:6px;cursor:pointer;text-align:center;font:inherit;color:var(--ink)}
+.mmcard.on{border-color:var(--good);box-shadow:0 0 0 2px color-mix(in srgb,var(--good) 30%,transparent)}
+.mmcard img,.mmcard .ph{display:block;width:78px;height:62px;object-fit:cover;border-radius:9px;background:var(--line);font-size:26px;line-height:62px}
+.mmcard b{display:block;font-size:12px;line-height:1.3;margin-top:4px;max-height:2.6em;overflow:hidden;font-weight:600}
+.mmcard .ck{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:99px;background:var(--good);color:#fff;font-size:12px;line-height:20px;display:none}
+.mmcard.on .ck{display:block}
+.mmcard .info{position:absolute;top:2px;right:2px;width:24px;height:24px;border-radius:99px;background:rgba(0,0,0,.45);color:#fff;font-size:13px;line-height:24px;border:0;padding:0;cursor:pointer}
+.mmcard.pend{opacity:.6}
+.mdbox{text-align:left}
+.mdphoto{display:grid;place-items:center;min-height:150px;border:2px dashed var(--line);border-radius:14px;margin:10px 0;cursor:pointer;overflow:hidden;background:var(--field);color:var(--muted);font-weight:600;font-size:14px;text-align:center;padding:8px}
+.mdphoto img{max-width:100%;max-height:30vh;border-radius:10px;margin:0}
+.mdai{font-size:13px;color:var(--muted);min-height:18px;margin-bottom:6px}
 .scanbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font:inherit;font-weight:700;font-size:15.5px;color:var(--accent);background:var(--card);border:1.5px dashed var(--accent);border-radius:14px;padding:11px;margin:0 0 14px;cursor:pointer;min-height:48px}
 .scanbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
 .scanbg{position:fixed;inset:0;z-index:60;background:rgba(10,10,15,.55);display:grid;place-items:center;padding:16px}
@@ -365,6 +382,11 @@ nav button.on svg{stroke-width:2.4}
         <div class="medrow"><label class="check"><input type="checkbox" class="medck" value="เย็น"> เย็น</label>
           <select class="medtm" aria-label="ช่วงเวลากินยามื้อเย็น"><option>ก่อนอาหาร</option><option selected>หลังอาหาร</option></select></div>
         <div class="medrow"><label class="check"><input type="checkbox" class="medck" value="ก่อนนอน"> ก่อนนอน</label><span class="muted" style="font-size:13px;padding-right:6px">🌙</span></div>
+        <div class="mymeds">
+          <div class="mmhead"><span class="f" style="margin:0">ยาของฉัน <span class="muted" style="font-weight:400">· แตะเพื่อใส่ชื่อ</span></span>
+            <button type="button" class="mmadd" id="medAddBtn">📷 เพิ่มยา</button></div>
+          <div class="mmlist" id="mmList"></div>
+        </div>
         <div class="medname"><label class="f" for="medName">ชื่อยา (ไม่บังคับ)</label>
           <input id="medName" type="text" list="medNames" maxlength="200" autocomplete="off" placeholder="เช่น อัมโลดิพีน 5 มก., เมทฟอร์มิน">
           <datalist id="medNames"></datalist>
@@ -551,7 +573,7 @@ nav button.on svg{stroke-width:2.4}
       <p class="muted">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ CSV (เปิดใน Excel ได้)</p>
       <div class="btnrow"><button class="btn2" type="button" id="exportCsv">ดาวน์โหลด CSV</button></div>
     </div>
-    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 32 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
+    <p class="muted" style="text-align:center">ดันดี · เวอร์ชัน 33 · <a href="landing.html" style="color:inherit">เกี่ยวกับ</a></p>
   </section>
 </main>
 
@@ -575,6 +597,27 @@ nav button.on svg{stroke-width:2.4}
     </div>
   </div>
 </div>
+<div class="scanbg" id="medDlg" hidden role="dialog" aria-modal="true" aria-labelledby="medDlgTitle">
+  <div class="scanbox mdbox">
+    <div class="scantitle" id="medDlgTitle" style="font-size:16px;color:var(--ink)">เพิ่มยาของฉัน</div>
+    <label class="mdphoto" id="mdPhotoLbl"><img id="mdImg" alt="" hidden><span id="mdPhTxt">📷 แตะเพื่อถ่ายรูปยา / เลือกรูป</span>
+      <input type="file" id="mdFile" accept="image/*" hidden></label>
+    <div class="mdai" id="mdAi"></div>
+    <label class="f" for="mdName" style="text-align:left">ชื่อยา</label>
+    <input id="mdName" type="text" maxlength="120" placeholder="เช่น อัมโลดิพีน 5 มก.">
+    <label class="f" for="mdNote" style="text-align:left;margin-top:8px">วิธีกิน / หมายเหตุ</label>
+    <input id="mdNote" type="text" maxlength="300" placeholder="เช่น 1 เม็ด หลังอาหารเช้า">
+    <div class="scanbtns"><button type="button" class="btn2" id="mdCancel">ยกเลิก</button><button type="button" class="btn" id="mdSave">บันทึกยา</button></div>
+  </div>
+</div>
+<div class="scanbg" id="medView" hidden role="dialog" aria-modal="true" aria-labelledby="mvName">
+  <div class="scanbox">
+    <img id="mvImg" alt="">
+    <div class="scanval" id="mvName" style="font-size:24px"></div>
+    <div class="scansub" id="mvNote"></div>
+    <div class="scanbtns"><button type="button" class="btn2" id="mvDel">ลบยานี้</button><button type="button" class="btn" id="mvClose">ปิด</button></div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -593,6 +636,10 @@ const demo = {
     this.load().push(Object.assign({}, r, { id, med: r.med || null, createdAt: new Date().toISOString() })); this.save(); return { ok:true, id }; },
   updateRecord(a){ const d = this.load(); const i = d.findIndex(x => x.id === a.id); if (i < 0) return { ok:false, error:'not_found' };
     d[i] = Object.assign({}, a.record, { id: a.id, med: a.record.med || null, createdAt: d[i].createdAt }); this.save(); return { ok:true, id: a.id }; },
+  meds(){ try { return JSON.parse(localStorage.getItem('hl_mymeds') || '[]'); } catch(e){ return []; } },
+  medAdd(m){ const l = this.meds(); const id = 'm' + Date.now(); l.push(Object.assign({ id }, m)); try { localStorage.setItem('hl_mymeds', JSON.stringify(l)); } catch(e){ return { ok:false, error:'storage_full' }; } return { ok:true, id }; },
+  medDel(id){ try { localStorage.setItem('hl_mymeds', JSON.stringify(this.meds().filter(x => x.id !== id))); } catch(e){} return { ok:true }; },
+  medOcr(){ return { ok:false, error:'ocr_off' }; },
   deleteRecord(id){ const d = this.load(); const i = d.findIndex(x => x.id === id); if (i >= 0) d.splice(i,1); this.save(); return { ok: i >= 0 }; }
 };
 /* ---------- การตั้งค่าการเชื่อมต่อ (เก็บในเครื่องนี้) ---------- */
@@ -667,6 +714,10 @@ async function api(fn, arg){
     catch(e) { if (!e.net) throw e; online = false; return { ok: true, id: queue.add(arg), queued: true }; }
   }
   if (fn === 'ocr') return remote(cfg, 'ocr', arg);
+  if (fn === 'meds') return (await remote(cfg, 'meds')).meds;
+  if (fn === 'medAdd') return remote(cfg, 'medAdd', { med: arg });
+  if (fn === 'medDel') return remote(cfg, 'medDel', { id: arg });
+  if (fn === 'medOcr') return remote(cfg, 'medOcr', arg);
   if (fn === 'deleteRecord') {
     if (String(arg).startsWith('q')) { queue.set(queue.get().filter(x => x.qid !== arg)); return { ok: true }; }
     return remote(cfg, 'delete', { id: arg });
@@ -1226,6 +1277,102 @@ async function scanRun(file){
   toast(ok && res.sure ? 'ใส่ค่าให้แล้ว ✓ ตรวจแล้วกดบันทึก' : 'ใส่ค่าให้แล้ว แต่บางตัวอ่านไม่ชัด โปรดตรวจก่อนบันทึก');
 }
 
+/* ---------- ยาของฉัน: รูปยา + ชื่อ ---------- */
+let myMeds = (() => { try { return JSON.parse(store.get('hl_medscache') || '[]'); } catch(e){ return []; } })();
+function medNamesInField(){ return $('#medName').value.split(/\s*,\s*/).map(x => x.trim()).filter(Boolean); }
+function renderMyMeds(){
+  const sel = medNamesInField();
+  $('#mmList').innerHTML = myMeds.map(m => `<div class="mmcard${sel.includes(m.name) ? ' on' : ''}${m.pending ? ' pend' : ''}" role="button" tabindex="0" data-id="${esc(m.id)}" aria-label="${esc(m.name || 'ยา')}">
+    <span class="ck">✓</span><button type="button" class="info" aria-label="ดูรายละเอียด ${esc(m.name)}">i</button>
+    ${m.photo ? `<img src="${esc(m.photo)}" alt="">` : '<span class="ph">💊</span>'}<b>${esc(m.name || 'ไม่มีชื่อ')}</b></div>`).join('');
+}
+async function loadMyMeds(){
+  try { const l = await api('meds'); myMeds = l || []; store.set('hl_medscache', JSON.stringify(myMeds)); renderMyMeds(); }
+  catch(e) { if (!/เวอร์ชันสคริปต์ไม่ตรง/.test(String(e && e.message))) console.warn(e); }
+}
+$('#mmList').addEventListener('click', e => {
+  const card = e.target.closest('.mmcard'); if (!card) return;
+  const m = myMeds.find(x => x.id === card.dataset.id); if (!m) return;
+  if (e.target.closest('.info')) return openMedView(m);
+  if (!m.name) return openMedView(m);
+  let names = medNamesInField();
+  names = names.includes(m.name) ? names.filter(n => n !== m.name) : names.concat(m.name);
+  $('#medName').value = names.join(', ');
+  renderMyMeds();
+  if (names.includes(m.name) && !medRows().some(r => r.querySelector('.medck').checked)) toast('ติ๊กมื้อที่กินด้วยนะครับ');
+});
+$('#medName').addEventListener('input', renderMyMeds);
+function openMedView(m){
+  $('#mvImg').src = m.photo || ''; $('#mvImg').hidden = !m.photo;
+  $('#mvName').textContent = m.name || 'ไม่มีชื่อ'; $('#mvNote').textContent = m.note || '';
+  $('#mvDel').dataset.id = m.id; $('#mvDel').textContent = 'ลบยานี้'; $('#mvDel').classList.remove('confirm');
+  $('#medView').hidden = false;
+}
+$('#mvClose').addEventListener('click', () => { $('#medView').hidden = true; });
+$('#mvDel').addEventListener('click', async () => {
+  const b = $('#mvDel');
+  if (!b.classList.contains('confirm')) { b.classList.add('confirm'); b.textContent = 'ยืนยันลบ?'; return; }
+  const id = b.dataset.id;
+  try { if (!/^tm/.test(id)) await api('medDel', id); myMeds = myMeds.filter(x => x.id !== id); store.set('hl_medscache', JSON.stringify(myMeds)); renderMyMeds(); $('#medView').hidden = true; toast('ลบยาแล้ว'); }
+  catch(e) { toast('ลบไม่สำเร็จ: ' + e.message); }
+});
+// เพิ่มยา
+async function makeThumb(file){
+  // ย่อรูปให้เก็บในช่องชีตได้ (ไม่เกิน ~45,000 ตัวอักษร)
+  let src; try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch(e) { src = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = URL.createObjectURL(file); }); }
+  let size = 520, q = 0.72, url = '';
+  for (let i = 0; i < 8; i++) {
+    const k = Math.min(1, size / Math.max(src.width, src.height));
+    const c = document.createElement('canvas'); c.width = Math.round(src.width * k); c.height = Math.round(src.height * k);
+    c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+    url = c.toDataURL('image/jpeg', q);
+    if (url.length <= 45000) return url;
+    size = Math.round(size * 0.82); q = Math.max(0.45, q - 0.06);
+  }
+  return url.length <= 48000 ? url : '';
+}
+let mdPhoto = '', mdFileObj = null;
+$('#medAddBtn').addEventListener('click', () => {
+  mdPhoto = ''; mdFileObj = null; $('#mdImg').hidden = true; $('#mdImg').src = ''; $('#mdPhTxt').hidden = false;
+  $('#mdName').value = ''; $('#mdNote').value = ''; $('#mdAi').textContent = ''; $('#mdFile').value = '';
+  $('#medDlg').hidden = false;
+});
+$('#mdCancel').addEventListener('click', () => { $('#medDlg').hidden = true; });
+$('#mdFile').addEventListener('change', async () => {
+  const f = $('#mdFile').files[0]; if (!f) return; mdFileObj = f;
+  try { mdPhoto = await makeThumb(f); } catch(e) { mdPhoto = ''; }
+  if (!mdPhoto) return toast('ใช้รูปนี้ไม่ได้ ลองรูปอื่น');
+  $('#mdImg').src = mdPhoto; $('#mdImg').hidden = false; $('#mdPhTxt').hidden = true;
+  if (!isLive() || navigator.onLine === false) return;
+  $('#mdAi').textContent = '⏳ AI กำลังอ่านชื่อยาจากฉลาก…';
+  try {
+    const big = await shrinkImage(f);
+    const r = await api('medOcr', { image: big.split(',')[1], mime: 'image/jpeg' });
+    if ($('#medDlg').hidden) return;
+    if (r.name && !$('#mdName').value.trim()) $('#mdName').value = r.name;
+    if (r.note && !$('#mdNote').value.trim()) $('#mdNote').value = r.note;
+    $('#mdAi').textContent = r.name ? '✓ AI ใส่ชื่อให้แล้ว ตรวจ/แก้ได้' : 'AI อ่านชื่อไม่ได้ พิมพ์เองได้เลย';
+  } catch(e) {
+    $('#mdAi').textContent = /ยังไม่ได้เปิดอ่านค่าจากรูป/.test(e.message) ? 'พิมพ์ชื่อยาเองได้เลย (เปิด AI อ่านฉลากได้ที่ชีต เมนู 3)' : 'AI อ่านไม่ได้ตอนนี้ พิมพ์เองได้เลย';
+  }
+});
+$('#mdSave').addEventListener('click', async () => {
+  const m = { name: $('#mdName').value.trim().replace(/\s+/g, ' '), note: $('#mdNote').value.trim(), photo: mdPhoto };
+  if (!m.name && !m.photo) return toast('ใส่รูปหรือชื่อยาอย่างน้อย 1 อย่าง');
+  const tmp = Object.assign({ id: 'tm' + Date.now(), pending: true }, m);
+  myMeds.push(tmp); renderMyMeds(); $('#medDlg').hidden = true; toast('เพิ่มยาแล้ว ✓');
+  try {
+    const r = await api('medAdd', m);
+    if (r && r.ok === false) throw new Error(ERR_TH[r.error] || r.error);
+    tmp.id = r.id; delete tmp.pending; store.set('hl_medscache', JSON.stringify(myMeds.filter(x => !x.pending))); renderMyMeds();
+  } catch(e) {
+    myMeds = myMeds.filter(x => x !== tmp); renderMyMeds();
+    toast(/เวอร์ชันสคริปต์ไม่ตรง/.test(e.message) ? 'ต้องอัปเดตโค้ดในชีตก่อน ถึงจะเก็บรูปยาได้' : 'เพิ่มยาไม่สำเร็จ: ' + e.message);
+  }
+});
+renderMyMeds();
+
 /* ---------- แก้ไขรายการ ---------- */
 let editingId = null, editingOrig = null;
 function openPanel(q){
@@ -1563,6 +1710,7 @@ async function loadRecords(){
     lastError = '';
     updateStatus(); updateOffBar();
     if (live && online) flushQueue();
+    loadMyMeds();
   } catch(e) {
     if (!shown) { records = []; renderAll(); }
     lastError = e.message;

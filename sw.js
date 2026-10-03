@@ -2,7 +2,7 @@
    - หน้าแอป (index.html ฯลฯ): ลองเน็ตก่อน ไม่มีเน็ตใช้ของที่เก็บไว้
    - ไลบรารี/ฟอนต์จาก CDN: ใช้ของที่เก็บไว้ก่อน
    - Google Apps Script (ข้อมูลสุขภาพ): ไม่เก็บเลย */
-const CACHE = 'dundee-v1';
+const CACHE = 'dundee-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js'];
 

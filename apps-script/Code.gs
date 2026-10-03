@@ -73,16 +73,92 @@ function onOpen() {
     .addItem('1) เริ่มต้นใช้งาน', 'menuStart')
     .addItem('2) เชื่อมกับแอป (QR / ลิงก์)', 'menuConnect')
     .addItem('3) เปิดอ่านค่าจากรูป (AI)', 'menuOcr')
+    .addItem('🔄 อัปเดตแอป (หลังวางโค้ดใหม่)', 'menuUpdate')
     .addSeparator()
     .addItem('เปลี่ยนรหัสลับใหม่', 'menuResetKey')
     .addToUi();
 }
 
 function webAppUrl_() {
+  const saved = PropertiesService.getScriptProperties().getProperty('WEBAPP_URL');
+  if (saved) return saved;
   try {
     const u = ScriptApp.getService().getUrl();
     return u && /\/exec$/.test(u) ? u : '';
   } catch (e) { return ''; }
+}
+
+/* ===== Deploy อัตโนมัติผ่าน Apps Script API (ไม่ต้องกด Deploy เอง) =====
+   ต้องมีไฟล์ appsscript.json (มี webapp + scope script.projects/deployments)
+   และผู้ใช้ต้องเปิดสวิตช์ "Google Apps Script API" ที่ script.google.com/home/usersettings ครั้งเดียว */
+function scriptApi_(method, path, body) {
+  const res = UrlFetchApp.fetch('https://script.googleapis.com/v1/projects/' + ScriptApp.getScriptId() + path, {
+    method: method, contentType: 'application/json', muteHttpExceptions: true,
+    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+    payload: body ? JSON.stringify(body) : undefined
+  });
+  const code = res.getResponseCode(), txt = res.getContentText();
+  let j = {}; try { j = JSON.parse(txt); } catch (e) {}
+  if (code >= 200 && code < 300) return j;
+  const msg = (j.error && j.error.message) || txt.slice(0, 200);
+  const err = new Error(msg);
+  err.needApi = /has not (been )?(used|enabled)|Apps Script API|SERVICE_DISABLED|usersettings/i.test(msg);
+  err.code = code;
+  throw err;
+}
+
+// สร้าง/อัปเดตเว็บแอปเป็นเวอร์ชันล่าสุด → คืน URL
+function autoDeploy_() {
+  const props = PropertiesService.getScriptProperties();
+  const ver = scriptApi_('post', '/versions', { description: 'ดันดี ' + new Date().toISOString().slice(0, 10) });
+  const cfg = { versionNumber: ver.versionNumber, manifestFileName: 'appsscript', description: 'ดันดี เว็บแอป' };
+  let dep, depId = props.getProperty('WEBAPP_DEPLOY_ID');
+  if (!depId) {
+    // เคย Deploy เองไว้แล้ว → ใช้ตัวเดิม (URL เดิม มือถือไม่หลุด)
+    try {
+      const list = (scriptApi_('get', '/deployments?pageSize=50').deployments || []).filter(function (d) {
+        return d.deploymentConfig && d.deploymentConfig.versionNumber
+          && (d.entryPoints || []).some(function (x) { return x.entryPointType === 'WEB_APP'; });
+      });
+      let cur = ''; try { cur = ScriptApp.getService().getUrl() || ''; } catch (e) {}
+      const hit = list.filter(function (d) { return cur && cur.indexOf(d.deploymentId) >= 0; })[0]
+        || list.sort(function (a, b) { return String(b.updateTime).localeCompare(String(a.updateTime)); })[0];
+      if (hit) depId = hit.deploymentId;
+    } catch (e) { if (e.needApi) throw e; }
+  }
+  if (depId) {
+    try { dep = scriptApi_('put', '/deployments/' + depId, { deploymentConfig: cfg }); } catch (e) { if (e.needApi) throw e; dep = null; }
+  }
+  if (!dep) dep = scriptApi_('post', '/deployments', cfg);
+  const ep = (dep.entryPoints || []).filter(function (x) { return x.entryPointType === 'WEB_APP'; })[0];
+  const url = ep && ep.webApp && ep.webApp.url;
+  if (!url) throw new Error('สร้างเว็บแอปไม่สำเร็จ (ไม่พบ URL) — ตรวจว่ามีไฟล์ appsscript.json ที่ตั้ง webapp ไว้');
+  props.setProperty('WEBAPP_DEPLOY_ID', dep.deploymentId);
+  props.setProperty('WEBAPP_URL', url);
+  return url;
+}
+
+function needApiDialog_(retryFn) {
+  showDialog_(
+    '<h2>เหลืออีกขั้นเดียว</h2>'
+    + '<p>เปิดสวิตช์ให้ดันดีตั้งค่าเว็บแอปให้อัตโนมัติ (ทำครั้งเดียว)</p><ol>'
+    + '<li>กด → <a class="btn" style="padding:6px 12px" target="_blank" href="https://script.google.com/home/usersettings">เปิดหน้าตั้งค่า</a></li>'
+    + '<li>📱 มือถือ: หน้าใหม่ให้ขอ "เว็บไซต์เดสก์ท็อป" ก่อน</li>'
+    + '<li>แตะสวิตช์ <b class="hl">Google Apps Script API</b> ให้เป็น <b class="hl">เปิด</b></li>'
+    + '<li>กลับมาที่ชีตนี้ แล้วกดปุ่มด้านล่าง</li></ol>'
+    + '<p class="center"><button class="btn" id="r" onclick="this.disabled=true;this.textContent=\'กำลังตั้งค่า…\';google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(e){alert(e.message);document.getElementById(\'r\').disabled=false}).' + retryFn + '()">ลองอีกครั้ง</button></p>'
+    + '<p class="muted">เพิ่งเปิดสวิตช์? บางครั้งต้องรอ 1–2 นาที</p>',
+    'ดันดี — เปิดสวิตช์', 420);
+}
+
+function menuUpdate() {
+  try {
+    autoDeploy_();
+    SpreadsheetApp.getUi().alert('อัปเดตแอปแล้ว ✓', 'เว็บแอปใช้โค้ดล่าสุดแล้ว ลิงก์และ QR เดิมใช้ได้เหมือนเดิม', SpreadsheetApp.getUi().ButtonSet.OK);
+  } catch (e) {
+    if (e.needApi) return needApiDialog_('menuUpdate');
+    SpreadsheetApp.getUi().alert('อัปเดตไม่สำเร็จ', String(e.message), SpreadsheetApp.getUi().ButtonSet.OK);
+  }
 }
 
 const DIALOG_CSS = '<style>body{font-family:"IBM Plex Sans Thai",Arial,sans-serif;color:#1E2A3A;font-size:14px;line-height:1.6;margin:0;padding:4px 6px}'
@@ -101,6 +177,12 @@ function showDialog_(html, title, h) {
 
 function menuStart() {
   setup();
+  let autoErr = null;
+  if (!PropertiesService.getScriptProperties().getProperty('WEBAPP_URL')) {
+    try { autoDeploy_(); } catch (e) { autoErr = e; }
+  }
+  if (!autoErr && PropertiesService.getScriptProperties().getProperty('WEBAPP_URL')) return menuConnect(); // พร้อมแล้ว → ไปหน้าคัดลอกลิงก์เลย
+  if (autoErr && autoErr.needApi) return needApiDialog_('menuStart');
   const deployed = !!webAppUrl_();
   showDialog_(
     '<h2>ขั้นที่ 1 เสร็จแล้ว ✓</h2>'

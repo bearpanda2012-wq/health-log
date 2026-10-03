@@ -108,7 +108,8 @@ function menuStart() {
     + (deployed
       ? '<p>ชีตนี้เผยแพร่เป็นเว็บแอปแล้ว ไปที่เมนู <b class="hl">❤️ ดันดี → 2) เชื่อมกับแอป</b> ได้เลย</p>'
       : '<p><b>ขั้นที่ 2: เผยแพร่เป็นเว็บแอป</b> (ทำครั้งเดียว)</p><ol>'
-        + '<li>เมนู <b class="hl">ส่วนขยาย → Apps Script</b></li>'
+        + '<li>กดปุ่มนี้ → <a class="btn" style="padding:6px 12px" target="_blank" href="https://script.google.com/d/' + ScriptApp.getScriptId() + '/edit">เปิดหน้า Apps Script</a>'
+        + '<br><span class="muted">📱 มือถือ: หน้าใหม่ที่เปิดขึ้น ต้องกดขอ "เว็บไซต์เดสก์ท็อป" อีกครั้ง</span></li>'
         + '<li>ปุ่มสีน้ำเงินมุมขวาบน <b class="hl">การทำให้ใช้งานได้ → การทำให้ใช้งานได้รายการใหม่</b></li>'
         + '<li>กดเฟือง ⚙ เลือก <b class="hl">เว็บแอป</b></li>'
         + '<li>ดำเนินการในฐานะ: <b class="hl">ฉัน</b> · ผู้ที่มีสิทธิ์เข้าถึง: <b class="hl">ทุกคน</b></li>'
@@ -131,8 +132,9 @@ function menuConnect() {
     + '<p id="err" style="display:none;color:#C93B46"></p>'
     + '<p class="muted">ยังไม่ได้ Deploy? ดูเมนู ❤️ ดันดี → 1) เริ่มต้นใช้งาน</p></div>'
     + '<div id="done" style="display:none" class="center">'
-    + '<p>📱 <b>มือถือ:</b> เปิดกล้องสแกน QR แล้วแตะลิงก์</p><div id="qr"></div>'
-    + '<p><a class="btn" id="open" target="_blank">💻 เปิดแอปบนเครื่องนี้</a> <button class="btn2" onclick="copy()">คัดลอกลิงก์</button></p>'
+    + '<p style="margin:4px 0"><button class="btn" style="font-size:16px;padding:12px 18px" onclick="copy()">📋 คัดลอกลิงก์เชื่อมต่อ</button></p>'
+    + '<p class="muted" style="text-align:left">📱 <b>ตั้งค่าบนมือถือเครื่องนี้:</b> กดคัดลอก → เปิดแอปดันดี (ไอคอนหน้าจอโฮม) → กดปุ่ม <b>วางลิงก์เชื่อมต่อ</b></p>'
+    + '<p class="muted" style="text-align:left">💻 <b>ตั้งค่าบนคอม:</b> ใช้มือถือสแกน QR นี้ หรือ <a id="open" target="_blank">เปิดแอปบนเครื่องนี้</a></p><div id="qr"></div>'
     + '<p class="muted">QR และลิงก์นี้มีรหัสลับอยู่ข้างใน ห้ามให้คนอื่นเห็น</p></div>'
     + '<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>'
     + '<script>var D=' + data + ',LINK="";'
@@ -150,9 +152,11 @@ function menuConnect() {
     + 'if(FORCE===u){make(u);return;}$("go").disabled=true;$("go").textContent="กำลังตรวจสอบ…";'
     + 'verify(u,function(r){$("go").disabled=false;$("go").textContent="ตรวจสอบและสร้าง QR";if(r==="ok"){make(u);return;}FORCE=u;'
     + 'ask(r==="html"?"URL นี้ยังใช้ไม่ได้: ตรวจว่า Deploy แบบ ผู้ที่มีสิทธิ์เข้าถึง = ทุกคน แล้วลองใหม่ (หรือกดปุ่มอีกครั้งเพื่อใช้ URL นี้อยู่ดี)":"ตรวจสอบไม่ผ่าน ลองใหม่อีกครั้ง หรือกดปุ่มอีกครั้งเพื่อใช้ URL นี้อยู่ดี")})}'
-    + 'function copy(){var t=document.createElement("textarea");t.value=LINK;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();alert("คัดลอกลิงก์แล้ว ส่งเข้ามือถือตัวเองได้เลย");}'
+    + 'function copy(){var done=function(){alert("คัดลอกแล้ว ✓ เปิดแอปดันดี แล้วกด วางลิงก์เชื่อมต่อ")};'
+    + 'try{navigator.clipboard.writeText(LINK).then(done,fb)}catch(e){fb()}'
+    + 'function fb(){var t=document.createElement("textarea");t.value=LINK;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();done()}}'
     + 'if(D.url){verify(D.url,function(r){if(r==="ok"){$("chk").style.display="none";make(D.url)}else ask("")})}else ask("");</script>',
-    'ดันดี — เชื่อมกับแอป', 480);
+    'ดันดี — เชื่อมกับแอป', 560);
 }
 
 function menuResetKey() {

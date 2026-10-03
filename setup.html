@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ตั้งค่าดันดีบนมือถือ</title>
+<meta name="description" content="วิธีตั้งค่าแอปดันดีให้บันทึกลง Google ชีตของคุณ ทำบนมือถืออย่างเดียวได้ ประมาณ 10 นาที">
+<meta name="theme-color" content="#E8505B">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF8F3;--card:#fff;--ink:#1E2A3A;--muted:#5F6673;--line:#F0E4DC;--coral:#E8505B;--coral-d:#C93B46;--coral-soft:#FDE6E7;--teal:#1FA38A;--teal-d:#147A66;--teal-soft:#DDF3EE;--warn:#FFF1C9;--warn-ink:#5C3D00}
+@media (prefers-color-scheme:dark){:root{--bg:#15131A;--card:#1E1B24;--ink:#F3EEEA;--muted:#B0A8AE;--line:#2E2A33;--coral:#F06A73;--coral-d:#F06A73;--coral-soft:#3A2227;--teal:#3CC4A8;--teal-d:#3CC4A8;--teal-soft:#1B312C;--warn:#3A3120;--warn-ink:#FFE3A3}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:16px 16px 60px}
+header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+header img{width:40px;height:40px;border-radius:11px}
+header b{font-family:Kanit,sans-serif;font-size:24px;color:var(--coral)}
+h1{font-family:Kanit,sans-serif;font-size:26px;line-height:1.25;margin:10px 0 4px}
+.lead{color:var(--muted);font-size:15.5px}
+.prog{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:16px 0 4px}
+.prog i{display:block;height:100%;width:0;background:var(--teal);transition:width .3s}
+.progt{font-size:13.5px;color:var(--muted);margin-bottom:12px}
+.tip{background:var(--warn);color:var(--warn-ink);border-radius:14px;padding:12px 14px;font-size:15px;margin:12px 0}
+.tip b{font-weight:700}
+.step{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+.step.done{border-color:var(--teal);background:color-mix(in srgb,var(--teal-soft) 55%,var(--card))}
+.sh{display:flex;align-items:center;gap:10px}
+.num{flex:0 0 34px;height:34px;border-radius:10px;background:var(--coral);color:#fff;font-family:Kanit,sans-serif;font-weight:700;font-size:18px;display:grid;place-items:center}
+.done .num{background:var(--teal)}
+.sh h2{font-family:Kanit,sans-serif;font-size:19px;line-height:1.3;flex:1}
+ol{margin:10px 0 0 22px;display:grid;gap:6px;font-size:15.5px}
+ol b{background:var(--coral-soft);padding:0 6px;border-radius:6px;font-weight:600}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font:inherit;font-weight:700;font-size:16.5px;text-decoration:none;border-radius:14px;padding:13px 16px;margin-top:12px;background:var(--coral);color:#fff;border:0;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
+.ck{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px}
+.ck input{width:24px;height:24px;accent-color:var(--teal)}
+.os{display:flex;gap:6px;margin:12px 0 4px}
+.os button{flex:1;font:inherit;font-size:14.5px;font-weight:600;border:1.5px solid var(--line);background:var(--card);color:var(--muted);border-radius:12px;padding:8px;cursor:pointer}
+.os button.on{border-color:var(--coral);color:var(--coral);background:var(--coral-soft)}
+.mini{font-size:13.5px;color:var(--muted);margin-top:8px}
+.finish{text-align:center;background:var(--teal-soft);border-radius:18px;padding:20px;margin-top:6px}
+.finish h2{font-family:Kanit,sans-serif;font-size:22px;color:var(--teal-d)}
+footer{text-align:center;color:var(--muted);font-size:13.5px;margin-top:20px}
+footer a{color:var(--coral-d);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><img src="icon-192.png" alt=""><b>ดันดี</b></header>
+  <h1>ตั้งค่าบนมือถือ ทีละขั้น</h1>
+  <p class="lead">ทำครั้งเดียว ประมาณ 10 นาที ไม่ต้องใช้คอม ข้อมูลจะเก็บใน Google ชีตของคุณเอง</p>
+
+  <div class="os" role="group" aria-label="มือถือของคุณ">
+    <button type="button" data-os="ios">🍎 iPhone</button><button type="button" data-os="and">🤖 Android</button>
+  </div>
+  <div class="prog"><i id="bar"></i></div>
+  <div class="progt" id="progt">ยังไม่ได้เริ่ม</div>
+
+  <div class="tip">⚠️ <b>เปิดหน้านี้ในเบราว์เซอร์</b> (<span class="ios">Safari</span><span class="and">Chrome</span>) ไม่ใช่ในแอป LINE
+    — ถ้าเปิดจาก LINE ให้กด <b>⋯</b> มุมขวาบน → <b>เปิดในเบราว์เซอร์</b> · ใช้บัญชี Gmail ที่จะเก็บข้อมูล</div>
+
+  <section class="step" data-s="1">
+    <div class="sh"><span class="num">1</span><h2>ทำสำเนาชีตดันดี</h2></div>
+    <ol>
+      <li>กดปุ่มด้านล่าง แล้วกด <b>ทำสำเนา</b></li>
+      <li>ถ้ามือถือเด้งไปเปิดแอป Google ชีต ให้ปิดแอป แล้ว<span class="ios">กดค้างที่ปุ่ม → <b>เปิดในแท็บใหม่</b></span><span class="and">กดค้างที่ปุ่ม → <b>เปิดในแท็บใหม่</b></span></li>
+    </ol>
+    <a class="btn" href="https://docs.google.com/spreadsheets/d/1qoTxQgcbnnwNsfsQoccjLh4WGTBi4KMBWnpVQI_vmqE/copy" target="_blank" rel="noopener">📄 ทำสำเนาชีตดันดี</a>
+    <label class="ck"><input type="checkbox">ทำสำเนาแล้ว เห็นชีตของฉัน</label>
+  </section>
+
+  <section class="step" data-s="2">
+    <div class="sh"><span class="num">2</span><h2>เปลี่ยนเป็นมุมมองเดสก์ท็อป</h2></div>
+    <ol class="ios">
+      <li>แตะ <b>aA</b> ที่ช่องที่อยู่เว็บ (ล่างหรือบนจอ)</li>
+      <li>เลือก <b>ขอเว็บไซต์เดสก์ท็อป</b></li>
+    </ol>
+    <ol class="and">
+      <li>แตะ <b>⋮</b> มุมขวาบน</li>
+      <li>ติ๊ก <b>เว็บไซต์เวอร์ชันเดสก์ท็อป</b></li>
+    </ol>
+    <p class="mini">ชีตจะดูเหมือนบนคอม และมีเมนู <b>❤️ ดันดี</b> ด้านบน (รอ 5–10 วินาที) · ซูมด้วยสองนิ้วได้</p>
+    <label class="ck"><input type="checkbox">เห็นเมนู ❤️ ดันดี แล้ว</label>
+  </section>
+
+  <section class="step" data-s="3">
+    <div class="sh"><span class="num">3</span><h2>เริ่มต้นใช้งาน + อนุญาต</h2></div>
+    <ol>
+      <li>แตะเมนู <b>❤️ ดันดี</b> → <b>1) เริ่มต้นใช้งาน</b></li>
+      <li>ขึ้น "ต้องให้สิทธิ์" → <b>ตกลง</b> → เลือกบัญชีของคุณ</li>
+      <li>ถ้าขึ้น "Google ยังไม่ได้ยืนยันแอปนี้" <u>อย่ากดปุ่มสีน้ำเงิน</u> → แตะ <b>ขั้นสูง</b> → <b>ไปที่ ดันดี</b></li>
+      <li>ติ๊ก <b>เลือกทั้งหมด</b> → <b>ดำเนินการต่อ</b></li>
+      <li>กลับมาที่ชีต แตะ <b>1) เริ่มต้นใช้งาน</b> อีกครั้ง จนขึ้น "ขั้นที่ 1 เสร็จแล้ว ✓"</li>
+    </ol>
+    <p class="mini">สคริปต์นี้อยู่ในชีตของคุณเอง ไม่มีใครเห็นข้อมูล</p>
+    <label class="ck"><input type="checkbox">ขึ้น "ขั้นที่ 1 เสร็จแล้ว ✓"</label>
+  </section>
+
+  <section class="step" data-s="4">
+    <div class="sh"><span class="num">4</span><h2>เปิดใช้เป็นเว็บแอป (Deploy)</h2></div>
+    <ol>
+      <li>ในหน้าต่างขั้นที่ 1 แตะปุ่ม <b>เปิดหน้า Apps Script</b></li>
+      <li>หน้าใหม่ที่เปิด ให้เปลี่ยนเป็น<b>มุมมองเดสก์ท็อป</b>อีกครั้ง (เหมือนขั้นที่ 2)</li>
+      <li>ปุ่มสีน้ำเงินมุมขวาบน <b>การทำให้ใช้งานได้</b> → <b>การทำให้ใช้งานได้รายการใหม่</b></li>
+      <li>แตะรูปเฟือง ⚙ → <b>เว็บแอป</b></li>
+      <li>ดำเนินการในฐานะ: <b>ฉัน</b> · ผู้ที่มีสิทธิ์เข้าถึง: <b>ทุกคน</b></li>
+      <li>แตะ <b>ทำให้ใช้งานได้</b> → ถ้าขอสิทธิ์ ทำแบบขั้นที่ 3 → <b>เสร็จสิ้น</b></li>
+    </ol>
+    <label class="ck"><input type="checkbox">ขึ้น "การทำให้ใช้งานได้ใหม่" แล้ว</label>
+  </section>
+
+  <section class="step" data-s="5">
+    <div class="sh"><span class="num">5</span><h2>คัดลอกลิงก์เชื่อมต่อ</h2></div>
+    <ol>
+      <li>กลับไปแท็บ <b>Google ชีต</b> → เมนู <b>❤️ ดันดี</b> → <b>2) เชื่อมกับแอป</b></li>
+      <li>รอขึ้น QR แล้วแตะ <b>📋 คัดลอกลิงก์เชื่อมต่อ</b></li>
+    </ol>
+    <p class="mini">🔒 ลิงก์นี้มีรหัสลับ ห้ามส่งให้คนอื่น</p>
+    <label class="ck"><input type="checkbox">คัดลอกลิงก์แล้ว</label>
+  </section>
+
+  <section class="step" data-s="6">
+    <div class="sh"><span class="num">6</span><h2>ติดตั้งแอปบนหน้าจอโฮม + เชื่อม</h2></div>
+    <ol class="ios">
+      <li>แตะปุ่มด้านล่างเพื่อเปิดแอปดันดีใน Safari</li>
+      <li>แตะปุ่ม <b>แชร์</b> (สี่เหลี่ยมมีลูกศรขึ้น) → <b>เพิ่มไปยังหน้าจอโฮม</b> → <b>เพิ่ม</b></li>
+      <li>ปิด Safari แล้ว<b>เปิดดันดีจากไอคอนบนหน้าจอโฮม</b></li>
+      <li>แตะ <b>📋 วางลิงก์เชื่อมต่อ</b> → แตะ <b>วาง</b> ถ้ามือถือถาม</li>
+    </ol>
+    <ol class="and">
+      <li>แตะปุ่มด้านล่างเพื่อเปิดแอปดันดี</li>
+      <li>แตะ <b>⋮</b> → <b>เพิ่มลงในหน้าจอหลัก</b> (หรือ <b>ติดตั้งแอป</b>)</li>
+      <li>เปิดดันดีจากไอคอน แล้วแตะ <b>📋 วางลิงก์เชื่อมต่อ</b></li>
+    </ol>
+    <a class="btn" href="./" target="_blank" rel="noopener">❤️ เปิดแอปดันดี</a>
+    <p class="mini">เชื่อมสำเร็จแล้ว รูปเมฆมุมขวาบนจะมี<b>จุดเขียว</b></p>
+    <label class="ck"><input type="checkbox">เห็นจุดเขียว ใช้งานได้แล้ว 🎉</label>
+  </section>
+
+  <div class="finish" id="finish" hidden>
+    <h2>เสร็จแล้ว! 🎉</h2>
+    <p>ลองจดความดันครั้งแรก แล้วเปิด Google ชีตดู ค่าจะเข้าไปทันที</p>
+  </div>
+
+  <footer>ติดขั้นไหน แคปหน้าจอส่งมาได้เลย · <a href="landing.html">เกี่ยวกับดันดี</a></footer>
+</div>
+<script>
+(function(){
+  var KEY = 'hl_setup', st = {};
+  try { st = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){}
+  var save = function(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} };
+  // เลือกระบบ
+  var ua = navigator.userAgent, guess = /iPhone|iPad|iPod|Macintosh/.test(ua) ? 'ios' : 'and';
+  var setOS = function(os){
+    st.os = os; save();
+    document.querySelectorAll('.os button').forEach(function(b){ b.classList.toggle('on', b.dataset.os === os); });
+    document.querySelectorAll('.ios').forEach(function(e){ e.style.display = os === 'ios' ? '' : 'none'; });
+    document.querySelectorAll('.and').forEach(function(e){ e.style.display = os === 'and' ? '' : 'none'; });
+  };
+  document.querySelectorAll('.os button').forEach(function(b){ b.addEventListener('click', function(){ setOS(b.dataset.os); }); });
+  setOS(st.os || guess);
+  // ติ๊กขั้นที่ทำแล้ว
+  var steps = document.querySelectorAll('.step');
+  var upd = function(){
+    var n = 0;
+    steps.forEach(function(s){ var on = s.querySelector('input').checked; s.classList.toggle('done', on); if (on) n++; });
+    document.getElementById('bar').style.width = (n / steps.length * 100) + '%';
+    document.getElementById('progt').textContent = n ? 'ทำแล้ว ' + n + ' จาก ' + steps.length + ' ขั้น' : 'ยังไม่ได้เริ่ม';
+    document.getElementById('finish').hidden = n < steps.length;
+  };
+  steps.forEach(function(s){
+    var i = s.querySelector('input'), k = s.dataset.s;
+    i.checked = !!(st.done && st.done[k]);
+    i.addEventListener('change', function(){
+      st.done = st.done || {}; st.done[k] = i.checked; save(); upd();
+      if (i.checked) { var nx = s.nextElementSibling; if (nx && nx.classList.contains('step')) setTimeout(function(){ nx.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250); }
+    });
+  });
+  upd();
+})();
+</script>
+</body>
+</html>

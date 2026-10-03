@@ -102,7 +102,10 @@ function scriptApi_(method, path, body) {
   if (code >= 200 && code < 300) return j;
   const msg = (j.error && j.error.message) || txt.slice(0, 200);
   const err = new Error(msg);
-  err.needApi = /has not (been )?(used|enabled)|Apps Script API|SERVICE_DISABLED|usersettings/i.test(msg);
+  // สวิตช์ระดับผู้ใช้ (script.google.com/home/usersettings) ยังไม่เปิด → ให้ผู้ใช้เปิดเอง
+  // ส่วนข้อผิดพลาดอื่น (เช่น API ปิดในโปรเจกต์ Cloud) → ถอยไปใช้วิธี Deploy เอง ไม่ถามวนซ้ำ
+  err.needApi = /User has not enabled the Apps Script API|usersettings/i.test(msg);
+  console.error('Apps Script API ' + code + ': ' + msg);
   err.code = code;
   throw err;
 }
@@ -138,7 +141,9 @@ function autoDeploy_() {
   return url;
 }
 
-function needApiDialog_(retryFn) {
+function needApiDialog_(retryFn, err) {
+  const tries = Number(PropertiesService.getUserProperties().getProperty('API_TRIES') || 0) + 1;
+  PropertiesService.getUserProperties().setProperty('API_TRIES', String(tries));
   showDialog_(
     '<h2>เหลืออีกขั้นเดียว</h2>'
     + '<p>เปิดสวิตช์ให้ดันดีตั้งค่าเว็บแอปให้อัตโนมัติ (ทำครั้งเดียว)</p><ol>'
@@ -147,8 +152,15 @@ function needApiDialog_(retryFn) {
     + '<li>แตะสวิตช์ <b class="hl">Google Apps Script API</b> ให้เป็น <b class="hl">เปิด</b></li>'
     + '<li>กลับมาที่ชีตนี้ แล้วกดปุ่มด้านล่าง</li></ol>'
     + '<p class="center"><button class="btn" id="r" onclick="this.disabled=true;this.textContent=\'กำลังตั้งค่า…\';google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(e){alert(e.message);document.getElementById(\'r\').disabled=false}).' + retryFn + '()">ลองอีกครั้ง</button></p>'
-    + '<p class="muted">เพิ่งเปิดสวิตช์? บางครั้งต้องรอ 1–2 นาที</p>',
-    'ดันดี — เปิดสวิตช์', 420);
+    + '<p class="muted">เพิ่งเปิดสวิตช์? บางครั้งต้องรอ 1–2 นาที</p>'
+    + (tries > 1 ? '<p class="muted">ยังไม่ได้ผล? <a href="#" onclick="google.script.run.withSuccessHandler(function(){}).menuManualDeploy();return false">ข้ามไปตั้งค่าเอง (Deploy เอง)</a></p>' : '')
+    + (err ? '<p class="muted" style="font-size:11px;word-break:break-all">รายละเอียด: ' + String(err.message).replace(/</g, '&lt;').slice(0, 200) + '</p>' : ''),
+    'ดันดี — เปิดสวิตช์', 460);
+}
+
+function menuManualDeploy() {
+  PropertiesService.getUserProperties().setProperty('SKIP_AUTO', '1');
+  menuStart();
 }
 
 function menuUpdate() {
@@ -156,7 +168,7 @@ function menuUpdate() {
     autoDeploy_();
     SpreadsheetApp.getUi().alert('อัปเดตแอปแล้ว ✓', 'เว็บแอปใช้โค้ดล่าสุดแล้ว ลิงก์และ QR เดิมใช้ได้เหมือนเดิม', SpreadsheetApp.getUi().ButtonSet.OK);
   } catch (e) {
-    if (e.needApi) return needApiDialog_('menuUpdate');
+    if (e.needApi) return needApiDialog_('menuUpdate', e);
     SpreadsheetApp.getUi().alert('อัปเดตไม่สำเร็จ', String(e.message), SpreadsheetApp.getUi().ButtonSet.OK);
   }
 }
@@ -178,15 +190,18 @@ function showDialog_(html, title, h) {
 function menuStart() {
   setup();
   let autoErr = null;
-  if (!PropertiesService.getScriptProperties().getProperty('WEBAPP_URL')) {
-    try { autoDeploy_(); } catch (e) { autoErr = e; }
+  const up = PropertiesService.getUserProperties();
+  const skipAuto = up.getProperty('SKIP_AUTO') === '1';
+  if (!skipAuto && !PropertiesService.getScriptProperties().getProperty('WEBAPP_URL') && !webAppUrl_()) {
+    try { autoDeploy_(); up.deleteProperty('API_TRIES'); } catch (e) { autoErr = e; }
   }
   if (!autoErr && PropertiesService.getScriptProperties().getProperty('WEBAPP_URL')) return menuConnect(); // พร้อมแล้ว → ไปหน้าคัดลอกลิงก์เลย
-  if (autoErr && autoErr.needApi) return needApiDialog_('menuStart');
+  if (autoErr && autoErr.needApi) return needApiDialog_('menuStart', autoErr);
   const deployed = !!webAppUrl_();
   showDialog_(
     '<h2>ขั้นที่ 1 เสร็จแล้ว ✓</h2>'
     + '<p class="ok">สร้างตารางบันทึกและรหัสลับเรียบร้อย</p>'
+    + (autoErr && !deployed ? '<p class="muted" style="font-size:11px">ตั้งค่าอัตโนมัติไม่สำเร็จ จึงต้อง Deploy เอง (' + String(autoErr.message).replace(/</g, '&lt;').slice(0, 160) + ')</p>' : '')
     + (deployed
       ? '<p>ชีตนี้เผยแพร่เป็นเว็บแอปแล้ว ไปที่เมนู <b class="hl">❤️ ดันดี → 2) เชื่อมกับแอป</b> ได้เลย</p>'
       : '<p><b>ขั้นที่ 2: เผยแพร่เป็นเว็บแอป</b> (ทำครั้งเดียว)</p><ol>'

@@ -51,7 +51,7 @@ footer a{color:var(--coral-d);font-weight:600}
 <div class="wrap">
   <header><img src="icon-192.png" alt=""><b>ดันดี</b></header>
   <h1>ตั้งค่าบนมือถือ ทีละขั้น</h1>
-  <p class="lead">ทำครั้งเดียว 4 ขั้น ประมาณ 5–7 นาที ไม่ต้องใช้คอม ข้อมูลจะเก็บใน Google ชีตของคุณเอง</p>
+  <p class="lead">ทำครั้งเดียว 5 ขั้น ประมาณ 10 นาที ไม่ต้องใช้คอม ข้อมูลจะเก็บใน Google ชีตของคุณเอง</p>
 
   <div class="os" role="group" aria-label="มือถือของคุณ">
     <button type="button" data-os="ios">🍎 iPhone</button><button type="button" data-os="and">🤖 Android</button>
@@ -75,44 +75,56 @@ footer a{color:var(--coral-d);font-weight:600}
   </section>
 
   <section class="step" data-s="2">
-    <div class="sh"><span class="num">2</span><h2>เปิดสวิตช์ (ครั้งเดียว)</h2></div>
-    <ol>
-      <li>กดปุ่มด้านล่าง (เปิดแท็บใหม่) แล้วเปิด<b>แบบเดสก์ท็อป</b>เหมือนขั้นที่ 1</li>
-      <li>แตะสวิตช์ <b>Google Apps Script API</b> ให้เป็น <b>เปิด</b></li>
-      <li>กลับไปแท็บ Google ชีต</li>
-    </ol>
-    <p class="mini">สวิตช์นี้ให้ดันดีตั้งค่าเว็บแอปให้อัตโนมัติ คุณไม่ต้องทำเอง</p>
-    <a class="btn ghost" href="https://script.google.com/home/usersettings" target="_blank" rel="noopener">⚙️ เปิดหน้าสวิตช์</a>
-    <label class="ck"><input type="checkbox">เปิดสวิตช์แล้ว</label>
-  </section>
-
-  <section class="step" data-s="3">
-    <div class="sh"><span class="num">3</span><h2>เริ่มต้นใช้งาน + คัดลอกลิงก์</h2></div>
+    <div class="sh"><span class="num">2</span><h2>เริ่มต้นใช้งาน + อนุญาต</h2></div>
     <ol>
       <li>แตะเมนู <b>❤️ ดันดี</b> → <b>1) เริ่มต้นใช้งาน</b></li>
       <li>ขึ้น "ต้องให้สิทธิ์" → <b>ตกลง</b> → เลือกบัญชีของคุณ</li>
       <li>ถ้าขึ้น "Google ยังไม่ได้ยืนยันแอปนี้" <u>อย่ากดปุ่มสีน้ำเงิน</u> → แตะ <b>ขั้นสูง</b> → <b>ไปที่ ดันดี</b></li>
       <li>ติ๊ก <b>เลือกทั้งหมด</b> → <b>ดำเนินการต่อ</b></li>
-      <li>กลับมาที่ชีต แตะ <b>1) เริ่มต้นใช้งาน</b> อีกครั้ง → รอสักครู่ → แตะ <b>📋 คัดลอกลิงก์เชื่อมต่อ</b></li>
+      <li>กลับมาที่ชีต แตะ <b>1) เริ่มต้นใช้งาน</b> อีกครั้ง จนขึ้น "ขั้นที่ 1 เสร็จแล้ว ✓"</li>
     </ol>
-    <p class="mini">สคริปต์อยู่ในชีตของคุณเอง ไม่มีใครเห็นข้อมูล · 🔒 ลิงก์ที่คัดลอกมีรหัสลับ ห้ามส่งให้คนอื่น</p>
-    <label class="ck"><input type="checkbox">คัดลอกลิงก์แล้ว</label>
+    <p class="mini">สคริปต์นี้อยู่ในชีตของคุณเอง ไม่มีใครเห็นข้อมูล</p>
+    <label class="ck"><input type="checkbox">ขึ้น "ขั้นที่ 1 เสร็จแล้ว ✓"</label>
+  </section>
+
+  <section class="step" data-s="3">
+    <div class="sh"><span class="num">3</span><h2>เปิดใช้เป็นเว็บแอป (Deploy)</h2></div>
+    <ol>
+      <li>ในหน้าต่าง "ขั้นที่ 1 เสร็จแล้ว" แตะปุ่ม <b>เปิดหน้า Apps Script</b></li>
+      <li>หน้าใหม่ที่เปิด ให้เปลี่ยนเป็น<b>มุมมองเดสก์ท็อป</b>อีกครั้ง (เหมือนขั้นที่ 1)</li>
+      <li>ปุ่มสีน้ำเงินมุมขวาบน <b>การทำให้ใช้งานได้</b> → <b>การทำให้ใช้งานได้รายการใหม่</b></li>
+      <li>แตะรูปเฟือง ⚙ → <b>เว็บแอป</b></li>
+      <li>ดำเนินการในฐานะ: <b>ฉัน</b> · ผู้ที่มีสิทธิ์เข้าถึง: <b>ทุกคน</b></li>
+      <li>แตะ <b>ทำให้ใช้งานได้</b> → ถ้าขอสิทธิ์ ทำแบบขั้นที่ 2 → <b>เสร็จสิ้น</b></li>
+    </ol>
+    <label class="ck"><input type="checkbox">ขึ้น "การทำให้ใช้งานได้ใหม่" แล้ว</label>
   </section>
 
   <section class="step" data-s="4">
-    <div class="sh"><span class="num">4</span><h2>ติดตั้งแอป + วางลิงก์</h2></div>
+    <div class="sh"><span class="num">4</span><h2>คัดลอกลิงก์เชื่อมต่อ</h2></div>
+    <ol>
+      <li>กลับไปแท็บ <b>Google ชีต</b> → เมนู <b>❤️ ดันดี</b> → <b>2) เชื่อมกับแอป</b></li>
+      <li>รอขึ้น QR แล้วแตะ <b>📋 คัดลอกลิงก์เชื่อมต่อ</b></li>
+    </ol>
+    <p class="mini">🔒 ลิงก์นี้มีรหัสลับ ห้ามส่งให้คนอื่น</p>
+    <label class="ck"><input type="checkbox">คัดลอกลิงก์แล้ว</label>
+  </section>
+
+  <section class="step" data-s="5">
+    <div class="sh"><span class="num">5</span><h2>ติดตั้งแอปบนหน้าจอโฮม + เชื่อม</h2></div>
     <ol class="ios">
       <li>แตะปุ่มด้านล่างเพื่อเปิดแอปดันดีใน Safari</li>
       <li>แตะปุ่ม <b>แชร์</b> (สี่เหลี่ยมมีลูกศรขึ้น) → <b>เพิ่มไปยังหน้าจอโฮม</b> → <b>เพิ่ม</b></li>
-      <li>เปิดดันดีจาก<b>ไอคอนบนหน้าจอโฮม</b> → แตะ <b>📋 วางลิงก์เชื่อมต่อ</b> → <b>วาง</b></li>
+      <li>ปิด Safari แล้ว<b>เปิดดันดีจากไอคอนบนหน้าจอโฮม</b></li>
+      <li>แตะ <b>📋 วางลิงก์เชื่อมต่อ</b> → แตะ <b>วาง</b> ถ้ามือถือถาม</li>
     </ol>
     <ol class="and">
       <li>แตะปุ่มด้านล่างเพื่อเปิดแอปดันดี</li>
       <li>แตะ <b>⋮</b> → <b>เพิ่มลงในหน้าจอหลัก</b> (หรือ <b>ติดตั้งแอป</b>)</li>
-      <li>เปิดดันดีจากไอคอน → แตะ <b>📋 วางลิงก์เชื่อมต่อ</b></li>
+      <li>เปิดดันดีจากไอคอน แล้วแตะ <b>📋 วางลิงก์เชื่อมต่อ</b></li>
     </ol>
     <a class="btn" href="./" target="_blank" rel="noopener">❤️ เปิดแอปดันดี</a>
-    <p class="mini">เชื่อมสำเร็จ รูปเมฆมุมขวาบนจะมี<b>จุดเขียว</b></p>
+    <p class="mini">เชื่อมสำเร็จแล้ว รูปเมฆมุมขวาบนจะมี<b>จุดเขียว</b></p>
     <label class="ck"><input type="checkbox">เห็นจุดเขียว ใช้งานได้แล้ว 🎉</label>
   </section>
 
@@ -125,7 +137,7 @@ footer a{color:var(--coral-d);font-weight:600}
 </div>
 <script>
 (function(){
-  var KEY = 'hl_setup2', st = {};
+  var KEY = 'hl_setup3', st = {};
   try { st = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){}
   var save = function(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} };
   // เลือกระบบ

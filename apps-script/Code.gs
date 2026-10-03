@@ -169,7 +169,9 @@ function menuUpdate() {
     SpreadsheetApp.getUi().alert('อัปเดตแอปแล้ว ✓', 'เว็บแอปใช้โค้ดล่าสุดแล้ว ลิงก์และ QR เดิมใช้ได้เหมือนเดิม', SpreadsheetApp.getUi().ButtonSet.OK);
   } catch (e) {
     if (e.needApi) return needApiDialog_('menuUpdate', e);
-    SpreadsheetApp.getUi().alert('อัปเดตไม่สำเร็จ', String(e.message), SpreadsheetApp.getUi().ButtonSet.OK);
+    SpreadsheetApp.getUi().alert('อัปเดตอัตโนมัติไม่ได้',
+      'ให้อัปเดตเองแทน: ส่วนขยาย → Apps Script → ปุ่ม "การทำให้ใช้งานได้" → จัดการการทำให้ใช้งานได้ → ✏️ → เวอร์ชัน: เวอร์ชันใหม่ → ทำให้ใช้งานได้\n\n(รายละเอียด: ' + String(e.message).slice(0, 160) + ')',
+      SpreadsheetApp.getUi().ButtonSet.OK);
   }
 }
 
@@ -190,13 +192,8 @@ function showDialog_(html, title, h) {
 function menuStart() {
   setup();
   let autoErr = null;
-  const up = PropertiesService.getUserProperties();
-  const skipAuto = up.getProperty('SKIP_AUTO') === '1';
-  if (!skipAuto && !PropertiesService.getScriptProperties().getProperty('WEBAPP_URL') && !webAppUrl_()) {
-    try { autoDeploy_(); up.deleteProperty('API_TRIES'); } catch (e) { autoErr = e; }
-  }
-  if (!autoErr && PropertiesService.getScriptProperties().getProperty('WEBAPP_URL')) return menuConnect(); // พร้อมแล้ว → ไปหน้าคัดลอกลิงก์เลย
-  if (autoErr && autoErr.needApi) return needApiDialog_('menuStart', autoErr);
+  // หมายเหตุ: ไม่ Deploy อัตโนมัติตอนตั้งค่าครั้งแรก — โปรเจกต์ Apps Script แบบปกติ (โปรเจกต์ Cloud เริ่มต้น)
+  // เรียก Apps Script API ไม่ได้ ("has not been used in project…") ต่อให้เปิดสวิตช์แล้ว จึงให้ลูกค้า Deploy เอง
   const deployed = !!webAppUrl_();
   showDialog_(
     '<h2>ขั้นที่ 1 เสร็จแล้ว ✓</h2>'

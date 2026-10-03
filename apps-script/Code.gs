@@ -82,10 +82,20 @@ function onOpen() {
 function webAppUrl_() {
   const saved = PropertiesService.getScriptProperties().getProperty('WEBAPP_URL');
   if (saved) return saved;
+  // getUrl() คืน URL ให้แม้ยังไม่เคย Deploy (เพราะ appsscript.json มีส่วน webapp)
+  // จึงต้องลองเรียกจริงว่าเว็บแอปตอบกลับ และเป็นของสคริปต์นี้ ก่อนถือว่า Deploy แล้ว
+  let u = '';
+  try { u = ScriptApp.getService().getUrl() || ''; } catch (e) { return ''; }
+  if (!/\/exec$/.test(u)) return '';
   try {
-    const u = ScriptApp.getService().getUrl();
-    return u && /\/exec$/.test(u) ? u : '';
+    const res = UrlFetchApp.fetch(u, { muteHttpExceptions: true, followRedirects: true });
+    if (res.getResponseCode() !== 200) return '';
+    const j = JSON.parse(res.getContentText());
+    if (!j || j.app !== 'health-log') return '';
+    if (j.sid && j.sid !== ScriptApp.getScriptId()) return '';
   } catch (e) { return ''; }
+  PropertiesService.getScriptProperties().setProperty('WEBAPP_URL', u);
+  return u;
 }
 
 /* ===== Deploy อัตโนมัติผ่าน Apps Script API (ไม่ต้องกด Deploy เอง) =====
@@ -461,7 +471,7 @@ function medOcr_(p) {
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
-  if (!p.action) return json_({ ok: true, app: 'health-log' });
+  if (!p.action) return json_({ ok: true, app: 'health-log', sid: ScriptApp.getScriptId() });
   return handle_(p.action, p);
 }
 
